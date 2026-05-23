@@ -1,0 +1,27 @@
+# Android
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.ap_
+*.apk
+*.aab
+
+# Keystore (nunca en git)
+*.jks
+*.keystore
+
+# Google Services
+google-services.json
+
+# Kotlin
+*.class
+*.jar (excepto libs locales)
+
+# OS
+Thumbs.db

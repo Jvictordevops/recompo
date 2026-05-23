@@ -1,0 +1,8 @@
+# Copia este archivo como local.properties (gitignored) y rellena los valores
+
+# API key de Anthropic (Claude)
+# Obtener en: https://console.anthropic.com/
+CLAUDE_API_KEY=sk-ant-...
+
+# SDK de Android (Android Studio lo genera automáticamente)
+# sdk.dir=/Users/TU_USUARIO/Library/Android/sdk
