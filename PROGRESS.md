@@ -17,12 +17,13 @@ MERIENDA, CENA). Selector de variante desde `ComidaBase`. Entrada manual directa
 (kcal/prot/grasa/carbo). Totales del día actualizados en tiempo real. Sin IA aún.
 CRUD de `EntradaComida`.
 
-**Commit**: pendiente (prueba en móvil primero)
+**Commit**: `feat(nutricion): T-006 pantalla nutrición con log manual y selector de plantillas`
 - `NutricionViewModel.kt` — StateFlow<NutricionUiState> + DialogState con CRUD de EntradaComida
 - `NutricionScreen.kt` — LazyColumn con TarjetaTotalesDelDia + 5 slots; tap-to-edit + borrar por entrada
 - `AnadirComidaDialog` — modo Plantilla (dropdown por slot desde ComidaBase) y modo Libre; validación de campos
 - `MainActivity.kt` — NutricionViewModelFactory cableado con DAOs de App.database
-- Build verde, tests verdes ✓
+- fix: Icons.Filled.ShowChart → AutoMirrored
+- Build verde, tests verdes, probado en móvil ✓
 
 ---
 
@@ -30,8 +31,13 @@ CRUD de `EntradaComida`.
 
 ### DT-001 — Fechas en formato español + DatePicker
 **Afecta**: wizard (y cualquier formulario futuro con fechas)
-**Problema**: el campo de fecha usa formato ISO (AAAA-MM-DD) con teclado numérico. El usuario tiene que construir la fecha externamente. Debería ser DD/MM/AAAA con `DatePickerDialog` de Material 3.
-**Cuando atacar**: antes de T-006 (Nutrición) o cuando se detecte otro formulario con fechas.
+**Problema**: el campo de fecha usa formato ISO (AAAA-MM-DD) con teclado numérico. Debería ser DD/MM/AAAA con `DatePickerDialog` de Material 3.
+**Cuando atacar**: cuando se detecte otro formulario con fechas o antes de entregar el MVP.
+
+### DT-002 — Seed de plantillas de comida
+**Afecta**: pantalla Nutrición → modo Plantilla
+**Problema**: `ComidaBase` está vacía, el selector de plantillas no muestra nada. El modo Plantilla es inútil hasta que haya datos.
+**Cuando atacar**: antes de usar la app en serio, o cuando se implemente la pantalla de gestión de plantillas en Settings (Fase 3). Solución mínima: seed manual con `INSERT` o pantalla básica de CRUD en Settings.
 
 ---
 
