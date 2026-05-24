@@ -55,6 +55,15 @@ CRUD de `EntradaComida`.
 
 ---
 
+## DEUDA TÉCNICA
+
+### DT-001 — Fechas en formato español + DatePicker
+**Afecta**: wizard (y cualquier formulario futuro con fechas)
+**Problema**: el campo de fecha usa formato ISO (AAAA-MM-DD) con teclado numérico. El usuario tiene que construir la fecha externamente. Debería ser DD/MM/AAAA con `DatePickerDialog` de Material 3.
+**Cuando atacar**: antes de T-006 (Nutrición) o cuando se detecte otro formulario con fechas.
+
+---
+
 ## DONE
 
 ### T-001 — Setup del repo y archivos de proceso
@@ -85,7 +94,7 @@ CRUD de `EntradaComida`.
 - `MainActivity.kt` — lógica primer arranque: null→splash, false→wizard, true→app
 - `AndroidManifest.xml` — android:name=".App"
 - Build verde, tests en verde ✓
-- Probado en móvil (reinstalar para probar primer arranque) ← PENDIENTE
+- Probado en móvil: wizard aparece en primer arranque, no vuelve a aparecer ✓
 
 ### T-003 — Room: entidades + DAOs + type converters + tests
 **Commit**: `feat: T-003 Room entities, DAOs, type converters y tests in-memory`
