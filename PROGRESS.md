@@ -2,57 +2,13 @@
 
 ## DOING
 
-### T-002 — Proyecto Android Studio + tema + navegación
-
-**Estimación**: 4h (completado)
-
-**Descripción**
-Dependencias añadidas al versions catalog, estructura de paquetes creada, NavHost con
-bottom navigation (5 tabs), pantallas stub para cada sección.
-
-**Hecho cuando**
-- [x] Build verde (`./gradlew assembleDebug`)
-- [ ] Probado en móvil con bottom nav funcionando
-
----
-
-### T-001 — Setup del repo y archivos de proceso (DONE)
-**Estimación**: 5-7h
-
-**Descripción**
-Repo Git con primer push, 9 archivos de proceso con contenido real, 3 ADRs fundacionales,
-CI verde, proyecto Android Studio mínimo (un Activity con Compose hola mundo).
-
-**Hecho cuando**
-- Repo Git con primer push y CI verde
-- 9 archivos de proceso existen con contenido real
-- 3 ADRs reflejan decisiones del plan
-- CONVENTIONS.md cubre convenciones de código
-- PROGRESS.md tiene T-002 a T-006 redactadas
-- Proyecto compila y arranca con Compose hola mundo
-- Probado en el móvil
+_(ninguna — siguiente tarea: T-003)_
 
 ---
 
 ## TODO
 
-### T-002 — Proyecto Android Studio + tema + navegación
-**Estimación**: 4h
-
-**Descripción**
-Crear proyecto Android en Android Studio con Kotlin + Jetpack Compose. Configurar
-`build.gradle.kts` con versions catalog, tema Material 3, NavHost con rutas vacías para
-las 5 secciones (Home, Nutrición, Entrenamiento, Actividad, Mediciones, Settings).
-Estructura de paquetes según plan §1.1.
-
-**Hecho cuando**
-- Build verde (`./gradlew assembleDebug`)
-- App arranca en móvil con bottom nav y pantallas stub
-- Estructura de paquetes creada
-
----
-
-### T-003 — Room: 8 entidades + DAOs + type converters + tests
+### T-003 — Room: entidades + DAOs + type converters + tests
 **Estimación**: 5h
 
 **Descripción**
@@ -74,7 +30,7 @@ entidad. Tests con Room in-memory para DAOs críticos.
 **Descripción**
 `UserSettings` completo en DataStore Preferences (§2.1). Wizard de primer arranque:
 pantalla 1 (datos personales), pantalla 2 (plan + macros), pantalla 3 (backup SAF,
-skippable). Lógica de "primer arranque" en `App.kt` o `MainActivity`.
+skippable). Lógica de "primer arranque" en `MainActivity`.
 
 **Hecho cuando**
 - Wizard aparece en primer arranque y no vuelve a aparecer
@@ -117,4 +73,20 @@ CRUD de `EntradaComida`.
 
 ## DONE
 
-_(vacío por ahora)_
+### T-001 — Setup del repo y archivos de proceso
+**Commit**: primer push a `jvictordevops/recompo` rama `main`
+- Repo Git + GitHub + git-personal script para push con cuenta personal
+- 9 archivos de proceso: CLAUDE.md, PROGRESS.md, CONVENTIONS.md, README, 3 ADRs, local.properties.example
+- CI: `.github/workflows/ci.yml`
+- Proyecto Android Studio (Empty Activity, Kotlin + Compose, minSdk 26)
+- APK debug instalado y probado en móvil ✓
+
+### T-002 — Proyecto Android Studio + dependencias + navegación
+**Commit**: `feat: T-002 dependencias, estructura paquetes y navegación con bottom nav`
+- Versions catalog completo: Room, KSP 2.3.8, Navigation, DataStore, OkHttp, Retrofit, kotlinx.serialization, Timber, Coroutines, Robolectric, Turbine
+- app/build.gradle.kts: Java 17, KSP, serialización, BuildConfig con CLAUDE_API_KEY
+- Estructura de paquetes: data/, domain/, ui/{home,nutricion,entreno,mediciones,actividad,settings,common}
+- assets/tools/ y assets/prompts/ creados
+- Bottom navigation con 5 tabs: Home, Nutrición, Entreno, Mediciones, Ajustes
+- Pantallas stub para cada sección
+- APK instalado y bottom nav probado en móvil ✓
