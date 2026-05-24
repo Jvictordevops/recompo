@@ -9,6 +9,7 @@ import com.vic.recompo.data.db.dao.EntradaComidaDao
 import com.vic.recompo.data.db.dao.SesionDao
 import com.vic.recompo.data.db.entity.Sesion
 import com.vic.recompo.domain.model.EstadoSesion
+import com.vic.recompo.domain.usecase.CalcularKcalObjetivoUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -39,6 +40,7 @@ class HomeViewModel(
 ) : ViewModel() {
 
     private val hoy = LocalDate.now()
+    private val calcularKcalObjetivo = CalcularKcalObjetivoUseCase()
 
     val uiState: StateFlow<HomeUiState> = combine(
         settingsStore.settings,
@@ -54,11 +56,10 @@ class HomeViewModel(
             actividades.any { it.tipo.lowercase() == "bici" } -> TipoDia.BICI
             else -> TipoDia.DESCANSO
         }
-        val kcalObjetivo = when (tipoDia) {
-            TipoDia.MUSCULACION -> settings?.kcalMusculacion ?: 0
-            TipoDia.BICI -> settings?.kcalBici ?: 0
-            TipoDia.DESCANSO -> settings?.kcalDescanso ?: 0
-        }
+        val kcalObjetivo = calcularKcalObjetivo.calcular(
+            kcalBaseDia = settings?.kcalBaseDia ?: 0,
+            actividadesHoy = actividades
+        )
         HomeUiState(
             nombre = settings?.nombre ?: "",
             tipoDia = tipoDia,

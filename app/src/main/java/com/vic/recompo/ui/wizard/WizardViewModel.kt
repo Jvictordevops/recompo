@@ -25,9 +25,7 @@ data class WizardState(
     val pesoInicialKg: String = "",
     val pesoObjetivoKg: String = "",
     val faseActual: String = "Fase 1",
-    val kcalDescanso: String = "1900",
-    val kcalMusculacion: String = "2050",
-    val kcalBici: String = "2150",
+    val kcalBaseDia: String = "1900",
     val proteinaObjetivoG: String = "160",
     // Paso 3 — backup
     val backupUri: String? = null,
@@ -49,9 +47,7 @@ class WizardViewModel(private val store: UserSettingsStore) : ViewModel() {
     fun onPesoInicialKgChanged(v: String) = _state.update { it.copy(pesoInicialKg = v, error = null) }
     fun onPesoObjetivoKgChanged(v: String) = _state.update { it.copy(pesoObjetivoKg = v, error = null) }
     fun onFaseActualChanged(v: String) = _state.update { it.copy(faseActual = v, error = null) }
-    fun onKcalDescansoChanged(v: String) = _state.update { it.copy(kcalDescanso = v, error = null) }
-    fun onKcalMusculacionChanged(v: String) = _state.update { it.copy(kcalMusculacion = v, error = null) }
-    fun onKcalBiciChanged(v: String) = _state.update { it.copy(kcalBici = v, error = null) }
+    fun onKcalBaseDiaChanged(v: String) = _state.update { it.copy(kcalBaseDia = v, error = null) }
     fun onProteinaObjetivoGChanged(v: String) = _state.update { it.copy(proteinaObjetivoG = v, error = null) }
     fun onBackupUriSelected(uri: String) = _state.update { it.copy(backupUri = uri, error = null) }
 
@@ -105,9 +101,7 @@ class WizardViewModel(private val store: UserSettingsStore) : ViewModel() {
         if (s.pesoInicialKg.toDoubleOrNull()?.let { it > 0 } != true) return "Peso inicial inválido"
         if (s.pesoObjetivoKg.toDoubleOrNull()?.let { it > 0 } != true) return "Peso objetivo inválido"
         if (s.faseActual.isBlank()) return "La fase actual es obligatoria"
-        if (s.kcalDescanso.toIntOrNull()?.let { it > 0 } != true) return "Kcal descanso inválido"
-        if (s.kcalMusculacion.toIntOrNull()?.let { it > 0 } != true) return "Kcal musculación inválido"
-        if (s.kcalBici.toIntOrNull()?.let { it > 0 } != true) return "Kcal bici inválido"
+        if (s.kcalBaseDia.toIntOrNull()?.let { it > 0 } != true) return "Kcal base día inválido"
         if (s.proteinaObjetivoG.toIntOrNull()?.let { it > 0 } != true) return "Proteína objetivo inválida"
         return null
     }
@@ -123,9 +117,7 @@ class WizardViewModel(private val store: UserSettingsStore) : ViewModel() {
             pesoInicialKg = s.pesoInicialKg.toDouble(),
             pesoObjetivoKg = s.pesoObjetivoKg.toDouble(),
             faseActual = s.faseActual,
-            kcalDescanso = s.kcalDescanso.toInt(),
-            kcalMusculacion = s.kcalMusculacion.toInt(),
-            kcalBici = s.kcalBici.toInt(),
+            kcalBaseDia = s.kcalBaseDia.toInt(),
             proteinaObjetivoG = s.proteinaObjetivoG.toInt(),
             carpetaBackupUri = s.backupUri,
             ultimoBackupOk = null,

@@ -184,34 +184,15 @@ private fun Step2(state: WizardState, vm: WizardViewModel) {
     )
     Spacer(Modifier.height(16.dp))
 
-    Text("Kcal objetivo por tipo de día", style = MaterialTheme.typography.titleSmall)
-    Spacer(Modifier.height(8.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        OutlinedTextField(
-            value = state.kcalDescanso,
-            onValueChange = vm::onKcalDescansoChanged,
-            label = { Text("Descanso") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.weight(1f)
-        )
-        OutlinedTextField(
-            value = state.kcalMusculacion,
-            onValueChange = vm::onKcalMusculacionChanged,
-            label = { Text("Musculación") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.weight(1f)
-        )
-        OutlinedTextField(
-            value = state.kcalBici,
-            onValueChange = vm::onKcalBiciChanged,
-            label = { Text("Bici") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.weight(1f)
-        )
-    }
+    OutlinedTextField(
+        value = state.kcalBaseDia,
+        onValueChange = vm::onKcalBaseDiaChanged,
+        label = { Text("Kcal base/día") },
+        supportingText = { Text("Déficit de mantenimiento. La actividad registrada suma encima.") },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        modifier = Modifier.fillMaxWidth()
+    )
     Spacer(Modifier.height(12.dp))
 
     OutlinedTextField(

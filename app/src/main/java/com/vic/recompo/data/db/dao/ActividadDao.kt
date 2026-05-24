@@ -18,4 +18,7 @@ interface ActividadDao {
 
     @Query("SELECT * FROM Actividad WHERE fecha = :fecha ORDER BY id")
     fun getByFecha(fecha: LocalDate): Flow<List<Actividad>>
+
+    @Query("SELECT * FROM Actividad ORDER BY fecha DESC, id DESC")
+    fun getAll(): Flow<List<Actividad>>
 }

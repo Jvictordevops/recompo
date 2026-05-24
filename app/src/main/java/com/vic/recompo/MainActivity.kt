@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Restaurant
@@ -32,6 +33,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.vic.recompo.ui.Screen
 import com.vic.recompo.ui.actividad.ActividadScreen
+import com.vic.recompo.ui.actividad.ActividadViewModel
+import com.vic.recompo.ui.actividad.ActividadViewModelFactory
 import com.vic.recompo.ui.entreno.EntrenoScreen
 import com.vic.recompo.ui.home.HomeScreen
 import com.vic.recompo.ui.home.HomeViewModel
@@ -78,6 +81,10 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    private val actividadViewModel by viewModels<ActividadViewModel> {
+        ActividadViewModelFactory(app.database.actividadDao())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -91,7 +98,8 @@ class MainActivity : ComponentActivity() {
                     true -> MainAppContent(
                     homeViewModel = homeViewModel,
                     nutricionViewModel = nutricionViewModel,
-                    medicionesViewModel = medicionesViewModel
+                    medicionesViewModel = medicionesViewModel,
+                    actividadViewModel = actividadViewModel
                 )
                 }
             }
@@ -103,7 +111,8 @@ class MainActivity : ComponentActivity() {
 private fun MainAppContent(
     homeViewModel: HomeViewModel,
     nutricionViewModel: com.vic.recompo.ui.nutricion.NutricionViewModel,
-    medicionesViewModel: MedicionesViewModel
+    medicionesViewModel: MedicionesViewModel,
+    actividadViewModel: ActividadViewModel
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -113,6 +122,7 @@ private fun MainAppContent(
         BottomNavItem(Screen.Home.route, "Home", Icons.Default.Home),
         BottomNavItem(Screen.Nutricion.route, "Nutrición", Icons.Default.Restaurant),
         BottomNavItem(Screen.Entreno.route, "Entreno", Icons.Default.FitnessCenter),
+        BottomNavItem(Screen.Actividad.route, "Actividad", Icons.AutoMirrored.Filled.DirectionsRun),
         BottomNavItem(Screen.Mediciones.route, "Mediciones", Icons.AutoMirrored.Filled.ShowChart),
         BottomNavItem(Screen.Settings.route, "Ajustes", Icons.Default.Settings),
     )
@@ -131,7 +141,7 @@ private fun MainAppContent(
                             }
                         },
                         icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) }
+                        label = null
                     )
                 }
             }
@@ -145,6 +155,7 @@ private fun MainAppContent(
             composable(Screen.Home.route) { HomeScreen(homeViewModel) }
             composable(Screen.Nutricion.route) { NutricionScreen(nutricionViewModel) }
             composable(Screen.Entreno.route) { EntrenoScreen() }
+            composable(Screen.Actividad.route) { ActividadScreen(actividadViewModel) }
             composable(Screen.Mediciones.route) { MedicionesScreen(medicionesViewModel) }
             composable(Screen.Settings.route) { SettingsScreen() }
         }

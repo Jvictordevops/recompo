@@ -8,7 +8,7 @@ _(ninguna)_
 
 ## TODO
 
-### T-008 — Actividad + refactor a kcalObjetivo dinámico
+### T-008 — Actividad + refactor a kcalObjetivo dinámico ✓ (pendiente prueba en móvil)
 **Estimación**: 5-6h
 
 **Descripción**
@@ -178,7 +178,7 @@ Checklist:
 ## DONE (reciente)
 
 ### T-007 — Mediciones: CRUD + cálculos automáticos
-**Commit**: pendiente (prueba en móvil primero)
+**Commit**: `f080d45 feat(mediciones): T-007 pantalla mediciones con CRUD y cálculos automáticos`
 - `domain/calc/MedicionCalcs.kt` — fórmula Navy Hodgdon-Beckett (cm), IMC, masa grasa/magra, WHR
 - `domain/MedicionCalcsTest.kt` — 12 tests unitarios, todos en verde
 - `ui/mediciones/MedicionesViewModel.kt` — StateFlow<MedicionesUiState> + MedicionFormState + CRUD; snapshot de alturaCmEnLaMedicion y faseTexto congelados al crear (no sobreescriben en edición)
