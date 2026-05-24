@@ -13,7 +13,7 @@ import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -38,6 +38,8 @@ import com.vic.recompo.ui.home.HomeViewModel
 import com.vic.recompo.ui.home.HomeViewModelFactory
 import com.vic.recompo.ui.mediciones.MedicionesScreen
 import com.vic.recompo.ui.nutricion.NutricionScreen
+import com.vic.recompo.ui.nutricion.NutricionViewModel
+import com.vic.recompo.ui.nutricion.NutricionViewModelFactory
 import com.vic.recompo.ui.settings.SettingsScreen
 import com.vic.recompo.ui.theme.RecompoTheme
 import com.vic.recompo.ui.wizard.WizardScreen
@@ -49,6 +51,13 @@ class MainActivity : ComponentActivity() {
 
     private val wizardViewModel by viewModels<com.vic.recompo.ui.wizard.WizardViewModel> {
         WizardViewModelFactory(app.userSettingsStore)
+    }
+
+    private val nutricionViewModel by viewModels<NutricionViewModel> {
+        NutricionViewModelFactory(
+            app.database.entradaComidaDao(),
+            app.database.comidaBaseDao()
+        )
     }
 
     private val homeViewModel by viewModels<HomeViewModel> {
@@ -70,7 +79,7 @@ class MainActivity : ComponentActivity() {
                 when (setupDone) {
                     null -> Surface(Modifier.fillMaxSize()) { Box(Modifier.fillMaxSize()) }
                     false -> WizardScreen(viewModel = wizardViewModel)
-                    true -> MainAppContent(homeViewModel = homeViewModel)
+                    true -> MainAppContent(homeViewModel = homeViewModel, nutricionViewModel = nutricionViewModel)
                 }
             }
         }
@@ -78,7 +87,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @androidx.compose.runtime.Composable
-private fun MainAppContent(homeViewModel: HomeViewModel) {
+private fun MainAppContent(
+    homeViewModel: HomeViewModel,
+    nutricionViewModel: com.vic.recompo.ui.nutricion.NutricionViewModel
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -87,7 +99,7 @@ private fun MainAppContent(homeViewModel: HomeViewModel) {
         BottomNavItem(Screen.Home.route, "Home", Icons.Default.Home),
         BottomNavItem(Screen.Nutricion.route, "Nutrición", Icons.Default.Restaurant),
         BottomNavItem(Screen.Entreno.route, "Entreno", Icons.Default.FitnessCenter),
-        BottomNavItem(Screen.Mediciones.route, "Mediciones", Icons.Default.ShowChart),
+        BottomNavItem(Screen.Mediciones.route, "Mediciones", Icons.AutoMirrored.Filled.ShowChart),
         BottomNavItem(Screen.Settings.route, "Ajustes", Icons.Default.Settings),
     )
 
@@ -117,7 +129,7 @@ private fun MainAppContent(homeViewModel: HomeViewModel) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) { HomeScreen(homeViewModel) }
-            composable(Screen.Nutricion.route) { NutricionScreen() }
+            composable(Screen.Nutricion.route) { NutricionScreen(nutricionViewModel) }
             composable(Screen.Entreno.route) { EntrenoScreen() }
             composable(Screen.Mediciones.route) { MedicionesScreen() }
             composable(Screen.Settings.route) { SettingsScreen() }

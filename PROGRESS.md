@@ -2,26 +2,11 @@
 
 ## DOING
 
-_(ninguna — siguiente tarea: T-006)_
+_(ninguna)_
 
 ---
 
-## TODO
-
-### T-004 — DataStore UserSettings + wizard 3 pantallas
-**Estimación**: 6h
-
-**Descripción**
-`UserSettings` completo en DataStore Preferences (§2.1). Wizard de primer arranque:
-pantalla 1 (datos personales), pantalla 2 (plan + macros), pantalla 3 (backup SAF,
-skippable). Lógica de "primer arranque" en `MainActivity`.
-
-**Hecho cuando**
-- Wizard aparece en primer arranque y no vuelve a aparecer
-- `UserSettings` persiste correctamente
-- Probado en móvil (reinstalar app para probar primer arranque)
-
----
+## DONE (reciente)
 
 ### T-006 — Nutrición: log manual + selector de plantillas
 **Estimación**: 6h
@@ -32,11 +17,12 @@ MERIENDA, CENA). Selector de variante desde `ComidaBase`. Entrada manual directa
 (kcal/prot/grasa/carbo). Totales del día actualizados en tiempo real. Sin IA aún.
 CRUD de `EntradaComida`.
 
-**Hecho cuando**
-- Puedes registrar una comida desde plantilla y desde entrada libre
-- Los totales del día se actualizan
-- Home refleja los macros del día
-- Probado en móvil
+**Commit**: pendiente (prueba en móvil primero)
+- `NutricionViewModel.kt` — StateFlow<NutricionUiState> + DialogState con CRUD de EntradaComida
+- `NutricionScreen.kt` — LazyColumn con TarjetaTotalesDelDia + 5 slots; tap-to-edit + borrar por entrada
+- `AnadirComidaDialog` — modo Plantilla (dropdown por slot desde ComidaBase) y modo Libre; validación de campos
+- `MainActivity.kt` — NutricionViewModelFactory cableado con DAOs de App.database
+- Build verde, tests verdes ✓
 
 ---
 
