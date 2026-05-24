@@ -2,7 +2,7 @@
 
 ## DOING
 
-_(ninguna — siguiente tarea: T-004)_
+_(ninguna — siguiente tarea: T-005)_
 
 ---
 
@@ -74,6 +74,18 @@ CRUD de `EntradaComida`.
 - Bottom navigation con 5 tabs: Home, Nutrición, Entreno, Mediciones, Ajustes
 - Pantallas stub para cada sección
 - APK instalado y bottom nav probado en móvil ✓
+
+### T-004 — DataStore UserSettings + wizard 3 pantallas
+**Commit**: `feat: T-004 UserSettings DataStore y wizard de primer arranque`
+- `domain/model/UserSettings.kt` — data class completa (§2.1)
+- `data/UserSettingsStore.kt` — DataStore Preferences con Flow<UserSettings?>, Flow<Boolean> setupDone, save(), markSetupDone()
+- `App.kt` — Application con singletons lazy (database, userSettingsStore)
+- `ui/wizard/WizardViewModel.kt` — WizardState + validación por paso + WizardViewModelFactory
+- `ui/wizard/WizardScreen.kt` — 3 pasos: datos personales, plan+macros, backup SAF (skippable)
+- `MainActivity.kt` — lógica primer arranque: null→splash, false→wizard, true→app
+- `AndroidManifest.xml` — android:name=".App"
+- Build verde, tests en verde ✓
+- Probado en móvil (reinstalar para probar primer arranque) ← PENDIENTE
 
 ### T-003 — Room: entidades + DAOs + type converters + tests
 **Commit**: `feat: T-003 Room entities, DAOs, type converters y tests in-memory`
