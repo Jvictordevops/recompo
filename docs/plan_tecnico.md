@@ -1,8 +1,8 @@
 # PLAN TÉCNICO — APP DE RECOMPOSICIÓN CORPORAL
 
 **José Víctor Sánchez Riquelme**
-Fecha: 23/05/2026
-Versión: 1.5 (post 2ª auditoría: límites contexto IA, backup visible, entreno fasificado)
+Fecha: 24/05/2026
+Versión: 1.6 (patch ADR-0004: cálculo dinámico de kcalObjetivo basado en actividad)
 
 ---
 
@@ -90,9 +90,7 @@ data class UserSettings(
     val faseActual: String,            // texto libre: "Fase 1 casa", "Fase 2 gym"
 
     // Macros objetivo (cambia cuando cambias de fase: editas aquí)
-    val kcalDescanso: Int,             // 1900
-    val kcalMusculacion: Int,          // 2050
-    val kcalBici: Int,                 // 2150
+    val kcalBaseDia: Int,              // 1900 — déficit de mantenimiento
     val proteinaObjetivoG: Int,        // 160
 
     // Backup
@@ -104,6 +102,14 @@ data class UserSettings(
 ```
 
 **Por qué los macros viven aquí y no en una entidad `Fase`**: una sola persona, una sola fase activa a la vez. Cuando cambies de fase 1 a fase 2 (1 jun), editas estos campos en Settings. Si en el futuro quieres histórico de fases, se modela entonces. **No anticipes**.
+
+**Cálculo dinámico de `kcalObjetivo` (ADR-0004)**: el objetivo de kcal del día se calcula en runtime como:
+
+```
+kcalObjetivo = kcalBaseDia + sum(actividadesHoy.kcalQuemadas)
+```
+
+Esto refleja la realidad (45 min de paseo ≠ 90 min de salida) y evita un esquema rígido con tres valores fijos por tipo de día. `TipoDia` (MUSCULACION / BICI / DESCANSO) se mantiene como **etiqueta visual informativa** en Home, pero **no afecta al cálculo** del objetivo. La implementación vive en `domain/usecase/CalcularKcalObjetivoUseCase.kt`.
 
 ### 2.2 Comida base (plantillas reutilizables)
 
@@ -798,4 +804,4 @@ Este plan está calibrado para una app personal seria. Si en algún momento sien
 
 ---
 
-*Plan v1.5 — 23/05/2026 — calibrado para constancia, no para perfección*
+*Plan v1.6 — 24/05/2026 — calibrado para constancia, no para perfección*
