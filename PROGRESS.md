@@ -2,27 +2,11 @@
 
 ## DOING
 
-_(ninguna — siguiente tarea: T-003)_
+_(ninguna — siguiente tarea: T-004)_
 
 ---
 
 ## TODO
-
-### T-003 — Room: entidades + DAOs + type converters + tests
-**Estimación**: 5h
-
-**Descripción**
-Implementar todas las entidades Room del plan §2: `ComidaBase`, `Ejercicio`, `Sesion`,
-`EjercicioEnSesion`, `Serie`, `EntradaComida`, `Actividad`, `Medicion`, `Conversacion`,
-`MensajeIA`. Type converters para `LocalDate`, `Instant`, enums. DAOs básicos para cada
-entidad. Tests con Room in-memory para DAOs críticos.
-
-**Hecho cuando**
-- Build verde
-- Tests de DAOs críticos en verde (Medicion, EntradaComida, Sesion)
-- `fallbackToDestructiveMigration()` configurado
-
----
 
 ### T-004 — DataStore UserSettings + wizard 3 pantallas
 **Estimación**: 6h
@@ -90,3 +74,13 @@ CRUD de `EntradaComida`.
 - Bottom navigation con 5 tabs: Home, Nutrición, Entreno, Mediciones, Ajustes
 - Pantallas stub para cada sección
 - APK instalado y bottom nav probado en móvil ✓
+
+### T-003 — Room: entidades + DAOs + type converters + tests
+**Commit**: `feat: T-003 Room entities, DAOs, type converters y tests in-memory`
+- 9 enums en `domain/model/Enums.kt`: SlotComida, GrupoMuscular, PatronMovimiento, TipoSesion, EstadoSesion, OrigenSesion, TipoConversacion, RolMensaje, Sexo
+- Type converters Room para LocalDate, Instant y todos los enums en `data/db/Converters.kt`
+- 10 entidades: ComidaBase, Ejercicio, Sesion, EjercicioEnSesion, Serie, EntradaComida, Actividad, Medicion, Conversacion, MensajeIA
+- Índices en columnas FK/fecha frecuentes
+- 10 DAOs con operaciones básicas + queries críticas (getTotalesDelDia, getPendientes, getLatest…)
+- `RecompoDatabase` con `fallbackToDestructiveMigration(true)`
+- 16 tests in-memory Robolectric, todos en verde ✓
