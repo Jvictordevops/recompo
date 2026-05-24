@@ -2,7 +2,21 @@
 
 ## DOING
 
-### T-001 — Setup del repo y archivos de proceso
+### T-002 — Proyecto Android Studio + tema + navegación
+
+**Estimación**: 4h (completado)
+
+**Descripción**
+Dependencias añadidas al versions catalog, estructura de paquetes creada, NavHost con
+bottom navigation (5 tabs), pantallas stub para cada sección.
+
+**Hecho cuando**
+- [x] Build verde (`./gradlew assembleDebug`)
+- [ ] Probado en móvil con bottom nav funcionando
+
+---
+
+### T-001 — Setup del repo y archivos de proceso (DONE)
 **Estimación**: 5-7h
 
 **Descripción**
