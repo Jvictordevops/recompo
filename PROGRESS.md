@@ -8,26 +8,6 @@ _(ninguna)_
 
 ## TODO
 
-### T-007 — Mediciones: CRUD + cálculos automáticos
-**Estimación**: 6h
-
-**Descripción**
-Pantalla Mediciones con lista (más reciente primero) y formulario de nueva medición.
-Inputs crudos (§2.6): pesoKg, cinturaCm, caderaCm, cuelloCm, pechoCm, bicepsCm, musloCm.
-Al guardar, calcular y persistir como snapshot: grasaPct (Navy según sexo desde UserSettings),
-masaGrasaKg, masaMagraKg, imc, whr, alturaCmEnLaMedicion, faseTexto (snapshot de
-UserSettings.faseActual). Soporte para grasaPctOverride (si Vic mete grasa% a mano).
-Campos opcionales: hito (texto), notas. Sin fotos (fuera de MVP).
-
-**Hecho cuando**
-- Build verde + tests verdes
-- Cálculos Navy/IMC/masa magra/WHR con tests unitarios en domain
-- CRUD funcional (crear, editar, borrar)
-- Snapshot de altura y fase se congela al crear
-- Probado en móvil
-
----
-
 ### T-008 — Actividad + refactor a kcalObjetivo dinámico
 **Estimación**: 5-6h
 
@@ -196,6 +176,17 @@ Checklist:
 ---
 
 ## DONE (reciente)
+
+### T-007 — Mediciones: CRUD + cálculos automáticos
+**Commit**: pendiente (prueba en móvil primero)
+- `domain/calc/MedicionCalcs.kt` — fórmula Navy Hodgdon-Beckett (cm), IMC, masa grasa/magra, WHR
+- `domain/MedicionCalcsTest.kt` — 12 tests unitarios, todos en verde
+- `ui/mediciones/MedicionesViewModel.kt` — StateFlow<MedicionesUiState> + MedicionFormState + CRUD; snapshot de alturaCmEnLaMedicion y faseTexto congelados al crear (no sobreescriben en edición)
+- `ui/mediciones/MedicionesScreen.kt` — LazyColumn más reciente primero + FAB + Dialog scrollable con inputs crudos, grasaPctOverride checkbox, hito y notas
+- `MainActivity.kt` — MedicionesViewModelFactory cableado con medicionDao + userSettingsStore
+- Build verde, tests verdes ✓
+
+---
 
 ### T-006 — Nutrición: log manual + selector de plantillas
 **Estimación**: 6h

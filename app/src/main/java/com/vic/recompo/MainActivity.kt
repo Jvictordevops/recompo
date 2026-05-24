@@ -37,6 +37,8 @@ import com.vic.recompo.ui.home.HomeScreen
 import com.vic.recompo.ui.home.HomeViewModel
 import com.vic.recompo.ui.home.HomeViewModelFactory
 import com.vic.recompo.ui.mediciones.MedicionesScreen
+import com.vic.recompo.ui.mediciones.MedicionesViewModel
+import com.vic.recompo.ui.mediciones.MedicionesViewModelFactory
 import com.vic.recompo.ui.nutricion.NutricionScreen
 import com.vic.recompo.ui.nutricion.NutricionViewModel
 import com.vic.recompo.ui.nutricion.NutricionViewModelFactory
@@ -60,6 +62,13 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    private val medicionesViewModel by viewModels<MedicionesViewModel> {
+        MedicionesViewModelFactory(
+            app.database.medicionDao(),
+            app.userSettingsStore
+        )
+    }
+
     private val homeViewModel by viewModels<HomeViewModel> {
         HomeViewModelFactory(
             app.userSettingsStore,
@@ -79,7 +88,11 @@ class MainActivity : ComponentActivity() {
                 when (setupDone) {
                     null -> Surface(Modifier.fillMaxSize()) { Box(Modifier.fillMaxSize()) }
                     false -> WizardScreen(viewModel = wizardViewModel)
-                    true -> MainAppContent(homeViewModel = homeViewModel, nutricionViewModel = nutricionViewModel)
+                    true -> MainAppContent(
+                    homeViewModel = homeViewModel,
+                    nutricionViewModel = nutricionViewModel,
+                    medicionesViewModel = medicionesViewModel
+                )
                 }
             }
         }
@@ -89,7 +102,8 @@ class MainActivity : ComponentActivity() {
 @androidx.compose.runtime.Composable
 private fun MainAppContent(
     homeViewModel: HomeViewModel,
-    nutricionViewModel: com.vic.recompo.ui.nutricion.NutricionViewModel
+    nutricionViewModel: com.vic.recompo.ui.nutricion.NutricionViewModel,
+    medicionesViewModel: MedicionesViewModel
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -131,7 +145,7 @@ private fun MainAppContent(
             composable(Screen.Home.route) { HomeScreen(homeViewModel) }
             composable(Screen.Nutricion.route) { NutricionScreen(nutricionViewModel) }
             composable(Screen.Entreno.route) { EntrenoScreen() }
-            composable(Screen.Mediciones.route) { MedicionesScreen() }
+            composable(Screen.Mediciones.route) { MedicionesScreen(medicionesViewModel) }
             composable(Screen.Settings.route) { SettingsScreen() }
         }
     }
