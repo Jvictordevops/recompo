@@ -34,6 +34,8 @@ import com.vic.recompo.ui.Screen
 import com.vic.recompo.ui.actividad.ActividadScreen
 import com.vic.recompo.ui.entreno.EntrenoScreen
 import com.vic.recompo.ui.home.HomeScreen
+import com.vic.recompo.ui.home.HomeViewModel
+import com.vic.recompo.ui.home.HomeViewModelFactory
 import com.vic.recompo.ui.mediciones.MedicionesScreen
 import com.vic.recompo.ui.nutricion.NutricionScreen
 import com.vic.recompo.ui.settings.SettingsScreen
@@ -49,6 +51,15 @@ class MainActivity : ComponentActivity() {
         WizardViewModelFactory(app.userSettingsStore)
     }
 
+    private val homeViewModel by viewModels<HomeViewModel> {
+        HomeViewModelFactory(
+            app.userSettingsStore,
+            app.database.entradaComidaDao(),
+            app.database.sesionDao(),
+            app.database.actividadDao()
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -59,7 +70,7 @@ class MainActivity : ComponentActivity() {
                 when (setupDone) {
                     null -> Surface(Modifier.fillMaxSize()) { Box(Modifier.fillMaxSize()) }
                     false -> WizardScreen(viewModel = wizardViewModel)
-                    true -> MainAppContent()
+                    true -> MainAppContent(homeViewModel = homeViewModel)
                 }
             }
         }
@@ -67,7 +78,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @androidx.compose.runtime.Composable
-private fun MainAppContent() {
+private fun MainAppContent(homeViewModel: HomeViewModel) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -105,7 +116,7 @@ private fun MainAppContent() {
             startDestination = Screen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Home.route) { HomeScreen() }
+            composable(Screen.Home.route) { HomeScreen(homeViewModel) }
             composable(Screen.Nutricion.route) { NutricionScreen() }
             composable(Screen.Entreno.route) { EntrenoScreen() }
             composable(Screen.Mediciones.route) { MedicionesScreen() }

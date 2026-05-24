@@ -2,7 +2,7 @@
 
 ## DOING
 
-_(ninguna — siguiente tarea: T-005)_
+_(ninguna — siguiente tarea: T-006)_
 
 ---
 
@@ -20,21 +20,6 @@ skippable). Lógica de "primer arranque" en `MainActivity`.
 - Wizard aparece en primer arranque y no vuelve a aparecer
 - `UserSettings` persiste correctamente
 - Probado en móvil (reinstalar app para probar primer arranque)
-
----
-
-### T-005 — Pantalla Home
-**Estimación**: 4h
-
-**Descripción**
-Dashboard del día: tipo de día (descanso/musculación/bici), resumen de macros consumidos
-vs objetivo, sesión del día si toca, `BackupChip` (estado del último backup). Datos
-calculados desde el log del día en Room.
-
-**Hecho cuando**
-- Home muestra resumen real del día (aunque esté vacío)
-- BackupChip visible (aunque backup no esté configurado aún)
-- Build y prueba en móvil
 
 ---
 
@@ -65,6 +50,18 @@ CRUD de `EntradaComida`.
 ---
 
 ## DONE
+
+### T-005 — Pantalla Home
+**Commit**: pendiente (prueba en móvil primero)
+- `HomeViewModel.kt` — StateFlow<HomeUiState> combinando 4 flows (settings, entradas, sesiones, actividades)
+- `TipoDia` enum derivado: MUSCULACION si hay sesión activa hoy, BICI si hay actividad "bici", DESCANSO si no
+- `kcalObjetivo` seleccionado automáticamente según tipoDia desde UserSettings
+- `BackupChip.kt` en `ui/common/` — estados: sin configurar / pendiente / OK (Xh) / atrasado (>48h ⚠) / falló ⚠
+- `HomeScreen.kt` — LazyColumn: encabezado (nombre + fecha + chip tipo día), tarjeta macros (kcal + proteína con LinearProgressIndicator), tarjeta sesión (si toca), BackupChip
+- `MainActivity.kt` — HomeViewModelFactory cableado con DAOs de App.database
+- Build verde, tests verdes ✓
+
+---
 
 ### T-001 — Setup del repo y archivos de proceso
 **Commit**: primer push a `jvictordevops/recompo` rama `main`
