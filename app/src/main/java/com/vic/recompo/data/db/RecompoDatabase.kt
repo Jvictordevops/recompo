@@ -39,7 +39,7 @@ import com.vic.recompo.data.db.entity.Sesion
         Conversacion::class,
         MensajeIA::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

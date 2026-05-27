@@ -1,11 +1,13 @@
 package com.vic.recompo.data.db.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.vic.recompo.data.db.entity.Sesion
 import com.vic.recompo.domain.model.EstadoSesion
+import com.vic.recompo.domain.model.TipoSesion
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -13,6 +15,7 @@ import java.time.LocalDate
 interface SesionDao {
     @Insert suspend fun insert(sesion: Sesion): Long
     @Update suspend fun update(sesion: Sesion)
+    @Delete suspend fun delete(sesion: Sesion)
 
     @Query("SELECT * FROM Sesion WHERE id = :id")
     suspend fun getById(id: Long): Sesion?
@@ -22,6 +25,9 @@ interface SesionDao {
 
     @Query("SELECT * FROM Sesion WHERE fechaPrevista = :fecha")
     fun getByFecha(fecha: LocalDate): Flow<List<Sesion>>
+
+    @Query("SELECT * FROM Sesion WHERE fechaPrevista = :fecha AND tipo = :tipo LIMIT 1")
+    suspend fun getByFechaYTipo(fecha: LocalDate, tipo: TipoSesion): Sesion?
 
     @Query("SELECT * FROM Sesion WHERE estado = :estado ORDER BY fechaPrevista")
     fun getByEstado(estado: EstadoSesion): Flow<List<Sesion>>

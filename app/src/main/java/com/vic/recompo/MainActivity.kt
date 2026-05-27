@@ -36,6 +36,8 @@ import com.vic.recompo.ui.actividad.ActividadScreen
 import com.vic.recompo.ui.actividad.ActividadViewModel
 import com.vic.recompo.ui.actividad.ActividadViewModelFactory
 import com.vic.recompo.ui.entreno.EntrenoScreen
+import com.vic.recompo.ui.entreno.EntrenoViewModel
+import com.vic.recompo.ui.entreno.EntrenoViewModelFactory
 import com.vic.recompo.ui.home.HomeScreen
 import com.vic.recompo.ui.home.HomeViewModel
 import com.vic.recompo.ui.home.HomeViewModelFactory
@@ -85,6 +87,16 @@ class MainActivity : ComponentActivity() {
         ActividadViewModelFactory(app.database.actividadDao())
     }
 
+    private val entrenoViewModel by viewModels<EntrenoViewModel> {
+        EntrenoViewModelFactory(
+            applicationContext,
+            app.database.sesionDao(),
+            app.database.ejercicioEnSesionDao(),
+            app.database.serieDao(),
+            app.database.ejercicioDao()
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -99,7 +111,8 @@ class MainActivity : ComponentActivity() {
                     homeViewModel = homeViewModel,
                     nutricionViewModel = nutricionViewModel,
                     medicionesViewModel = medicionesViewModel,
-                    actividadViewModel = actividadViewModel
+                    actividadViewModel = actividadViewModel,
+                    entrenoViewModel = entrenoViewModel
                 )
                 }
             }
@@ -112,7 +125,8 @@ private fun MainAppContent(
     homeViewModel: HomeViewModel,
     nutricionViewModel: com.vic.recompo.ui.nutricion.NutricionViewModel,
     medicionesViewModel: MedicionesViewModel,
-    actividadViewModel: ActividadViewModel
+    actividadViewModel: ActividadViewModel,
+    entrenoViewModel: EntrenoViewModel
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -154,7 +168,7 @@ private fun MainAppContent(
         ) {
             composable(Screen.Home.route) { HomeScreen(homeViewModel) }
             composable(Screen.Nutricion.route) { NutricionScreen(nutricionViewModel) }
-            composable(Screen.Entreno.route) { EntrenoScreen() }
+            composable(Screen.Entreno.route) { EntrenoScreen(entrenoViewModel) }
             composable(Screen.Actividad.route) { ActividadScreen(actividadViewModel) }
             composable(Screen.Mediciones.route) { MedicionesScreen(medicionesViewModel) }
             composable(Screen.Settings.route) { SettingsScreen() }

@@ -18,4 +18,10 @@ interface EjercicioEnSesionDao {
 
     @Query("DELETE FROM EjercicioEnSesion WHERE id = :id")
     suspend fun deleteById(id: Long)
+
+    @Query("DELETE FROM EjercicioEnSesion WHERE sesionId = :sesionId")
+    suspend fun deleteBySesion(sesionId: Long)
+
+    @Query("SELECT id FROM EjercicioEnSesion WHERE sesionId = :sesionId")
+    suspend fun getIdsBySesion(sesionId: Long): List<Long>
 }

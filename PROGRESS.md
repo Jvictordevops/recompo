@@ -2,69 +2,81 @@
 
 ## DOING
 
-_(ninguna)_
+_(vacío)_
+
+---
+
+## DONE (reciente)
+
+### T-009 — Entreno: versión simple + iteración UX
+
+**Commit**: pendiente (este commit)
+
+**Estado**: iteración 1 + iteración 2 completadas y probadas en móvil
+(2026-05-27).
+
+**Iteración 1**
+- `domain/model/Enums.kt` — `GrupoMuscular` y `PatronMovimiento` ampliados
+  para cubrir el catálogo real (HOMBRO_LATERAL, ISQUIOS, GEMELOS, BISAGRA,
+  AISLAMIENTO, EXPLOSIVO, etc.).
+- `data/db/dao/EjercicioDao.kt` — métodos `count()`, `insertAll()`,
+  `getByNombre()` para soportar el seed idempotente.
+- `app/src/main/assets/seed/ejercicios.json` — catálogo de 25 ejercicios
+  desde el plan v2 de Vic (nombre, grupo, patrón, equipamiento, notas).
+- `App.kt` — `CoroutineScope` en `onCreate()` ejecuta `seedEjerciciosIfEmpty()`
+  (idempotente: sólo siembra si la tabla está vacía).
+- `app/src/main/assets/seed/sesiones_template.json` — plantillas de
+  sesiones A (10 ej), B (8 ej) y C (8 ej) con cargas objetivo y notas de
+  progresión exportadas del Excel actual de Vic.
+- `ui/entreno/EntrenoViewModel.kt` — máquina de estados (LISTA, PRE_SESION,
+  EN_CURSO, POST_SESION), `crearSesion()` llama a `poblarDesdeTemplate()`
+  que lee el JSON e inserta los `EjercicioEnSesion` automáticamente.
+- `ui/entreno/EntrenoScreen.kt` — cuatro composables, dialogs de añadir
+  ejercicio, registrar serie (con RIR 0-5) y post-sesión con botón
+  "Generar próxima sesión (Fase 2)" deshabilitado.
+- `MainActivity.kt` — `EntrenoViewModel` cableado con `applicationContext`
+  para acceso a assets.
+- Build verde, tests verdes, probado en móvil ✓
+
+**Iteración 2 — UX tras probar en móvil (ver ADR-0005)**
+
+Tras probar con una sesión real (2026-05-26), Vic identificó seis huecos
+de UX. ADR-0005 documenta la arquitectura del listado de sesiones (sección
+Hoy + Anteriores, todas editables, registro retroactivo permitido) y los
+cambios siguientes:
+
+1. **Listado con secciones** — `PantallaLista` reorganizada con
+   `stickyHeader` "HOY" / "ANTERIORES", ordenada por `fechaPrevista` DESC.
+   Tarjeta de hoy con `colorContainer` primario.
+2. **Borrado de sesiones** — icono papelera por card con `AlertDialog` de
+   confirmación; cascada manual desde ViewModel (`serieDao` →
+   `ejercicioEnSesionDao` → `sesionDao.delete`).
+3. **DatePicker en "Nueva sesión"** — `fechaPrevista` seleccionable
+   (default hoy, sin restricción de rango). Validación: no permitir dos
+   sesiones del mismo `(fecha, tipo)`. Solución a DT-001.
+4. **RIR por ejercicio** — eliminado control RIR del diálogo de cada serie;
+   se captura RIR sólo en la última serie del ejercicio. Nueva columna
+   `EjercicioEnSesion.rir: Int?`. Schema sube a v2 (destructive migration
+   sigue activa, sin datos productivos). El campo `Serie.rir` se mantiene
+   en el schema para Fase 2.
+5. **Vuelta atrás desde POST_SESION** — `TopAppBar` con `ArrowBack` que
+   llama a `viewModel.volverAEnCurso()`.
+6. **Fix RIR slider** — botones 0..5 con `weight(1f)` y
+   `Arrangement.SpaceBetween` para que no se corten en pantalla estándar.
+
+Crash al primer arranque tras el upgrade v1→v2: resuelto desinstalando
+la app antes de instalar el APK nuevo (colisión schema con instalación
+previa, `fallbackToDestructiveMigration(true)` no llegaba a actuar).
+
+Cambios adicionales del ViewModel: `abrirPreSesion()` enruta según estado
+(COMPLETADA→POST_SESION, EN_CURSO→EN_CURSO, PLANIFICADA→PRE_SESION) para
+que las sesiones ya completadas sigan siendo editables.
+
+**Build verde, tests verdes, probado en móvil ✓**
 
 ---
 
 ## TODO
-
-### T-008 — Actividad + refactor a kcalObjetivo dinámico ✓ (pendiente prueba en móvil)
-**Estimación**: 5-6h
-
-**Descripción**
-Dos fases:
-
-**Fase A — Refactor del modelo kcalObjetivo (plan §2.1 v1.6, ADR-0004)**
-Sustituir los 3 campos `kcalDescanso/Musculacion/Bici` de `UserSettings` por un único
-`kcalBaseDia: Int` (déficit de mantenimiento). El `kcalObjetivo` del día se calcula
-en runtime como `kcalBaseDia + sum(kcalQuemadas de actividades de hoy)`.
-- Modificar `UserSettings` (data class) + `UserSettingsStore` (DataStore Preferences).
-- Modificar paso 2 del wizard: un solo input de kcal base (default sugerido: 1900).
-- Crear `domain/usecase/CalcularKcalObjetivoUseCase.kt` con su test unitario.
-- Modificar `HomeViewModel`: combinar flow de actividades hoy + use case.
-- `TipoDia` se mantiene como etiqueta visual informativa pero **no afecta al cálculo**.
-- Como aún no hay datos reales en producción: borrar app + reconfigurar wizard vale
-  como "migración" (no se implementa lectura del schema viejo).
-
-**Fase B — Actividad: log manual (§2.5)**
-Pantalla Actividad con lista + alta manual. Entidad `Actividad`: fecha, tipo (texto
-libre: "bici", "caminata", "otro"), descripción opcional, duracionMin opcional,
-kcalQuemadas (input manual obligatorio). CRUD básico. Sin integraciones Health Connect
-ni Strava (decisión §8.3).
-
-**Hecho cuando**
-- Build verde + tests verdes (incluido test del use case)
-- Wizard funciona con campo único `kcalBaseDia`
-- Home muestra `kcalObjetivo = kcalBaseDia + Σ kcalQuemadas hoy` en tiempo real
-- CRUD de actividad funcional; añadir/borrar recalcula objetivo en Home
-- Probado en móvil
-
----
-
-### T-009 — Entreno: versión simple
-**Estimación**: 10h
-
-**Descripción**
-Pantalla de entreno en su versión MVP (§4.2 "Sesión de entreno simple"):
-1. Iniciar sesión A/B/C desde Home si toca hoy.
-2. Pre-sesión: lista de ejercicios con objetivos (series x reps, carga objetivo).
-3. En curso: lista plana de ejercicios con inputs por serie (reps, carga, RIR 0-5).
-   Persistencia simple al cerrar cada serie. Sin timer, sin gestión sofisticada
-   de estado en rotación (intento simple de restore; si se pierde algo se reintroduce).
-4. Post-sesión: resumen + nota libre + RIR global + botón "Generar próxima sesión"
-   **visible pero deshabilitado** con tooltip "Disponible en Fase 2". La generación
-   real con IA es trabajo de Fase 2.
-
-Sin KEEP_SCREEN_ON, sin timer descanso, sin animaciones (Fase 3).
-
-**Hecho cuando**
-- Build verde + tests verdes
-- Flujo completo: iniciar → registrar series → cerrar sesión
-- Estado se persiste en BD por serie (no se pierde si cierras la pantalla)
-- Botón "Generar próxima sesión" presente pero deshabilitado con tooltip
-- Probado en móvil con una sesión real
-
----
 
 ### T-011 — Settings básico
 **Estimación**: 4h
@@ -177,6 +189,20 @@ Checklist:
 
 ## DONE (reciente)
 
+### T-008 — Actividad + refactor a kcalObjetivo dinámico
+**Commit**: `225513d feat(actividad): T-008 actividad CRUD + refactor kcalObjetivo dinámico`
+- `domain/model/UserSettings.kt` — sustituidos `kcalDescanso/kcalMusculacion/kcalBici` por `kcalBaseDia: Int`
+- `data/UserSettingsStore.kt` — clave única `kcal_base_dia`
+- `ui/wizard/WizardViewModel.kt` + `WizardScreen.kt` — paso 2 con un solo campo kcal base (default 1900)
+- `domain/usecase/CalcularKcalObjetivoUseCase.kt` — `kcalBaseDia + Σ kcalQuemadas`; 5 tests unitarios
+- `ui/home/HomeViewModel.kt` — usa el use case en lugar de selección por TipoDia
+- `data/db/dao/ActividadDao.kt` — añadido `getAll()` ordenado por fecha DESC
+- `ui/actividad/ActividadViewModel.kt` + `ActividadScreen.kt` — CRUD con LazyColumn + FAB + dialog
+- `MainActivity.kt` — tab Actividad en bottom nav; nav sin etiquetas (6 tabs, solo iconos)
+- Build verde, tests verdes ✓
+
+---
+
 ### T-007 — Mediciones: CRUD + cálculos automáticos
 **Commit**: `f080d45 feat(mediciones): T-007 pantalla mediciones con CRUD y cálculos automáticos`
 - `domain/calc/MedicionCalcs.kt` — fórmula Navy Hodgdon-Beckett (cm), IMC, masa grasa/magra, WHR
@@ -210,9 +236,7 @@ CRUD de `EntradaComida`.
 ## DEUDA TÉCNICA
 
 ### DT-001 — Fechas en formato español + DatePicker
-**Afecta**: wizard (y cualquier formulario futuro con fechas)
-**Problema**: el campo de fecha usa formato ISO (AAAA-MM-DD) con teclado numérico. Debería ser DD/MM/AAAA con `DatePickerDialog` de Material 3.
-**Cuando atacar**: cuando se detecte otro formulario con fechas o antes de entregar el MVP.
+**Estado**: ✅ resuelta en T-009 iter 2 (DatePicker de Material 3 con locale "es" introducido en "Nueva sesión"). El wizard sigue con input ISO, pero ya hay patrón reutilizable cuando se aborde Settings (T-011).
 
 ### DT-002 — Seed de plantillas de comida
 **Afecta**: pantalla Nutrición → modo Plantilla

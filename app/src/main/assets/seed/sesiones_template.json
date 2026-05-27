@@ -1,0 +1,225 @@
+[
+  {
+    "tipo": "A",
+    "ejercicios": [
+      {
+        "nombreEjercicio": "Press banca con mancuernas",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 12,
+        "repsObjetivoMax": 12,
+        "cargaObjetivoKg": 8.0,
+        "notas": "Mantener carga. Progresar cuando RIR ≥ 3 dos sesiones seguidas. Técnica estricta."
+      },
+      {
+        "nombreEjercicio": "Press inclinado con mancuernas",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 12,
+        "repsObjetivoMax": 12,
+        "cargaObjetivoKg": 8.0,
+        "notas": "Codo a 45°."
+      },
+      {
+        "nombreEjercicio": "Remo con mancuerna",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 10,
+        "repsObjetivoMax": 10,
+        "cargaObjetivoKg": 16.0,
+        "notas": "Mantener KB16. Pausa 1s arriba."
+      },
+      {
+        "nombreEjercicio": "Press militar con mancuernas",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 10,
+        "repsObjetivoMax": 10,
+        "cargaObjetivoKg": 5.0,
+        "notas": "CONGELADO en 5 kg hasta hombro limpio 2 semanas seguidas. No subir carga."
+      },
+      {
+        "nombreEjercicio": "Pullover con mancuerna",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 15,
+        "repsObjetivoMax": 15,
+        "cargaObjetivoKg": 8.0,
+        "notas": "Objetivo 15 reps (venía de 12). Espalda pegada al banco."
+      },
+      {
+        "nombreEjercicio": "Curl bíceps con mancuernas",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 12,
+        "repsObjetivoMax": 12,
+        "cargaObjetivoKg": 5.0,
+        "notas": "Objetivo 12 reps (venía de 10). Tempo 3-1-1. Supinar al subir."
+      },
+      {
+        "nombreEjercicio": "Tríceps overhead a dos manos",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 15,
+        "repsObjetivoMax": 15,
+        "cargaObjetivoKg": 5.0,
+        "notas": "Objetivo 15 reps (venía de 12). Dos manos. Anotar molestias de codo."
+      },
+      {
+        "nombreEjercicio": "Elevaciones laterales",
+        "seriesObjetivo": 2,
+        "repsObjetivoMin": 15,
+        "repsObjetivoMax": 15,
+        "cargaObjetivoKg": 5.0,
+        "notas": "Recuperar 15 reps (S3 cayeron a 12 en sesión anterior). No progresar hasta tocar techo."
+      },
+      {
+        "nombreEjercicio": "Plancha frontal",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 60,
+        "repsObjetivoMax": 60,
+        "cargaObjetivoKg": 0.0,
+        "notas": "60s. Consolidar antes de subir tiempo (S3 fue RIR=1). SALTAR si hombro sensible."
+      },
+      {
+        "nombreEjercicio": "Crunch",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 15,
+        "repsObjetivoMax": 15,
+        "cargaObjetivoKg": 0.0,
+        "notas": "No saltar. Tempo 3-2-3."
+      }
+    ]
+  },
+  {
+    "tipo": "B",
+    "ejercicios": [
+      {
+        "nombreEjercicio": "Goblet squat",
+        "seriesObjetivo": 4,
+        "repsObjetivoMin": 12,
+        "repsObjetivoMax": 12,
+        "cargaObjetivoKg": 16.0,
+        "notas": "KB16. +1 serie respecto a B3. Pausa 2s abajo."
+      },
+      {
+        "nombreEjercicio": "Peso muerto rumano con mancuernas",
+        "seriesObjetivo": 4,
+        "repsObjetivoMin": 10,
+        "repsObjetivoMax": 10,
+        "cargaObjetivoKg": 24.0,
+        "notas": "2×12 kg (24 kg total). Cambio: KB16 → 2 mancuernas. Tempo 3-1-1. Recorrido al lado del muslo."
+      },
+      {
+        "nombreEjercicio": "Zancadas",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 10,
+        "repsObjetivoMax": 10,
+        "cargaObjetivoKg": 16.0,
+        "notas": "10 reps por pierna. 2×8 kg (16 kg total). Cambio: una → dos mancuernas."
+      },
+      {
+        "nombreEjercicio": "Hip thrust",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 12,
+        "repsObjetivoMax": 12,
+        "cargaObjetivoKg": 16.0,
+        "notas": "KB16. Tempo: 3s bajada + 2s contracción arriba."
+      },
+      {
+        "nombreEjercicio": "Swing KB",
+        "seriesObjetivo": 4,
+        "repsObjetivoMin": 15,
+        "repsObjetivoMax": 15,
+        "cargaObjetivoKg": 16.0,
+        "notas": "KB16. SALTAR si hombro sensible → sustituir por 2×12 Hip thrust extra."
+      },
+      {
+        "nombreEjercicio": "Gemelos un pie a la vez",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 20,
+        "repsObjetivoMax": 20,
+        "cargaObjetivoKg": 16.0,
+        "notas": "KB16. Un pie a la vez. +5 reps respecto a sesión anterior. Pausa 1s arriba."
+      },
+      {
+        "nombreEjercicio": "Crunch",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 15,
+        "repsObjetivoMax": 15,
+        "cargaObjetivoKg": 0.0,
+        "notas": "Restaurar 15 reps. Tempo 3-2-3."
+      },
+      {
+        "nombreEjercicio": "Plancha frontal",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 30,
+        "repsObjetivoMax": 30,
+        "cargaObjetivoKg": 0.0,
+        "notas": "30s. SALTAR si hombro sensible."
+      }
+    ]
+  },
+  {
+    "tipo": "C",
+    "ejercicios": [
+      {
+        "nombreEjercicio": "Clean and press KB",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 6,
+        "repsObjetivoMax": 6,
+        "cargaObjetivoKg": 16.0,
+        "notas": "+1 rep respecto a C anterior. Técnica limpia obligatoria. Si reps caen, parar serie."
+      },
+      {
+        "nombreEjercicio": "Remo KB",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 10,
+        "repsObjetivoMax": 10,
+        "cargaObjetivoKg": 16.0,
+        "notas": "Mantener. Buscar RPE 6-7."
+      },
+      {
+        "nombreEjercicio": "Pullover KB suelo",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 8,
+        "repsObjetivoMax": 8,
+        "cargaObjetivoKg": 16.0,
+        "notas": "Mantener. Buscar RPE 6-7."
+      },
+      {
+        "nombreEjercicio": "Goblet squat con tempo lento",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 10,
+        "repsObjetivoMax": 10,
+        "cargaObjetivoKg": 16.0,
+        "notas": "Tempo 3-2-1 (3s bajada + 2s pausa abajo + 1s subida). Buscar RPE 6-7."
+      },
+      {
+        "nombreEjercicio": "Curl martillo",
+        "seriesObjetivo": 2,
+        "repsObjetivoMin": 12,
+        "repsObjetivoMax": 12,
+        "cargaObjetivoKg": 5.0,
+        "notas": "Superserie sin pausa con Skull crusher."
+      },
+      {
+        "nombreEjercicio": "Skull crusher",
+        "seriesObjetivo": 2,
+        "repsObjetivoMin": 15,
+        "repsObjetivoMax": 15,
+        "cargaObjetivoKg": 5.0,
+        "notas": "+3 reps respecto a C anterior. Superserie con Curl martillo. 90s descanso tras la SS."
+      },
+      {
+        "nombreEjercicio": "Plancha lateral",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 30,
+        "repsObjetivoMax": 30,
+        "cargaObjetivoKg": 0.0,
+        "notas": "30s por lado. +5s respecto a C anterior."
+      },
+      {
+        "nombreEjercicio": "Dead bug",
+        "seriesObjetivo": 3,
+        "repsObjetivoMin": 15,
+        "repsObjetivoMax": 15,
+        "cargaObjetivoKg": 0.0,
+        "notas": "15 reps por lado. +3 reps respecto a C anterior."
+      }
+    ]
+  }
+]

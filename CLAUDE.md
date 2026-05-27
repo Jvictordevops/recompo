@@ -33,6 +33,7 @@ El remote usa HTTPS: `https://github.com/jvictordevops/recompo.git`
 - **kotlinOptions**: deprecado en AGP 9.x. El JVM target se configura solo con `compileOptions { sourceCompatibility/targetCompatibility = VERSION_17 }`.
 - **material-icons-extended**: dependencia separada del BOM. Necesaria para iconos como FitnessCenter, Restaurant, ShowChart.
 - **compileSdk**: 35 (no 36 — el formato `release(36)` que genera Android Studio con AGP 9.2.1 da problemas, usar Int plano).
+- **Bottom nav sin etiquetas**: 6 tabs no caben con texto en pantallas estándar. `label = null` en todos los `NavigationBarItem`. Los iconos son suficientemente reconocibles en app personal.
 
 ## Reglas
 1. Lee PROGRESS.md. Trabaja en la tarea DOING. Si no hay ninguna, pregunta cuál atacar.

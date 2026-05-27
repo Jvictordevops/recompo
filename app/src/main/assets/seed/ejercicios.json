@@ -1,0 +1,227 @@
+[
+  {
+    "nombre": "Press banca con mancuernas",
+    "grupoMuscularPrincipal": "PECHO",
+    "gruposSecundarios": "TRICEPS,HOMBRO_FRONTAL",
+    "patron": "EMPUJE_HORIZONTAL",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Empuje horizontal. Sustituye temporalmente a flexión por hombro. Técnica estricta."
+  },
+  {
+    "nombre": "Press inclinado con mancuernas",
+    "grupoMuscularPrincipal": "PECHO",
+    "gruposSecundarios": "HOMBRO_FRONTAL,TRICEPS",
+    "patron": "EMPUJE_INCLINADO",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Porción clavicular del pecho. Codo a 45 grados."
+  },
+  {
+    "nombre": "Remo con mancuerna",
+    "grupoMuscularPrincipal": "DORSAL",
+    "gruposSecundarios": "BICEPS,HOMBRO_POSTERIOR",
+    "patron": "TIRON_HORIZONTAL",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Tirón horizontal. Pausa 1s arriba."
+  },
+  {
+    "nombre": "Press militar con mancuernas",
+    "grupoMuscularPrincipal": "HOMBRO_FRONTAL",
+    "gruposSecundarios": "TRICEPS,TRAPECIO",
+    "patron": "EMPUJE_VERTICAL",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Atascado en 5kg hasta hombro limpio. NO subir carga hasta resolver."
+  },
+  {
+    "nombre": "Pullover con mancuerna",
+    "grupoMuscularPrincipal": "DORSAL",
+    "gruposSecundarios": "PECHO,TRICEPS",
+    "patron": "TIRON_VERTICAL",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Dorsal vertical. Espalda pegada al banco."
+  },
+  {
+    "nombre": "Curl bíceps con mancuernas",
+    "grupoMuscularPrincipal": "BICEPS",
+    "gruposSecundarios": "",
+    "patron": "AISLAMIENTO",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Tempo 3-1-1. Supinar al subir."
+  },
+  {
+    "nombre": "Tríceps overhead a dos manos",
+    "grupoMuscularPrincipal": "TRICEPS",
+    "gruposSecundarios": "",
+    "patron": "AISLAMIENTO",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Dos manos (mejor que una para codo). Vigilar codo."
+  },
+  {
+    "nombre": "Elevaciones laterales",
+    "grupoMuscularPrincipal": "HOMBRO_LATERAL",
+    "gruposSecundarios": "",
+    "patron": "AISLAMIENTO",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Sacrificable si falta tiempo."
+  },
+  {
+    "nombre": "Plancha frontal",
+    "grupoMuscularPrincipal": "CORE",
+    "gruposSecundarios": "HOMBRO_FRONTAL",
+    "patron": "ESTABILIZACION",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Consolidar 60s. No subir tiempo hasta RIR mayor o igual a 3. SALTAR si hombro sensible."
+  },
+  {
+    "nombre": "Crunch",
+    "grupoMuscularPrincipal": "CORE",
+    "gruposSecundarios": "",
+    "patron": "FLEXION_CORE",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Tempo 3-2-3. Lento y controlado."
+  },
+  {
+    "nombre": "Russian twist",
+    "grupoMuscularPrincipal": "CORE",
+    "gruposSecundarios": "",
+    "patron": "ROTACION_CORE",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Puede hacerse con peso corporal o con mancuerna ligera."
+  },
+  {
+    "nombre": "Goblet squat",
+    "grupoMuscularPrincipal": "CUADRICEPS",
+    "gruposSecundarios": "GLUTEO,CORE",
+    "patron": "SENTADILLA",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Pausa 2s abajo (consolidada desde S2)."
+  },
+  {
+    "nombre": "Goblet squat con tempo lento",
+    "grupoMuscularPrincipal": "CUADRICEPS",
+    "gruposSecundarios": "GLUTEO,CORE",
+    "patron": "SENTADILLA",
+    "equipamientoCasa": true,
+    "equipamientoGym": false,
+    "notasTecnica": "Tempo 3-2-1 (3s bajada + 2s pausa abajo + 1s subida)."
+  },
+  {
+    "nombre": "Peso muerto rumano con mancuernas",
+    "grupoMuscularPrincipal": "ISQUIOS",
+    "gruposSecundarios": "GLUTEO,LUMBAR",
+    "patron": "BISAGRA_CADERA",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Tempo 3-1-1. Recorrido al lado del muslo. Sentir isquios."
+  },
+  {
+    "nombre": "Zancadas",
+    "grupoMuscularPrincipal": "CUADRICEPS",
+    "gruposSecundarios": "GLUTEO,ISQUIOS",
+    "patron": "UNILATERAL",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Unilateral. Equilibrio + cuádriceps."
+  },
+  {
+    "nombre": "Hip thrust",
+    "grupoMuscularPrincipal": "GLUTEO",
+    "gruposSecundarios": "ISQUIOS",
+    "patron": "EXTENSION_CADERA",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Glúteo directo. Contracción 1s arriba."
+  },
+  {
+    "nombre": "Swing KB",
+    "grupoMuscularPrincipal": "GLUTEO",
+    "gruposSecundarios": "ISQUIOS,LUMBAR,CORE",
+    "patron": "BISAGRA_EXPLOSIVA",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Cadena posterior + cardio. SALTAR si hombro sensible."
+  },
+  {
+    "nombre": "Gemelos un pie a la vez",
+    "grupoMuscularPrincipal": "GEMELOS",
+    "gruposSecundarios": "",
+    "patron": "AISLAMIENTO",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Pausa arriba 1s."
+  },
+  {
+    "nombre": "Clean and press KB",
+    "grupoMuscularPrincipal": "FULL_BODY",
+    "gruposSecundarios": "HOMBRO_FRONTAL,GLUTEO,CUADRICEPS",
+    "patron": "EXPLOSIVO",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Full body explosivo. Técnica limpia obligatoria. Si reps caen, parar serie."
+  },
+  {
+    "nombre": "Remo KB",
+    "grupoMuscularPrincipal": "DORSAL",
+    "gruposSecundarios": "BICEPS,HOMBRO_POSTERIOR",
+    "patron": "TIRON_HORIZONTAL",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Tirón horizontal. Pausa 1s arriba."
+  },
+  {
+    "nombre": "Pullover KB suelo",
+    "grupoMuscularPrincipal": "DORSAL",
+    "gruposSecundarios": "PECHO,TRICEPS",
+    "patron": "TIRON_VERTICAL",
+    "equipamientoCasa": true,
+    "equipamientoGym": false,
+    "notasTecnica": "Dorsal vertical. Sentir dorsal las 3 series."
+  },
+  {
+    "nombre": "Curl martillo",
+    "grupoMuscularPrincipal": "BICEPS",
+    "gruposSecundarios": "ANTEBRAZO",
+    "patron": "AISLAMIENTO",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Superserie con skull crusher. Sin pausa entre ambos."
+  },
+  {
+    "nombre": "Skull crusher",
+    "grupoMuscularPrincipal": "TRICEPS",
+    "gruposSecundarios": "",
+    "patron": "AISLAMIENTO",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Superserie con curl martillo. Vigilar codo."
+  },
+  {
+    "nombre": "Plancha lateral",
+    "grupoMuscularPrincipal": "CORE",
+    "gruposSecundarios": "HOMBRO_LATERAL",
+    "patron": "ESTABILIZACION",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Core lateral. Mejorar técnica antes de subir tiempo."
+  },
+  {
+    "nombre": "Dead bug",
+    "grupoMuscularPrincipal": "CORE",
+    "gruposSecundarios": "",
+    "patron": "ESTABILIZACION",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Core profundo. Coordinación cruzada."
+  }
+]

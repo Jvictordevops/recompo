@@ -14,5 +14,6 @@ data class EjercicioEnSesion(
     val repsObjetivoMin: Int,
     val repsObjetivoMax: Int,
     val cargaObjetivoKg: Double?,
-    val notas: String?
+    val notas: String?,
+    val rir: Int? = null
 )
