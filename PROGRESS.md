@@ -10,7 +10,7 @@ _(vacío)_
 
 ### T-011 — Settings básico
 
-**Commit**: pendiente (este commit)
+**Commit**: `7048013 feat(settings): T-011 pantalla ajustes con edición de perfil, macros y backup`
 
 **Estado**: build verde, 43 tests verdes (10 nuevos), probado en móvil
 (2026-05-28).
