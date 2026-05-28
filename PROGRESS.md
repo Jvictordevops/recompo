@@ -8,6 +8,43 @@ _(vacío)_
 
 ## DONE (reciente)
 
+### T-011 — Settings básico
+
+**Commit**: pendiente (este commit)
+
+**Estado**: build verde, 43 tests verdes (10 nuevos), probado en móvil
+(2026-05-28).
+
+- `domain/validation/UserSettingsValidation.kt` — funciones puras
+  (`parseNombre`, `parseFase`, `parseAltura`, `parsePesoKg`, `parseKcal`,
+  `parseProteinaG`, `parseLocalDate`) con `Result<T>` y mensajes de error
+  como constantes. Tests AAA sin Robolectric (10 casos).
+- `ui/common/DialogDatePicker.kt` — composable común extraído de
+  `EntrenoScreen.kt:367-388`. Misma firma `(fechaInicial, onFechaSeleccionada,
+  onDismiss)`. EntrenoScreen pasa a importarlo (cero cambio funcional).
+- `ui/settings/SettingsViewModel.kt` + Factory — sealed `SettingsDialog`
+  (Texto/Entero/Decimal/Fecha/EditarSexo/ConfirmarQuitarBackup) con error
+  por dialog. `StateFlow<SettingsUiState>` combina `store.settings + _dialog`.
+  `guardar()` valida via `UserSettingsValidation` y persiste; SAF via
+  `cambiarCarpetaBackup(uri)` con `takePersistableUriPermission`.
+- `ui/settings/SettingsScreen.kt` — reescrito. 6 cards (Perfil/Plan/
+  Macros/Backup/Export/IA) con `CardSeccion` + `CampoItem` (ListItem
+  clickable). `DialogHost` rutea por tipo a `DialogTextoEditor`
+  (parametrizado por `KeyboardType`), `DialogDatePicker`, `DialogSexo`
+  con RadioButtons o `AlertDialog` de confirmación. Botones de export
+  deshabilitados con etiqueta "Disponible en T-010". Card IA con
+  placeholder "Disponible en Fase 2 (Claude API)".
+- `ui/wizard/WizardViewModel.kt` — `validateStep1/2` refactorizado a
+  llamadas a `UserSettingsValidation`. API pública intacta.
+- `data/UserSettingsStore.kt` — añadido `clearBackupUri()`; `save()`
+  ahora usa helper `setOrRemove()` para eliminar la pref cuando el valor
+  es null (bugfix: antes los nullables nunca se podían limpiar).
+- `MainActivity.kt` — `SettingsViewModel` cableado con `application` +
+  `userSettingsStore` y pasado a `MainAppContent`.
+- Build verde, tests verdes (43), probado en móvil ✓
+
+---
+
 ### T-009 — Entreno: versión simple + iteración UX
 
 **Commit**: pendiente (este commit)
@@ -77,28 +114,6 @@ que las sesiones ya completadas sigan siendo editables.
 ---
 
 ## TODO
-
-### T-011 — Settings básico
-**Estimación**: 4h
-
-**Descripción**
-Pantalla Settings con:
-- Editar perfil (datos personales, plan).
-- Editar macros objetivo: sólo `kcalBaseDia` y `proteinaObjetivoG` (tras refactor
-  T-008 / ADR-0004).
-- Reconfigurar carpeta de backup (SAF) si quieres cambiarla.
-- Botones de export (capa 2 y 3 — los implementa T-010, aquí solo se exponen).
-- Placeholder "Uso de IA" (la pantalla real es de Fase 2).
-
-Cuando cambies de fase, editas `kcalBaseDia` aquí. No hay entidad Fase histórica en MVP.
-
-**Hecho cuando**
-- Build verde + tests verdes
-- Edición de UserSettings funcional (cambios se reflejan en Home)
-- Reconfigurar carpeta backup funcional
-- Probado en móvil
-
----
 
 ### T-010 — Backup: JSON continuo + export XLSX
 **Estimación**: 8-12h

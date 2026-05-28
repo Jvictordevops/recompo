@@ -48,6 +48,8 @@ import com.vic.recompo.ui.nutricion.NutricionScreen
 import com.vic.recompo.ui.nutricion.NutricionViewModel
 import com.vic.recompo.ui.nutricion.NutricionViewModelFactory
 import com.vic.recompo.ui.settings.SettingsScreen
+import com.vic.recompo.ui.settings.SettingsViewModel
+import com.vic.recompo.ui.settings.SettingsViewModelFactory
 import com.vic.recompo.ui.theme.RecompoTheme
 import com.vic.recompo.ui.wizard.WizardScreen
 import com.vic.recompo.ui.wizard.WizardViewModelFactory
@@ -97,6 +99,10 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    private val settingsViewModel by viewModels<SettingsViewModel> {
+        SettingsViewModelFactory(application, app.userSettingsStore)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -112,7 +118,8 @@ class MainActivity : ComponentActivity() {
                     nutricionViewModel = nutricionViewModel,
                     medicionesViewModel = medicionesViewModel,
                     actividadViewModel = actividadViewModel,
-                    entrenoViewModel = entrenoViewModel
+                    entrenoViewModel = entrenoViewModel,
+                    settingsViewModel = settingsViewModel
                 )
                 }
             }
@@ -126,7 +133,8 @@ private fun MainAppContent(
     nutricionViewModel: com.vic.recompo.ui.nutricion.NutricionViewModel,
     medicionesViewModel: MedicionesViewModel,
     actividadViewModel: ActividadViewModel,
-    entrenoViewModel: EntrenoViewModel
+    entrenoViewModel: EntrenoViewModel,
+    settingsViewModel: SettingsViewModel
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -171,7 +179,7 @@ private fun MainAppContent(
             composable(Screen.Entreno.route) { EntrenoScreen(entrenoViewModel) }
             composable(Screen.Actividad.route) { ActividadScreen(actividadViewModel) }
             composable(Screen.Mediciones.route) { MedicionesScreen(medicionesViewModel) }
-            composable(Screen.Settings.route) { SettingsScreen() }
+            composable(Screen.Settings.route) { SettingsScreen(settingsViewModel) }
         }
     }
 }

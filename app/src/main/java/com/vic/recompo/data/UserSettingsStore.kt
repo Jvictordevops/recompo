@@ -89,11 +89,19 @@ class UserSettingsStore(context: Context) {
             prefs[KEY_FASE_ACTUAL] = s.faseActual
             prefs[KEY_KCAL_BASE_DIA] = s.kcalBaseDia
             prefs[KEY_PROTEINA_OBJETIVO_G] = s.proteinaObjetivoG
-            s.carpetaBackupUri?.let { prefs[KEY_CARPETA_BACKUP_URI] = it }
-            s.ultimoBackupOk?.let { prefs[KEY_ULTIMO_BACKUP_OK] = it.toEpochMilli() }
-            s.ultimoBackupError?.let { prefs[KEY_ULTIMO_BACKUP_ERROR] = it }
-            s.ultimoBackupBytes?.let { prefs[KEY_ULTIMO_BACKUP_BYTES] = it }
+            setOrRemove(prefs, KEY_CARPETA_BACKUP_URI, s.carpetaBackupUri)
+            setOrRemove(prefs, KEY_ULTIMO_BACKUP_OK, s.ultimoBackupOk?.toEpochMilli())
+            setOrRemove(prefs, KEY_ULTIMO_BACKUP_ERROR, s.ultimoBackupError)
+            setOrRemove(prefs, KEY_ULTIMO_BACKUP_BYTES, s.ultimoBackupBytes)
         }
+    }
+
+    private fun <T : Any> setOrRemove(
+        prefs: androidx.datastore.preferences.core.MutablePreferences,
+        key: Preferences.Key<T>,
+        value: T?
+    ) {
+        if (value != null) prefs[key] = value else prefs.remove(key)
     }
 
     suspend fun markSetupDone() {
@@ -102,5 +110,9 @@ class UserSettingsStore(context: Context) {
 
     suspend fun saveBackupUri(uri: String) {
         dataStore.edit { prefs -> prefs[KEY_CARPETA_BACKUP_URI] = uri }
+    }
+
+    suspend fun clearBackupUri() {
+        dataStore.edit { prefs -> prefs.remove(KEY_CARPETA_BACKUP_URI) }
     }
 }

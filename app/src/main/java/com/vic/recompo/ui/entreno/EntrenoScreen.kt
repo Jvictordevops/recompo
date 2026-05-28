@@ -24,8 +24,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -42,7 +40,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -57,9 +54,8 @@ import com.vic.recompo.data.db.entity.Ejercicio
 import com.vic.recompo.data.db.entity.Sesion
 import com.vic.recompo.domain.model.EstadoSesion
 import com.vic.recompo.domain.model.TipoSesion
-import java.time.Instant
+import com.vic.recompo.ui.common.DialogDatePicker
 import java.time.LocalDate
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -360,31 +356,6 @@ private fun DialogCrearSesion(
         confirmButton = { TextButton(onClick = onConfirmar) { Text("Crear") } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun DialogDatePicker(
-    fechaInicial: LocalDate,
-    onFechaSeleccionada: (LocalDate) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val initialMillis = fechaInicial.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
-    val state = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
-
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = {
-                val millis = state.selectedDateMillis ?: initialMillis
-                val fecha = Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC).toLocalDate()
-                onFechaSeleccionada(fecha)
-            }) { Text("Aceptar") }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
-    ) {
-        DatePicker(state = state)
-    }
 }
 
 @Composable

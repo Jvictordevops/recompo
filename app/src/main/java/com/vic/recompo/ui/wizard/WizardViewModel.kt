@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.vic.recompo.data.UserSettingsStore
 import com.vic.recompo.domain.model.Sexo
 import com.vic.recompo.domain.model.UserSettings
+import com.vic.recompo.domain.validation.UserSettingsValidation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -86,23 +87,24 @@ class WizardViewModel(private val store: UserSettingsStore) : ViewModel() {
     }
 
     private fun validateStep1(s: WizardState): String? {
-        if (s.nombre.isBlank()) return "El nombre es obligatorio"
-        if (runCatching { LocalDate.parse(s.fechaNacimiento) }.isFailure)
-            return "Fecha de nacimiento inválida (formato AAAA-MM-DD)"
-        if (s.sexo == null) return "Selecciona sexo biológico"
-        val altura = s.alturaCm.toIntOrNull()
-        if (altura == null || altura < 100 || altura > 250) return "Altura inválida (100–250 cm)"
+        UserSettingsValidation.parseNombre(s.nombre).exceptionOrNull()?.let { return it.message }
+        UserSettingsValidation.parseLocalDate(s.fechaNacimiento, UserSettingsValidation.ERROR_FECHA_NACIMIENTO)
+            .exceptionOrNull()?.let { return it.message }
+        if (s.sexo == null) return UserSettingsValidation.ERROR_SEXO_OBLIGATORIO
+        UserSettingsValidation.parseAltura(s.alturaCm).exceptionOrNull()?.let { return it.message }
         return null
     }
 
     private fun validateStep2(s: WizardState): String? {
-        if (runCatching { LocalDate.parse(s.fechaInicioPlan) }.isFailure)
-            return "Fecha de inicio inválida (formato AAAA-MM-DD)"
-        if (s.pesoInicialKg.toDoubleOrNull()?.let { it > 0 } != true) return "Peso inicial inválido"
-        if (s.pesoObjetivoKg.toDoubleOrNull()?.let { it > 0 } != true) return "Peso objetivo inválido"
-        if (s.faseActual.isBlank()) return "La fase actual es obligatoria"
-        if (s.kcalBaseDia.toIntOrNull()?.let { it > 0 } != true) return "Kcal base día inválido"
-        if (s.proteinaObjetivoG.toIntOrNull()?.let { it > 0 } != true) return "Proteína objetivo inválida"
+        UserSettingsValidation.parseLocalDate(s.fechaInicioPlan, UserSettingsValidation.ERROR_FECHA_INICIO_PLAN)
+            .exceptionOrNull()?.let { return it.message }
+        UserSettingsValidation.parsePesoKg(s.pesoInicialKg, UserSettingsValidation.ERROR_PESO_INICIAL)
+            .exceptionOrNull()?.let { return it.message }
+        UserSettingsValidation.parsePesoKg(s.pesoObjetivoKg, UserSettingsValidation.ERROR_PESO_OBJETIVO)
+            .exceptionOrNull()?.let { return it.message }
+        UserSettingsValidation.parseFase(s.faseActual).exceptionOrNull()?.let { return it.message }
+        UserSettingsValidation.parseKcal(s.kcalBaseDia).exceptionOrNull()?.let { return it.message }
+        UserSettingsValidation.parseProteinaG(s.proteinaObjetivoG).exceptionOrNull()?.let { return it.message }
         return null
     }
 
