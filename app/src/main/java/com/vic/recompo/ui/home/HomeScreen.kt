@@ -1,6 +1,7 @@
 package com.vic.recompo.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
@@ -19,6 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -38,13 +45,27 @@ fun HomeScreen(viewModel: HomeViewModel) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item { Encabezado(nombre = state.nombre, tipoDia = state.tipoDia) }
         item {
-            TarjetaMacros(
+            Encabezado(
+                nombre = state.nombre,
+                tipoDia = state.tipoDia,
+                onTipoDiaChanged = viewModel::setTipoDia
+            )
+        }
+        item {
+            TarjetaObjetivoNutricional(
                 kcalConsumidas = state.kcalConsumidas,
                 kcalObjetivo = state.kcalObjetivo,
                 proteinaConsumidaG = state.proteinaConsumidaG,
                 proteinaObjetivoG = state.proteinaObjetivoG
+            )
+        }
+        item {
+            TarjetaGasto(
+                metabolismoBasal = state.metabolismoBasalKcal,
+                kcalActividad = state.kcalActividad,
+                kcalGastoReal = state.kcalGastoReal,
+                kcalConsumidas = state.kcalConsumidas
             )
         }
         state.sesionDelDia?.let { sesion ->
@@ -61,7 +82,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
 }
 
 @Composable
-private fun Encabezado(nombre: String, tipoDia: TipoDia) {
+private fun Encabezado(nombre: String, tipoDia: TipoDia, onTipoDiaChanged: (TipoDia) -> Unit) {
     val fecha = LocalDate.now()
         .format(DateTimeFormatter.ofPattern("EEEE, d MMM", Locale("es")))
         .replaceFirstChar { it.uppercase() }
@@ -78,26 +99,42 @@ private fun Encabezado(nombre: String, tipoDia: TipoDia) {
             Text(fecha, style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        TipoDiaChip(tipoDia)
+        TipoDiaChip(tipoDia, onTipoDiaChanged)
     }
 }
 
 @Composable
-private fun TipoDiaChip(tipoDia: TipoDia) {
+private fun TipoDiaChip(tipoDia: TipoDia, onTipoDiaChanged: (TipoDia) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
     val (label, color) = when (tipoDia) {
         TipoDia.MUSCULACION -> "Musculación" to MaterialTheme.colorScheme.primaryContainer
         TipoDia.BICI -> "Bici" to MaterialTheme.colorScheme.secondaryContainer
         TipoDia.DESCANSO -> "Descanso" to MaterialTheme.colorScheme.surfaceVariant
     }
-    SuggestionChip(
-        onClick = {},
-        label = { Text(label) },
-        colors = SuggestionChipDefaults.suggestionChipColors(containerColor = color)
-    )
+    Box {
+        SuggestionChip(
+            onClick = { expanded = true },
+            label = { Text(label) },
+            colors = SuggestionChipDefaults.suggestionChipColors(containerColor = color)
+        )
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            TipoDia.entries.forEach { tipo ->
+                val itemLabel = when (tipo) {
+                    TipoDia.MUSCULACION -> "Musculación"
+                    TipoDia.BICI -> "Bici"
+                    TipoDia.DESCANSO -> "Descanso"
+                }
+                DropdownMenuItem(
+                    text = { Text(itemLabel) },
+                    onClick = { onTipoDiaChanged(tipo); expanded = false }
+                )
+            }
+        }
+    }
 }
 
 @Composable
-private fun TarjetaMacros(
+private fun TarjetaObjetivoNutricional(
     kcalConsumidas: Int,
     kcalObjetivo: Int,
     proteinaConsumidaG: Double,
@@ -110,6 +147,8 @@ private fun TarjetaMacros(
 
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Objetivo nutricional", style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary)
             FilaMacro(
                 etiqueta = "Calorías",
                 consumido = "$kcalConsumidas",
@@ -122,6 +161,47 @@ private fun TarjetaMacros(
                 objetivo = "${proteinaObjetivoG}g",
                 progreso = progresoProt
             )
+        }
+    }
+}
+
+@Composable
+private fun TarjetaGasto(
+    metabolismoBasal: Int,
+    kcalActividad: Int,
+    kcalGastoReal: Int,
+    kcalConsumidas: Int
+) {
+    val deficit = kcalConsumidas - kcalGastoReal
+
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Gasto estimado", style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("Metabolismo basal", style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("$metabolismoBasal kcal", style = MaterialTheme.typography.bodySmall)
+            }
+            if (kcalActividad > 0) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Actividad", style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("+$kcalActividad kcal", style = MaterialTheme.typography.bodySmall)
+                }
+            }
+            HorizontalDivider()
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("Gasto total", style = MaterialTheme.typography.bodyMedium)
+                Text("$kcalGastoReal kcal", style = MaterialTheme.typography.bodyMedium)
+            }
+            if (kcalConsumidas > 0 || kcalGastoReal > 0) {
+                Spacer(Modifier.height(2.dp))
+                val deficitLabel = if (deficit <= 0) "Déficit: ${-deficit} kcal" else "Superávit: +$deficit kcal"
+                val deficitColor = if (deficit <= 0) MaterialTheme.colorScheme.primary
+                                   else MaterialTheme.colorScheme.error
+                Text(deficitLabel, style = MaterialTheme.typography.labelSmall, color = deficitColor)
+            }
         }
     }
 }

@@ -240,6 +240,19 @@ CRUD de `EntradaComida`.
 **Estado**: ✅ resuelta. `hacerBackup()` ahora escribe `recomposicion_YYYY-MM-DD.json`. Cada día genera un fichero nuevo en Drive, sin sobreescribir el anterior.
 
 ### DT-004 — Separar objetivo nutricional y gasto real
+**Estado**: ✅ resuelta (2026-05-29). Build verde, tests verdes.
+
+**Resumen de cambios**:
+- `UserSettings`: `kcalBaseDia` → `kcalDescanso / kcalMusculacion / kcalBici` + `metabolismoBasalKcal` (default 1830).
+- `UserSettingsStore`: 4 nuevas claves DataStore. **Nota**: al instalar este APK el wizard aparecerá de nuevo — hay que reconfigurar macros.
+- `CalcularKcalObjetivoUseCase`: reescrito con `calcularObjetivoNutricional(tipoDia, ...)` y `calcularGastoReal(basal, actividades)`.
+- `HomeViewModel`: TipoDia auto-derivado con prioridad BICI > MUSCULACION > DESCANSO. Override manual vía `setTipoDia()`.
+- `HomeScreen`: chip TipoDia clickable (DropdownMenu). `TarjetaObjetivoNutricional` (consumido vs plan) + `TarjetaGasto` (basal + actividad = total, déficit real).
+- `WizardScreen/ViewModel`: Step 2 con 3 campos kcal + metabolismo basal.
+- `SettingsScreen/ViewModel`: CardMacros con 4 items editables.
+- `BackupDto/BackupSerializer/XlsxExporter`: campos actualizados.
+- Tests: reescritos para la nueva API (6 casos, todos verdes).
+
 **Afecta**: `UserSettings`, `HomeViewModel`, `HomeScreen`, `SettingsScreen`, `WizardScreen`, `CalcularKcalObjetivoUseCase`
 **Problema**: el modelo actual mezcla en un solo número dos conceptos distintos. Con bici + musculación en el mismo día sale "2600 kcal" que no es ni el plan ni el balance real.
 **Decisión**:

@@ -26,7 +26,10 @@ data class WizardState(
     val pesoInicialKg: String = "",
     val pesoObjetivoKg: String = "",
     val faseActual: String = "Fase 1",
-    val kcalBaseDia: String = "1900",
+    val kcalDescanso: String = "1900",
+    val kcalMusculacion: String = "2050",
+    val kcalBici: String = "2150",
+    val metabolismoBasalKcal: String = "1830",
     val proteinaObjetivoG: String = "160",
     // Paso 3 — backup
     val backupUri: String? = null,
@@ -48,7 +51,10 @@ class WizardViewModel(private val store: UserSettingsStore) : ViewModel() {
     fun onPesoInicialKgChanged(v: String) = _state.update { it.copy(pesoInicialKg = v, error = null) }
     fun onPesoObjetivoKgChanged(v: String) = _state.update { it.copy(pesoObjetivoKg = v, error = null) }
     fun onFaseActualChanged(v: String) = _state.update { it.copy(faseActual = v, error = null) }
-    fun onKcalBaseDiaChanged(v: String) = _state.update { it.copy(kcalBaseDia = v, error = null) }
+    fun onKcalDescansoChanged(v: String) = _state.update { it.copy(kcalDescanso = v, error = null) }
+    fun onKcalMusculacionChanged(v: String) = _state.update { it.copy(kcalMusculacion = v, error = null) }
+    fun onKcalBiciChanged(v: String) = _state.update { it.copy(kcalBici = v, error = null) }
+    fun onMetabolismoBasalChanged(v: String) = _state.update { it.copy(metabolismoBasalKcal = v, error = null) }
     fun onProteinaObjetivoGChanged(v: String) = _state.update { it.copy(proteinaObjetivoG = v, error = null) }
     fun onBackupUriSelected(uri: String) = _state.update { it.copy(backupUri = uri, error = null) }
 
@@ -103,7 +109,10 @@ class WizardViewModel(private val store: UserSettingsStore) : ViewModel() {
         UserSettingsValidation.parsePesoKg(s.pesoObjetivoKg, UserSettingsValidation.ERROR_PESO_OBJETIVO)
             .exceptionOrNull()?.let { return it.message }
         UserSettingsValidation.parseFase(s.faseActual).exceptionOrNull()?.let { return it.message }
-        UserSettingsValidation.parseKcal(s.kcalBaseDia).exceptionOrNull()?.let { return it.message }
+        UserSettingsValidation.parseKcal(s.kcalDescanso).exceptionOrNull()?.let { return it.message }
+        UserSettingsValidation.parseKcal(s.kcalMusculacion).exceptionOrNull()?.let { return it.message }
+        UserSettingsValidation.parseKcal(s.kcalBici).exceptionOrNull()?.let { return it.message }
+        UserSettingsValidation.parseKcal(s.metabolismoBasalKcal).exceptionOrNull()?.let { return it.message }
         UserSettingsValidation.parseProteinaG(s.proteinaObjetivoG).exceptionOrNull()?.let { return it.message }
         return null
     }
@@ -119,7 +128,10 @@ class WizardViewModel(private val store: UserSettingsStore) : ViewModel() {
             pesoInicialKg = s.pesoInicialKg.toDouble(),
             pesoObjetivoKg = s.pesoObjetivoKg.toDouble(),
             faseActual = s.faseActual,
-            kcalBaseDia = s.kcalBaseDia.toInt(),
+            kcalDescanso = s.kcalDescanso.toInt(),
+            kcalMusculacion = s.kcalMusculacion.toInt(),
+            kcalBici = s.kcalBici.toInt(),
+            metabolismoBasalKcal = s.metabolismoBasalKcal.toInt(),
             proteinaObjetivoG = s.proteinaObjetivoG.toInt(),
             carpetaBackupUri = s.backupUri,
             ultimoBackupOk = null,

@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 enum class CampoTexto { NOMBRE, FASE }
-enum class CampoEntero { ALTURA, KCAL, PROTEINA }
+enum class CampoEntero { ALTURA, KCAL_DESCANSO, KCAL_MUSCULACION, KCAL_BICI, METABOLISMO_BASAL, PROTEINA }
 enum class CampoDecimal { PESO_INICIAL, PESO_OBJETIVO }
 enum class CampoFecha { FECHA_NACIMIENTO, FECHA_INICIO_PLAN }
 
@@ -140,13 +140,19 @@ class SettingsViewModel(
             is SettingsDialog.Entero -> {
                 val parsed = when (d.campo) {
                     CampoEntero.ALTURA -> UserSettingsValidation.parseAltura(d.valor)
-                    CampoEntero.KCAL -> UserSettingsValidation.parseKcal(d.valor)
+                    CampoEntero.KCAL_DESCANSO,
+                    CampoEntero.KCAL_MUSCULACION,
+                    CampoEntero.KCAL_BICI,
+                    CampoEntero.METABOLISMO_BASAL -> UserSettingsValidation.parseKcal(d.valor)
                     CampoEntero.PROTEINA -> UserSettingsValidation.parseProteinaG(d.valor)
                 }
                 val valor = parsed.getOrElse { setError(d, it.message); return }
                 when (d.campo) {
                     CampoEntero.ALTURA -> actuales.copy(alturaCm = valor)
-                    CampoEntero.KCAL -> actuales.copy(kcalBaseDia = valor)
+                    CampoEntero.KCAL_DESCANSO -> actuales.copy(kcalDescanso = valor)
+                    CampoEntero.KCAL_MUSCULACION -> actuales.copy(kcalMusculacion = valor)
+                    CampoEntero.KCAL_BICI -> actuales.copy(kcalBici = valor)
+                    CampoEntero.METABOLISMO_BASAL -> actuales.copy(metabolismoBasalKcal = valor)
                     CampoEntero.PROTEINA -> actuales.copy(proteinaObjetivoG = valor)
                 }
             }

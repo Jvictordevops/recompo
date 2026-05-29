@@ -1,6 +1,7 @@
 package com.vic.recompo.domain.usecase
 
 import com.vic.recompo.data.db.entity.Actividad
+import com.vic.recompo.ui.home.TipoDia
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.LocalDate
@@ -18,28 +19,37 @@ class CalcularKcalObjetivoUseCaseTest {
         kcalQuemadas = kcal
     )
 
+    // --- calcularObjetivoNutricional ---
+
     @Test
-    fun `sin actividades devuelve kcalBaseDia`() {
-        assertEquals(1900, useCase.calcular(1900, emptyList()))
+    fun `objetivo descanso devuelve kcalDescanso`() {
+        assertEquals(1900, useCase.calcularObjetivoNutricional(TipoDia.DESCANSO, 1900, 2050, 2150))
     }
 
     @Test
-    fun `una actividad suma sus kcal`() {
-        assertEquals(2300, useCase.calcular(1900, listOf(actividad(400))))
+    fun `objetivo musculacion devuelve kcalMusculacion`() {
+        assertEquals(2050, useCase.calcularObjetivoNutricional(TipoDia.MUSCULACION, 1900, 2050, 2150))
     }
 
     @Test
-    fun `varias actividades suman todas`() {
-        assertEquals(2500, useCase.calcular(1900, listOf(actividad(400), actividad(200))))
+    fun `objetivo bici devuelve kcalBici`() {
+        assertEquals(2150, useCase.calcularObjetivoNutricional(TipoDia.BICI, 1900, 2050, 2150))
+    }
+
+    // --- calcularGastoReal ---
+
+    @Test
+    fun `gasto real sin actividades es el metabolismo basal`() {
+        assertEquals(1830, useCase.calcularGastoReal(1830, emptyList()))
     }
 
     @Test
-    fun `base cero con actividad devuelve solo las kcal de la actividad`() {
-        assertEquals(300, useCase.calcular(0, listOf(actividad(300))))
+    fun `gasto real suma una actividad`() {
+        assertEquals(2230, useCase.calcularGastoReal(1830, listOf(actividad(400))))
     }
 
     @Test
-    fun `base y actividades cero devuelve cero`() {
-        assertEquals(0, useCase.calcular(0, emptyList()))
+    fun `gasto real suma varias actividades`() {
+        assertEquals(2430, useCase.calcularGastoReal(1830, listOf(actividad(400), actividad(200))))
     }
 }

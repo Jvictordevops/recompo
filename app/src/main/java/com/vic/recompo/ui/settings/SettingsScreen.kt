@@ -201,10 +201,28 @@ private fun CardPlan(s: UserSettings, vm: SettingsViewModel) {
 private fun CardMacros(s: UserSettings, vm: SettingsViewModel) {
     CardSeccion("Macros objetivo") {
         CampoItem(
-            titulo = "Kcal base/día",
-            valor = "${s.kcalBaseDia} kcal",
-            supporting = "Déficit de mantenimiento. La actividad registrada suma encima.",
-            onClick = { vm.abrirDialog(SettingsDialog.Entero(CampoEntero.KCAL, s.kcalBaseDia.toString())) }
+            titulo = "Kcal descanso",
+            valor = "${s.kcalDescanso} kcal",
+            onClick = { vm.abrirDialog(SettingsDialog.Entero(CampoEntero.KCAL_DESCANSO, s.kcalDescanso.toString())) }
+        )
+        HorizontalDivider()
+        CampoItem(
+            titulo = "Kcal musculación",
+            valor = "${s.kcalMusculacion} kcal",
+            onClick = { vm.abrirDialog(SettingsDialog.Entero(CampoEntero.KCAL_MUSCULACION, s.kcalMusculacion.toString())) }
+        )
+        HorizontalDivider()
+        CampoItem(
+            titulo = "Kcal bici",
+            valor = "${s.kcalBici} kcal",
+            onClick = { vm.abrirDialog(SettingsDialog.Entero(CampoEntero.KCAL_BICI, s.kcalBici.toString())) }
+        )
+        HorizontalDivider()
+        CampoItem(
+            titulo = "Metabolismo basal",
+            valor = "${s.metabolismoBasalKcal} kcal",
+            supporting = "Gasto en reposo. Base para calcular el déficit real.",
+            onClick = { vm.abrirDialog(SettingsDialog.Entero(CampoEntero.METABOLISMO_BASAL, s.metabolismoBasalKcal.toString())) }
         )
         HorizontalDivider()
         CampoItem(
@@ -427,7 +445,10 @@ private fun tituloDe(campo: CampoTexto): String = when (campo) {
 
 private fun tituloDe(campo: CampoEntero): String = when (campo) {
     CampoEntero.ALTURA -> "Altura (cm)"
-    CampoEntero.KCAL -> "Kcal base/día"
+    CampoEntero.KCAL_DESCANSO -> "Kcal descanso"
+    CampoEntero.KCAL_MUSCULACION -> "Kcal musculación"
+    CampoEntero.KCAL_BICI -> "Kcal bici"
+    CampoEntero.METABOLISMO_BASAL -> "Metabolismo basal (kcal)"
     CampoEntero.PROTEINA -> "Proteína objetivo (g/día)"
 }
 

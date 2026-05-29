@@ -33,7 +33,10 @@ class UserSettingsStore(context: Context) {
         val KEY_PESO_INICIAL_KG = doublePreferencesKey("peso_inicial_kg")
         val KEY_PESO_OBJETIVO_KG = doublePreferencesKey("peso_objetivo_kg")
         val KEY_FASE_ACTUAL = stringPreferencesKey("fase_actual")
-        val KEY_KCAL_BASE_DIA = intPreferencesKey("kcal_base_dia")
+        val KEY_KCAL_DESCANSO = intPreferencesKey("kcal_descanso")
+        val KEY_KCAL_MUSCULACION = intPreferencesKey("kcal_musculacion")
+        val KEY_KCAL_BICI = intPreferencesKey("kcal_bici")
+        val KEY_METABOLISMO_BASAL_KCAL = intPreferencesKey("metabolismo_basal_kcal")
         val KEY_PROTEINA_OBJETIVO_G = intPreferencesKey("proteina_objetivo_g")
         val KEY_CARPETA_BACKUP_URI = stringPreferencesKey("carpeta_backup_uri")
         val KEY_ULTIMO_BACKUP_OK = longPreferencesKey("ultimo_backup_ok")
@@ -57,7 +60,10 @@ class UserSettingsStore(context: Context) {
         val pesoInicialKg = prefs[KEY_PESO_INICIAL_KG] ?: return@map null
         val pesoObjetivoKg = prefs[KEY_PESO_OBJETIVO_KG] ?: return@map null
         val faseActual = prefs[KEY_FASE_ACTUAL] ?: return@map null
-        val kcalBaseDia = prefs[KEY_KCAL_BASE_DIA] ?: return@map null
+        val kcalDescanso = prefs[KEY_KCAL_DESCANSO] ?: return@map null
+        val kcalMusculacion = prefs[KEY_KCAL_MUSCULACION] ?: return@map null
+        val kcalBici = prefs[KEY_KCAL_BICI] ?: return@map null
+        val metabolismoBasalKcal = prefs[KEY_METABOLISMO_BASAL_KCAL] ?: return@map null
         val proteinaObjetivoG = prefs[KEY_PROTEINA_OBJETIVO_G] ?: return@map null
         UserSettings(
             nombre = nombre,
@@ -68,7 +74,10 @@ class UserSettingsStore(context: Context) {
             pesoInicialKg = pesoInicialKg,
             pesoObjetivoKg = pesoObjetivoKg,
             faseActual = faseActual,
-            kcalBaseDia = kcalBaseDia,
+            kcalDescanso = kcalDescanso,
+            kcalMusculacion = kcalMusculacion,
+            kcalBici = kcalBici,
+            metabolismoBasalKcal = metabolismoBasalKcal,
             proteinaObjetivoG = proteinaObjetivoG,
             carpetaBackupUri = prefs[KEY_CARPETA_BACKUP_URI],
             ultimoBackupOk = prefs[KEY_ULTIMO_BACKUP_OK]?.let { Instant.ofEpochMilli(it) },
@@ -87,7 +96,10 @@ class UserSettingsStore(context: Context) {
             prefs[KEY_PESO_INICIAL_KG] = s.pesoInicialKg
             prefs[KEY_PESO_OBJETIVO_KG] = s.pesoObjetivoKg
             prefs[KEY_FASE_ACTUAL] = s.faseActual
-            prefs[KEY_KCAL_BASE_DIA] = s.kcalBaseDia
+            prefs[KEY_KCAL_DESCANSO] = s.kcalDescanso
+            prefs[KEY_KCAL_MUSCULACION] = s.kcalMusculacion
+            prefs[KEY_KCAL_BICI] = s.kcalBici
+            prefs[KEY_METABOLISMO_BASAL_KCAL] = s.metabolismoBasalKcal
             prefs[KEY_PROTEINA_OBJETIVO_G] = s.proteinaObjetivoG
             setOrRemove(prefs, KEY_CARPETA_BACKUP_URI, s.carpetaBackupUri)
             setOrRemove(prefs, KEY_ULTIMO_BACKUP_OK, s.ultimoBackupOk?.toEpochMilli())

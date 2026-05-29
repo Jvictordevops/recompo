@@ -27,7 +27,10 @@ data class SettingsDto(
     val pesoInicialKg: Double,
     val pesoObjetivoKg: Double,
     val faseActual: String,
-    val kcalBaseDia: Int,
+    val kcalDescanso: Int,
+    val kcalMusculacion: Int,
+    val kcalBici: Int,
+    val metabolismoBasalKcal: Int,
     val proteinaObjetivoG: Int
 )
 

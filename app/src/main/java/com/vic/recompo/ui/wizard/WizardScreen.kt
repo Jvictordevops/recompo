@@ -184,11 +184,40 @@ private fun Step2(state: WizardState, vm: WizardViewModel) {
     )
     Spacer(Modifier.height(16.dp))
 
+    Text("Objetivo calórico por tipo de día", style = MaterialTheme.typography.bodyMedium)
+    Spacer(Modifier.height(8.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        OutlinedTextField(
+            value = state.kcalDescanso,
+            onValueChange = vm::onKcalDescansoChanged,
+            label = { Text("Descanso") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.weight(1f)
+        )
+        OutlinedTextField(
+            value = state.kcalMusculacion,
+            onValueChange = vm::onKcalMusculacionChanged,
+            label = { Text("Musculación") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.weight(1f)
+        )
+        OutlinedTextField(
+            value = state.kcalBici,
+            onValueChange = vm::onKcalBiciChanged,
+            label = { Text("Bici") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.weight(1f)
+        )
+    }
+    Spacer(Modifier.height(12.dp))
     OutlinedTextField(
-        value = state.kcalBaseDia,
-        onValueChange = vm::onKcalBaseDiaChanged,
-        label = { Text("Kcal base/día") },
-        supportingText = { Text("Déficit de mantenimiento. La actividad registrada suma encima.") },
+        value = state.metabolismoBasalKcal,
+        onValueChange = vm::onMetabolismoBasalChanged,
+        label = { Text("Metabolismo basal (kcal)") },
+        supportingText = { Text("Gasto en reposo. Se usa para calcular el déficit real del día.") },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         modifier = Modifier.fillMaxWidth()

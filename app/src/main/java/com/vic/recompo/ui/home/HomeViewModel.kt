@@ -10,6 +10,7 @@ import com.vic.recompo.data.db.dao.SesionDao
 import com.vic.recompo.data.db.entity.Sesion
 import com.vic.recompo.domain.model.EstadoSesion
 import com.vic.recompo.domain.usecase.CalcularKcalObjetivoUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -26,6 +27,9 @@ data class HomeUiState(
     val kcalObjetivo: Int = 0,
     val proteinaConsumidaG: Double = 0.0,
     val proteinaObjetivoG: Int = 0,
+    val metabolismoBasalKcal: Int = 0,
+    val kcalActividad: Int = 0,
+    val kcalGastoReal: Int = 0,
     val sesionDelDia: Sesion? = null,
     val backupUri: String? = null,
     val ultimoBackupOk: Instant? = null,
@@ -40,26 +44,37 @@ class HomeViewModel(
 ) : ViewModel() {
 
     private val hoy = LocalDate.now()
-    private val calcularKcalObjetivo = CalcularKcalObjetivoUseCase()
+    private val calcularKcal = CalcularKcalObjetivoUseCase()
+    private val _tipoDiaOverride = MutableStateFlow<TipoDia?>(null)
+
+    fun setTipoDia(tipo: TipoDia) { _tipoDiaOverride.value = tipo }
 
     val uiState: StateFlow<HomeUiState> = combine(
         settingsStore.settings,
         entradaComidaDao.getByFecha(hoy),
         sesionDao.getByFecha(hoy),
-        actividadDao.getByFecha(hoy)
-    ) { settings, entradas, sesiones, actividades ->
+        actividadDao.getByFecha(hoy),
+        _tipoDiaOverride
+    ) { settings, entradas, sesiones, actividades, override ->
         val sesionActiva = sesiones.firstOrNull {
             it.estado == EstadoSesion.PLANIFICADA || it.estado == EstadoSesion.EN_CURSO
         }
-        val tipoDia = when {
+        val tieneBici = actividades.any { it.tipo.lowercase() == "bici" }
+        val tipoDiaAuto = when {
+            tieneBici && sesionActiva != null -> TipoDia.BICI
+            tieneBici -> TipoDia.BICI
             sesionActiva != null -> TipoDia.MUSCULACION
-            actividades.any { it.tipo.lowercase() == "bici" } -> TipoDia.BICI
             else -> TipoDia.DESCANSO
         }
-        val kcalObjetivo = calcularKcalObjetivo.calcular(
-            kcalBaseDia = settings?.kcalBaseDia ?: 0,
-            actividadesHoy = actividades
+        val tipoDia = override ?: tipoDiaAuto
+        val kcalObjetivo = calcularKcal.calcularObjetivoNutricional(
+            tipoDia = tipoDia,
+            kcalDescanso = settings?.kcalDescanso ?: 0,
+            kcalMusculacion = settings?.kcalMusculacion ?: 0,
+            kcalBici = settings?.kcalBici ?: 0
         )
+        val metabolismo = settings?.metabolismoBasalKcal ?: 0
+        val kcalActividad = actividades.sumOf { it.kcalQuemadas }
         HomeUiState(
             nombre = settings?.nombre ?: "",
             tipoDia = tipoDia,
@@ -67,6 +82,9 @@ class HomeViewModel(
             kcalObjetivo = kcalObjetivo,
             proteinaConsumidaG = entradas.sumOf { it.proteinaG },
             proteinaObjetivoG = settings?.proteinaObjetivoG ?: 0,
+            metabolismoBasalKcal = metabolismo,
+            kcalActividad = kcalActividad,
+            kcalGastoReal = calcularKcal.calcularGastoReal(metabolismo, actividades),
             sesionDelDia = sesionActiva,
             backupUri = settings?.carpetaBackupUri,
             ultimoBackupOk = settings?.ultimoBackupOk,

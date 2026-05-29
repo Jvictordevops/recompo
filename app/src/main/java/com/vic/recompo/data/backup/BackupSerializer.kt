@@ -150,7 +150,10 @@ class BackupSerializer(
         pesoInicialKg = pesoInicialKg,
         pesoObjetivoKg = pesoObjetivoKg,
         faseActual = faseActual,
-        kcalBaseDia = kcalBaseDia,
+        kcalDescanso = kcalDescanso,
+        kcalMusculacion = kcalMusculacion,
+        kcalBici = kcalBici,
+        metabolismoBasalKcal = metabolismoBasalKcal,
         proteinaObjetivoG = proteinaObjetivoG
     )
 }
