@@ -13,6 +13,9 @@ interface EjercicioEnSesionDao {
     @Insert suspend fun insertAll(list: List<EjercicioEnSesion>)
     @Update suspend fun update(ejercicioEnSesion: EjercicioEnSesion)
 
+    @Query("SELECT * FROM EjercicioEnSesion ORDER BY sesionId, orden")
+    suspend fun getAll(): List<EjercicioEnSesion>
+
     @Query("SELECT * FROM EjercicioEnSesion WHERE sesionId = :sesionId ORDER BY orden")
     fun getBySesion(sesionId: Long): Flow<List<EjercicioEnSesion>>
 

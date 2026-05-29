@@ -13,13 +13,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
@@ -66,10 +69,19 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
         CardPerfil(settings, viewModel)
         CardPlan(settings, viewModel)
         CardMacros(settings, viewModel)
-        CardBackup(settings, viewModel)
-        CardExport()
+        CardBackup(settings, viewModel, state.exportando)
+        CardExport(settings, viewModel, state.exportando)
         CardIA()
         Spacer(Modifier.height(16.dp))
+    }
+
+    state.mensajeResultado?.let { msg ->
+        AlertDialog(
+            onDismissRequest = viewModel::descartarMensaje,
+            title = { Text("Resultado") },
+            text = { Text(msg) },
+            confirmButton = { TextButton(onClick = viewModel::descartarMensaje) { Text("OK") } }
+        )
     }
 
     state.dialog?.let { dialog ->
@@ -204,7 +216,7 @@ private fun CardMacros(s: UserSettings, vm: SettingsViewModel) {
 }
 
 @Composable
-private fun CardBackup(s: UserSettings, vm: SettingsViewModel) {
+private fun CardBackup(s: UserSettings, vm: SettingsViewModel, exportando: Boolean) {
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
         uri?.let { vm.cambiarCarpetaBackup(it) }
     }
@@ -222,25 +234,48 @@ private fun CardBackup(s: UserSettings, vm: SettingsViewModel) {
                 valor = "",
                 onClick = { vm.abrirDialog(SettingsDialog.ConfirmarQuitarBackup()) }
             )
+            HorizontalDivider()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    onClick = vm::hacerBackup,
+                    enabled = !exportando
+                ) {
+                    if (exportando) {
+                        CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
+                        Spacer(Modifier.width(8.dp))
+                    }
+                    Text("Hacer backup ahora")
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun CardExport() {
+private fun CardExport(s: UserSettings, vm: SettingsViewModel, exportando: Boolean) {
+    val tieneCarpeta = s.carpetaBackupUri != null
     CardSeccion("Exportar") {
         CampoItem(
             titulo = "Exportar a Excel",
             valor = "",
-            enabled = false,
-            supporting = "Disponible en T-010"
+            enabled = tieneCarpeta && !exportando,
+            supporting = if (tieneCarpeta) "Genera recomposicion_YYYY-MM-DD.xlsx en la carpeta de backup"
+                         else "Configura la carpeta de backup primero",
+            onClick = { vm.exportarXlsx() }
         )
         HorizontalDivider()
         CampoItem(
             titulo = "Exportar todo (ZIP)",
             valor = "",
-            enabled = false,
-            supporting = "Disponible en T-010"
+            enabled = tieneCarpeta && !exportando,
+            supporting = if (tieneCarpeta) "JSON + Excel + SQLite en un ZIP"
+                         else "Configura la carpeta de backup primero",
+            onClick = { vm.exportarZip() }
         )
     }
 }

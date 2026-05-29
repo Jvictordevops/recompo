@@ -8,6 +8,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.vic.recompo.data.UserSettingsStore
+import com.vic.recompo.data.backup.BackupSerializer
+import com.vic.recompo.data.backup.XlsxExporter
+import com.vic.recompo.data.backup.ZipExporter
+import com.vic.recompo.data.db.RecompoDatabase
 import com.vic.recompo.domain.model.Sexo
 import com.vic.recompo.domain.model.UserSettings
 import com.vic.recompo.domain.validation.UserSettingsValidation
@@ -64,20 +68,31 @@ sealed class SettingsDialog {
 
 data class SettingsUiState(
     val settings: UserSettings? = null,
-    val dialog: SettingsDialog? = null
+    val dialog: SettingsDialog? = null,
+    val exportando: Boolean = false,
+    val mensajeResultado: String? = null
 )
 
 class SettingsViewModel(
     application: Application,
-    private val store: UserSettingsStore
+    private val store: UserSettingsStore,
+    private val database: RecompoDatabase
 ) : AndroidViewModel(application) {
 
+    private val backupSerializer = BackupSerializer(application, database, store)
+    private val xlsxExporter = XlsxExporter(database, store)
+    private val zipExporter = ZipExporter(application, database, store, backupSerializer, xlsxExporter)
+
     private val _dialog = MutableStateFlow<SettingsDialog?>(null)
+    private val _exportando = MutableStateFlow(false)
+    private val _mensajeResultado = MutableStateFlow<String?>(null)
 
     val uiState: StateFlow<SettingsUiState> = combine(
         store.settings,
-        _dialog
-    ) { s, d -> SettingsUiState(settings = s, dialog = d) }
+        _dialog,
+        _exportando,
+        _mensajeResultado
+    ) { s, d, exp, msg -> SettingsUiState(settings = s, dialog = d, exportando = exp, mensajeResultado = msg) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsUiState())
 
     fun abrirDialog(dialog: SettingsDialog) { _dialog.value = dialog }
@@ -178,6 +193,53 @@ class SettingsViewModel(
         }
     }
 
+    fun descartarMensaje() { _mensajeResultado.value = null }
+
+    fun hacerBackup() {
+        if (_exportando.value) return
+        viewModelScope.launch {
+            _exportando.value = true
+            backupSerializer.hacerBackup()
+                .onSuccess { bytes -> _mensajeResultado.value = "Backup OK (${bytes / 1024} KB)" }
+                .onFailure { e -> _mensajeResultado.value = "Error: ${e.message}" }
+            _exportando.value = false
+        }
+    }
+
+    fun exportarXlsx() {
+        if (_exportando.value) return
+        val uri = uiState.value.settings?.carpetaBackupUri
+            ?: run { _mensajeResultado.value = "Configura la carpeta de backup primero"; return }
+        viewModelScope.launch {
+            _exportando.value = true
+            runCatching {
+                val bytes = xlsxExporter.generarBytes()
+                val nombre = "recomposicion_${java.time.LocalDate.now()}.xlsx"
+                backupSerializer.escribirEnCarpeta(uri, nombre, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", bytes)
+                bytes.size.toLong()
+            }.onSuccess { bytes -> _mensajeResultado.value = "Excel exportado (${bytes / 1024} KB)" }
+             .onFailure { e -> _mensajeResultado.value = "Error: ${e.message}" }
+            _exportando.value = false
+        }
+    }
+
+    fun exportarZip() {
+        if (_exportando.value) return
+        val uri = uiState.value.settings?.carpetaBackupUri
+            ?: run { _mensajeResultado.value = "Configura la carpeta de backup primero"; return }
+        viewModelScope.launch {
+            _exportando.value = true
+            runCatching {
+                val bytes = zipExporter.generarBytes()
+                val nombre = "recomposicion_backup_${java.time.LocalDate.now()}.zip"
+                backupSerializer.escribirEnCarpeta(uri, nombre, "application/zip", bytes)
+                bytes.size.toLong()
+            }.onSuccess { bytes -> _mensajeResultado.value = "ZIP exportado (${bytes / 1024} KB)" }
+             .onFailure { e -> _mensajeResultado.value = "Error: ${e.message}" }
+            _exportando.value = false
+        }
+    }
+
     private fun persistir(s: UserSettings) {
         viewModelScope.launch {
             store.save(s)
@@ -199,9 +261,10 @@ class SettingsViewModel(
 
 class SettingsViewModelFactory(
     private val application: Application,
-    private val store: UserSettingsStore
+    private val store: UserSettingsStore,
+    private val database: RecompoDatabase
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        SettingsViewModel(application, store) as T
+        SettingsViewModel(application, store, database) as T
 }

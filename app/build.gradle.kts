@@ -88,6 +88,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
 
+    // Export
+    implementation(libs.androidx.documentfile)
+
     // Logging
     implementation(libs.timber)
 

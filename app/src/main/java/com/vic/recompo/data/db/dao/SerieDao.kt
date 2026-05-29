@@ -13,6 +13,9 @@ interface SerieDao {
     @Insert suspend fun insertAll(list: List<Serie>)
     @Update suspend fun update(serie: Serie)
 
+    @Query("SELECT * FROM Serie ORDER BY ejercicioEnSesionId, numero")
+    suspend fun getAll(): List<Serie>
+
     @Query("SELECT * FROM Serie WHERE ejercicioEnSesionId = :ejercicioEnSesionId ORDER BY numero")
     fun getByEjercicioEnSesion(ejercicioEnSesionId: Long): Flow<List<Serie>>
 

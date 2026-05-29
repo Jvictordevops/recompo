@@ -24,6 +24,9 @@ interface EntradaComidaDao {
     @Query("DELETE FROM EntradaComida WHERE id = :id")
     suspend fun deleteById(id: Long)
 
+    @Query("SELECT * FROM EntradaComida ORDER BY fecha, timestamp")
+    suspend fun getAll(): List<EntradaComida>
+
     @Query("SELECT * FROM EntradaComida WHERE fecha = :fecha ORDER BY timestamp")
     fun getByFecha(fecha: LocalDate): Flow<List<EntradaComida>>
 

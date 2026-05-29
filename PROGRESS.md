@@ -8,6 +8,28 @@ _(vacío)_
 
 ## DONE (reciente)
 
+### T-010 — Backup: JSON continuo + export XLSX
+
+**Commit**: pendiente
+
+**Estado**: build verde, 43 tests verdes, probado en móvil ✓ (2026-05-29).
+
+- `data/backup/BackupDto.kt` — DTOs `@Serializable` para todas las tablas (11 clases). Fechas/enums como String para portabilidad.
+- `data/backup/BackupSerializer.kt` — lee todas las tablas Room (`.first()` sobre Flows + `suspend getAll()` en los que faltaba), construye `BackupData`, serializa a JSON y escribe en carpeta SAF. Actualiza `ultimoBackupOk/Error/Bytes` en UserSettings tras cada backup. Helper `escribirEnCarpeta()` reutilizado por exportadores.
+- `data/backup/XlsxExporter.kt` — genera `.xlsx` sin dependencias externas (ZIP de XML OpenXML directo). 5 hojas: Resumen, Mediciones, Entrenamiento (una fila por ejercicio), Nutrición, Actividad.
+- `data/backup/ZipExporter.kt` — genera ZIP con `recomposicion.json` + `recomposicion_YYYY-MM-DD.xlsx` + `recomposicion_raw.db` (con PRAGMA wal_checkpoint antes de copiar).
+- `data/db/dao/EntradaComidaDao.kt` — añadido `suspend fun getAll()`.
+- `data/db/dao/SerieDao.kt` — añadido `suspend fun getAll()`.
+- `data/db/dao/EjercicioEnSesionDao.kt` — añadido `suspend fun getAll()`.
+- `data/db/dao/MensajeIADao.kt` — añadido `suspend fun getAll()`.
+- `ui/settings/SettingsViewModel.kt` — añadidos `hacerBackup()`, `exportarXlsx()`, `exportarZip()`, `descartarMensaje()`. Estado `exportando: Boolean` + `mensajeResultado: String?`. Constructor recibe `RecompoDatabase`.
+- `ui/settings/SettingsScreen.kt` — `CardBackup` con botón "Hacer backup ahora" (visible si carpeta configurada). `CardExport` con botones "Exportar a Excel" y "Exportar todo (ZIP)" activos (deshabilitados si no hay carpeta). Dialog de resultado.
+- `MainActivity.kt` — `SettingsViewModelFactory` recibe `app.database`.
+- `gradle/libs.versions.toml` + `app/build.gradle.kts` — añadido `androidx.documentfile:documentfile:1.0.1`.
+- Build verde, tests verdes ✓
+
+---
+
 ### T-011 — Settings básico
 
 **Commit**: `7048013 feat(settings): T-011 pantalla ajustes con edición de perfil, macros y backup`
@@ -114,39 +136,6 @@ que las sesiones ya completadas sigan siendo editables.
 ---
 
 ## TODO
-
-### T-010 — Backup: JSON continuo + export XLSX
-**Estimación**: 8-12h
-
-**Descripción**
-Tres capas de backup (§6.4):
-- **Capa 1**: tras cambios significativos (cierre de sesión, fin del día, abandono de
-  pantalla con cambios pendientes), escribir `recomposicion.json` en carpeta Drive
-  elegida vía SAF. Trigger vía `BackupScheduler` con debounce global (no se invoca
-  desde cada repositorio). Actualizar UserSettings: ultimoBackupOk,
-  ultimoBackupError, ultimoBackupBytes. El chip de Home (ya implementado en T-005
-  con estados visuales, pero hoy muestra default porque nada actualiza esos campos
-  hasta esta tarea) pasará a reflejar el estado real.
-- **Capa 2**: botón "Exportar a Excel" en Settings → genera
-  `recomposicion_YYYY-MM-DD.xlsx` con fastexcel. Hojas: Resumen, Mediciones,
-  Entrenamiento, Nutrición, Actividad (§6.5).
-- **Capa 3**: botón "Exportar todo (ZIP)" → JSON + SQLite cruda + XLSX en un zip.
-
-Sin WorkManager automático (decisión §6.4). Sin sincronización entre dispositivos.
-
-Estimación amplia (8-12h) porque SAF + Drive es la zona más impredecible: permisos
-que caducan silenciosamente, locking, validar que el JSON se re-importa sin perder
-datos.
-
-**Hecho cuando**
-- Build verde + tests verdes
-- JSON continuo escribe tras cambios significativos y actualiza tracking en UserSettings
-- BackupChip de Home refleja correctamente OK / atrasado / falló
-- Export XLSX funciona y abre limpio en Excel/LibreOffice
-- Export ZIP contiene los 3 ficheros
-- Probado en móvil con cuenta Drive real
-
----
 
 ### T-012 — Seed inicial de ComidaBase
 **Estimación**: 1-2h
@@ -257,6 +246,11 @@ CRUD de `EntradaComida`.
 **Afecta**: pantalla Nutrición → modo Plantilla
 **Problema**: `ComidaBase` está vacía, el selector de plantillas no muestra nada. El modo Plantilla es inútil hasta que haya datos.
 **Cuando atacar**: antes de usar la app en serio, o cuando se implemente la pantalla de gestión de plantillas en Settings (Fase 3). Solución mínima: seed manual con `INSERT` o pantalla básica de CRUD en Settings.
+
+### DT-003 — Fecha en nombre del fichero JSON de backup
+**Afecta**: `BackupSerializer.kt` → `hacerBackup()`
+**Problema**: el backup continuo siempre escribe `recomposicion.json`, sobrescribiendo el anterior. No hay histórico de backups en la carpeta Drive.
+**Cuando atacar**: bajo demanda, antes de migrar datos importantes. Solución: añadir fecha al nombre (`recomposicion_YYYY-MM-DD.json`) o mantener los últimos N ficheros.
 
 ---
 

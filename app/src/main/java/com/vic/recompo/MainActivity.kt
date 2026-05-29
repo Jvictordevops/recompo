@@ -100,7 +100,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private val settingsViewModel by viewModels<SettingsViewModel> {
-        SettingsViewModelFactory(application, app.userSettingsStore)
+        SettingsViewModelFactory(application, app.userSettingsStore, app.database)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

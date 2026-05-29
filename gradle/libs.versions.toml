@@ -28,6 +28,9 @@ kotlinxCoroutines = "1.10.2"
 # Logging
 timber = "5.0.1"
 
+# Export
+documentfile = "1.0.1"
+
 # Testing
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -76,6 +79,9 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 
 # Logging
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+
+# Export
+androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentfile" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

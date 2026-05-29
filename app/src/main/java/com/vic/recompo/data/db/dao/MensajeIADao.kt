@@ -11,6 +11,9 @@ interface MensajeIADao {
     @Insert suspend fun insert(mensaje: MensajeIA): Long
     @Insert suspend fun insertAll(list: List<MensajeIA>)
 
+    @Query("SELECT * FROM MensajeIA ORDER BY conversacionId, timestamp")
+    suspend fun getAll(): List<MensajeIA>
+
     @Query("SELECT * FROM MensajeIA WHERE conversacionId = :conversacionId ORDER BY timestamp")
     fun getByConversacion(conversacionId: Long): Flow<List<MensajeIA>>
 
