@@ -11,6 +11,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.time.Instant
+import java.time.LocalDate
 
 private val json = Json { prettyPrint = false; encodeDefaults = true }
 
@@ -29,7 +30,8 @@ class BackupSerializer(
             val data = buildBackupData(settings)
             val encoded = json.encodeToString(data)
             val bytes = encoded.toByteArray(Charsets.UTF_8)
-            escribirEnCarpeta(uri, "recomposicion.json", "application/json", bytes)
+            val fecha = LocalDate.now()
+            escribirEnCarpeta(uri, "recomposicion_$fecha.json", "application/json", bytes)
             val ahora = Instant.now()
             store.save(
                 settings.copy(

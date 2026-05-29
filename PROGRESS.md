@@ -8,6 +8,11 @@ _(vacío)_
 
 ## DONE (reciente)
 
+### T-013 — Smoke test MVP completo
+**Estado**: completado (2026-05-29). Los 9 pasos del checklist pasaron sin bugs bloqueantes. MVP Fase 1 cerrado.
+
+---
+
 ### T-012 — Seed inicial de ComidaBase
 
 **Commit**: hecho
@@ -229,14 +234,26 @@ CRUD de `EntradaComida`.
 **Estado**: ✅ resuelta en T-009 iter 2 (DatePicker de Material 3 con locale "es" introducido en "Nueva sesión"). El wizard sigue con input ISO, pero ya hay patrón reutilizable cuando se aborde Settings (T-011).
 
 ### DT-002 — Seed de plantillas de comida
-**Afecta**: pantalla Nutrición → modo Plantilla
-**Problema**: `ComidaBase` está vacía, el selector de plantillas no muestra nada. El modo Plantilla es inútil hasta que haya datos.
-**Cuando atacar**: antes de usar la app en serio, o cuando se implemente la pantalla de gestión de plantillas en Settings (Fase 3). Solución mínima: seed manual con `INSERT` o pantalla básica de CRUD en Settings.
+**Estado**: ✅ resuelta en T-012 (seed de 7 plantillas reales de Vic: 1 desayuno, 3 tostadas, 3 natillas).
 
 ### DT-003 — Fecha en nombre del fichero JSON de backup
-**Afecta**: `BackupSerializer.kt` → `hacerBackup()`
-**Problema**: el backup continuo siempre escribe `recomposicion.json`, sobrescribiendo el anterior. No hay histórico de backups en la carpeta Drive.
-**Cuando atacar**: bajo demanda, antes de migrar datos importantes. Solución: añadir fecha al nombre (`recomposicion_YYYY-MM-DD.json`) o mantener los últimos N ficheros.
+**Estado**: ✅ resuelta. `hacerBackup()` ahora escribe `recomposicion_YYYY-MM-DD.json`. Cada día genera un fichero nuevo en Drive, sin sobreescribir el anterior.
+
+### DT-004 — Separar objetivo nutricional y gasto real
+**Afecta**: `UserSettings`, `HomeViewModel`, `HomeScreen`, `SettingsScreen`, `WizardScreen`, `CalcularKcalObjetivoUseCase`
+**Problema**: el modelo actual mezcla en un solo número dos conceptos distintos. Con bici + musculación en el mismo día sale "2600 kcal" que no es ni el plan ni el balance real.
+**Decisión**:
+- **Bloque 1 — Objetivo nutricional**: depende de TipoDia. Valores del plan nutricional, NO se suma la actividad registrada.
+- **Bloque 2 — Gasto real**: `metabolismoBasalKcal` (editable, default 1830) + Σ kcalQuemadas actividades del día = gasto total.
+- **Déficit real** (si se muestra): `ingerido − gasto total`. Nunca se mezcla con el objetivo.
+
+**Cambios de modelo**:
+- `UserSettings`: sustituir `kcalBaseDia` por tres campos `kcalDescanso`, `kcalMusculacion`, `kcalBici`. Añadir `metabolismoBasalKcal: Int` (default 1830).
+- `TipoDia`: sigue auto-derivado, pero con prioridad `BICI > MUSCULACION > DESCANSO` cuando coinciden actividad y sesión el mismo día. **Además: el chip en Home debe permitir override manual**, porque el tipo del día puede variar.
+- Eliminar `CalcularKcalObjetivoUseCase` o reescribirlo para los dos bloques independientes.
+- Wizard paso 2: 3 campos de kcal en lugar de 1.
+
+**Cuando atacar**: de golpe, antes de Fase 2 o cuando el uso diario muestre que el número confunde. Impacta wizard, settings, home y el use case — atacar todo en una sola tarea.
 
 ---
 
