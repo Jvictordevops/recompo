@@ -10,9 +10,9 @@ _(vacío)_
 
 ### T-012 — Seed inicial de ComidaBase
 
-**Commit**: pendiente
+**Commit**: hecho
 
-**Estado**: build verde, 43 tests verdes (2026-05-29).
+**Estado**: build verde, 43 tests verdes, probado en móvil ✓ (2026-05-29).
 
 - `data/db/dao/ComidaBaseDao.kt` — añadido `suspend fun count(): Int`.
 - `App.kt` — `seedComidasBaseIfEmpty()`: si `ComidaBase` está vacía, inserta 7 plantillas (1 desayuno, 3 tostadas, 3 natillas). Macros calculados con cantidades reales de Vic.
