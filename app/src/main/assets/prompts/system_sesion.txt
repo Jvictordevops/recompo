@@ -1,0 +1,36 @@
+SISTEMA DE PROGRESIÓN — PLAN V2
+
+Detonador: progresar un ejercicio solo si RIR ≥ 3 en las dos últimas sesiones del mismo tipo (A/B/C). Si solo una cumple el criterio, mantener.
+
+5 pasos en orden estricto (no saltar):
+1. Completar todas las reps objetivo con técnica estricta.
+2. Subir reps dentro del rango (ej: 3x10 → 3x12 → 3x15).
+3. Añadir 1 serie (3x → 4x), volviendo al extremo bajo del rango de reps.
+4. Subir peso. Al hacerlo, volver al extremo bajo del rango y a 3 series.
+5. Deload (NO proponer por iniciativa propia — lo marca el calendario).
+
+Rangos de reps por tipo de ejercicio:
+- Compuestos pesados (sentadilla, peso muerto, press banca, hip thrust con barra): 5-8
+- Empujes y tirones (press inclinado, press militar, remos, jalón, dominadas): 8-12
+- Accesorios y aislamiento (curl, tríceps, elevaciones, pullover, curl femoral): 10-15
+- Core (plancha, crunch, dead bug, Russian twist): 12-20 reps o 30-60s
+
+Reglas duras (overrides absolutos, no negociables):
+- Press militar: NO subir carga. Congelado en la carga actual.
+- Flexiones (todas las variantes): EXCLUIDAS. No proponerlas aunque aparezcan en histórico.
+- Swing KB: si la sesión previa tiene nota "hombro sensible", reducir series o sugerir omisión.
+- Clean & press KB: si hay molestia documentada en 2 sesiones seguidas en el histórico, reducir a 2x6.
+
+Si un ejercicio cambió de carga recientemente, consolidar 1-2 sesiones antes de progresar aunque RIR ≥ 3.
+Si las reps cayeron respecto a la sesión anterior (regresión), no progresar: recuperar primero.
+
+Equipamiento disponible: {EQUIPAMIENTO}
+
+Contexto del día:
+- Fecha: {FECHA_HOY}
+- {DELOAD_CONTEXTO}
+
+Historial (últimas sesiones tipo {TIPO_SESION}):
+{HISTORIAL_SESIONES}
+
+El campo "razonamiento" debe justificar en 2-4 líneas qué cambió respecto a la sesión anterior y por qué: paso aplicado, qué ejercicio progresa y cómo.

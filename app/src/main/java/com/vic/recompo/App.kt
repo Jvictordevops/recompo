@@ -1,7 +1,9 @@
 package com.vic.recompo
 
 import android.app.Application
+import com.vic.recompo.BuildConfig
 import com.vic.recompo.data.UserSettingsStore
+import com.vic.recompo.data.ai.ClaudeClient
 import com.vic.recompo.data.db.RecompoDatabase
 import com.vic.recompo.data.db.entity.ComidaBase
 import com.vic.recompo.data.db.entity.Ejercicio
@@ -17,6 +19,7 @@ import org.json.JSONArray
 class App : Application() {
     val database by lazy { RecompoDatabase.getInstance(this) }
     val userSettingsStore by lazy { UserSettingsStore(this) }
+    val claudeApi by lazy { ClaudeClient.create(BuildConfig.CLAUDE_API_KEY, BuildConfig.DEBUG) }
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 

@@ -8,6 +8,27 @@ _(vacío)_
 
 ## DONE (reciente)
 
+### T-014 — Cliente Claude API
+**Commit**: pendiente
+
+**Estado**: build verde, 57 tests verdes (+13 DeloadCalendarTest) (2026-05-29).
+
+- `domain/ai/ContextLimits.kt` — constantes MAX_SESIONES_HISTORICO=3, MAX_MEDICIONES_HISTORICO=4, MAX_MENSAJES_CHAT=20, MAX_PROMPT_CHARS=8000.
+- `domain/ai/DeloadCalendar.kt` — semanas 11/17/23 hardcodeadas; `isDeloadWeek()`, `daysToNextDeload()`, `deloadContextText()` para inyectar contexto en el prompt.
+- `data/ai/ClaudeModels.kt` — `DEFAULT_MODEL = "claude-sonnet-4-6"`.
+- `data/ai/dto/ClaudeRequest.kt` — `ClaudeRequest`, `Message`, `Tool` (@Serializable).
+- `data/ai/dto/ClaudeResponse.kt` — `ClaudeResponse`, `ContentBlock`, `Usage` (@Serializable, ignoreUnknownKeys, explicitNulls=false).
+- `data/ai/ClaudeApi.kt` — Retrofit interface `POST v1/messages`.
+- `data/ai/ClaudeClient.kt` — OkHttp con ApiKey interceptor + Anthropic-Version header; logging solo en debug; timeouts 30s connect / 60s read.
+- `assets/prompts/system_base.txt` — template de perfil con marcadores {NOMBRE}, {EDAD}, {KCAL_OBJETIVO}, etc.
+- `assets/prompts/system_sesion.txt` — reglas de progresión plan v2 completas + marcadores {EQUIPAMIENTO}, {DELOAD_CONTEXTO}, {HISTORIAL_SESIONES}.
+- `App.kt` — añadido `claudeApi by lazy { ClaudeClient.create(...) }`.
+- 13 tests DeloadCalendar (isDeloadWeek, daysToNextDeload, deloadContextText — semanas 11/17/23 y casos borde).
+
+---
+
+## DONE (reciente)
+
 ### T-013 — Smoke test MVP completo
 **Estado**: completado (2026-05-29). Los 9 pasos del checklist pasaron sin bugs bloqueantes. MVP Fase 1 cerrado.
 
@@ -229,6 +250,11 @@ CRUD de `EntradaComida`.
 ---
 
 ## DEUDA TÉCNICA
+
+### DT-005 — Forzar deload manualmente
+**Estado**: abierta. Hoy no hay forma de decirle a la app "esta semana es deload aunque el calendario diga semana X". Si se adelanta, generar la sesión y editarla a mano antes de aceptar. Mover fechas de deload a Settings cuando se necesite.
+
+
 
 ### DT-001 — Fechas en formato español + DatePicker
 **Estado**: ✅ resuelta en T-009 iter 2 (DatePicker de Material 3 con locale "es" introducido en "Nueva sesión"). El wizard sigue con input ISO, pero ya hay patrón reutilizable cuando se aborde Settings (T-011).
