@@ -8,9 +8,21 @@ _(vacío)_
 
 ## DONE (reciente)
 
-### T-010 — Backup: JSON continuo + export XLSX
+### T-012 — Seed inicial de ComidaBase
 
 **Commit**: pendiente
+
+**Estado**: build verde, 43 tests verdes (2026-05-29).
+
+- `data/db/dao/ComidaBaseDao.kt` — añadido `suspend fun count(): Int`.
+- `App.kt` — `seedComidasBaseIfEmpty()`: si `ComidaBase` está vacía, inserta 7 plantillas (1 desayuno, 3 tostadas, 3 natillas). Macros calculados con cantidades reales de Vic.
+- `ui/nutricion/NutricionScreen.kt` — dropdown de plantillas muestra todas las variantes activas independientemente del slot (antes filtraba por slot del dialog, lo que impedía usar una tostada en merienda).
+
+---
+
+### T-010 — Backup: JSON continuo + export XLSX
+
+**Commit**: hecho (confirmado por Vic)
 
 **Estado**: build verde, 43 tests verdes, probado en móvil ✓ (2026-05-29).
 
@@ -137,32 +149,6 @@ que las sesiones ya completadas sigan siendo editables.
 
 ## TODO
 
-### T-012 — Seed inicial de ComidaBase
-**Estimación**: 1-2h
-
-**Descripción**
-Resuelve DT-002. Sin esto, el modo "Plantilla" de la pantalla de nutrición está vacío
-y la app no es usable en serio. Seed hardcoded en código (no pantalla CRUD — eso es
-Fase 3).
-
-Disparador: en primer arranque (o cuando la tabla `ComidaBase` esté vacía), insertar
-los registros iniciales tras completar el wizard.
-
-**Datos a sembrar** (slots y macros a confirmar con Vic antes de codificar):
-- 1 desayuno fijo: 250 ml leche semi + 40 g avena + 30 g HSN whey
-- 3 tostadas: atún · lomo embuchado · pavo con queso
-- 3 natillas: sola · + plátano · + plátano + uvas
-
-Los macros (kcal/prot/grasa/carbo) de cada variante se rellenan con valores reales
-calculados con Vic antes de codificar (no estimaciones de IA).
-
-**Hecho cuando**
-- Build verde + tests verdes
-- Primer arranque con tabla vacía inserta las plantillas
-- Selector de plantillas en nutrición muestra las variantes esperadas por slot
-- Probado en móvil
-
----
 
 ### T-013 — Smoke test MVP completo
 **Estimación**: 1-2h

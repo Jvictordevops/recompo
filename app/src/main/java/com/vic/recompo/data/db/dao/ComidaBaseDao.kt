@@ -27,4 +27,7 @@ interface ComidaBaseDao {
 
     @Query("DELETE FROM ComidaBase WHERE id = :id")
     suspend fun deleteById(id: Long)
+
+    @Query("SELECT COUNT(*) FROM ComidaBase")
+    suspend fun count(): Int
 }

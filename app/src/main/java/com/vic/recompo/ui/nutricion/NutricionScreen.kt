@@ -74,7 +74,7 @@ fun NutricionScreen(viewModel: NutricionViewModel) {
     if (dialog.abierto) {
         AnadirComidaDialog(
             dialog = dialog,
-            plantillas = state.plantillasPorSlot[dialog.slot] ?: emptyList(),
+            plantillas = state.plantillasPorSlot.values.flatten(),
             onModoPlantillaChanged = viewModel::onModoPlantillaChanged,
             onPlantillaSeleccionada = viewModel::onPlantillaSeleccionada,
             onTextoLibreChanged = viewModel::onTextoLibreChanged,
