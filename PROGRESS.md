@@ -237,33 +237,19 @@ CRUD de `EntradaComida`.
 **Estado**: ✅ resuelta en T-012 (seed de 7 plantillas reales de Vic: 1 desayuno, 3 tostadas, 3 natillas).
 
 ### DT-003 — Fecha en nombre del fichero JSON de backup
-**Estado**: ✅ resuelta. `hacerBackup()` ahora escribe `recomposicion_YYYY-MM-DD.json`. Cada día genera un fichero nuevo en Drive, sin sobreescribir el anterior.
+**Estado**: ✅ resuelta. **Commit**: hecho (2026-05-29).
+`hacerBackup()` ahora escribe `recomposicion_YYYY-MM-DD.json`. Cada día genera un fichero nuevo en Drive, sin sobreescribir el anterior.
 
 ### DT-004 — Separar objetivo nutricional y gasto real
-**Estado**: ✅ resuelta (2026-05-29). Build verde, tests verdes.
+**Estado**: ✅ resuelta. **Commit**: hecho (2026-05-29). Build verde, tests verdes.
 
-**Resumen de cambios**:
 - `UserSettings`: `kcalBaseDia` → `kcalDescanso / kcalMusculacion / kcalBici` + `metabolismoBasalKcal` (default 1830).
-- `UserSettingsStore`: 4 nuevas claves DataStore. **Nota**: al instalar este APK el wizard aparecerá de nuevo — hay que reconfigurar macros.
-- `CalcularKcalObjetivoUseCase`: reescrito con `calcularObjetivoNutricional(tipoDia, ...)` y `calcularGastoReal(basal, actividades)`.
-- `HomeViewModel`: TipoDia auto-derivado con prioridad BICI > MUSCULACION > DESCANSO. Override manual vía `setTipoDia()`.
-- `HomeScreen`: chip TipoDia clickable (DropdownMenu). `TarjetaObjetivoNutricional` (consumido vs plan) + `TarjetaGasto` (basal + actividad = total, déficit real).
-- `WizardScreen/ViewModel`: Step 2 con 3 campos kcal + metabolismo basal.
-- `SettingsScreen/ViewModel`: CardMacros con 4 items editables.
-- `BackupDto/BackupSerializer/XlsxExporter`: campos actualizados.
-- Tests: reescritos para la nueva API (6 casos, todos verdes).
-
-**Afecta**: `UserSettings`, `HomeViewModel`, `HomeScreen`, `SettingsScreen`, `WizardScreen`, `CalcularKcalObjetivoUseCase`
-**Problema**: el modelo actual mezcla en un solo número dos conceptos distintos. Con bici + musculación en el mismo día sale "2600 kcal" que no es ni el plan ni el balance real.
-**Decisión**:
-- **Bloque 1 — Objetivo nutricional**: depende de TipoDia. Valores del plan nutricional, NO se suma la actividad registrada.
-- **Bloque 2 — Gasto real**: `metabolismoBasalKcal` (editable, default 1830) + Σ kcalQuemadas actividades del día = gasto total.
-- **Déficit real** (si se muestra): `ingerido − gasto total`. Nunca se mezcla con el objetivo.
-
-**Cambios de modelo**:
-- `UserSettings`: sustituir `kcalBaseDia` por tres campos `kcalDescanso`, `kcalMusculacion`, `kcalBici`. Añadir `metabolismoBasalKcal: Int` (default 1830).
-- `TipoDia`: sigue auto-derivado, pero con prioridad `BICI > MUSCULACION > DESCANSO` cuando coinciden actividad y sesión el mismo día. **Además: el chip en Home debe permitir override manual**, porque el tipo del día puede variar.
-- Eliminar `CalcularKcalObjetivoUseCase` o reescribirlo para los dos bloques independientes.
+- `UserSettingsStore`: 4 nuevas claves DataStore. ⚠️ Al instalar, el wizard vuelve a aparecer — reconfigurar macros.
+- `CalcularKcalObjetivoUseCase`: `calcularObjetivoNutricional(tipoDia, ...)` + `calcularGastoReal(basal, actividades)`.
+- `HomeViewModel`: TipoDia auto con prioridad BICI > MUSCULACION > DESCANSO. Override manual vía `setTipoDia()`.
+- `HomeScreen`: chip TipoDia clickable. `TarjetaObjetivoNutricional` + `TarjetaGasto` (déficit real).
+- `WizardScreen/ViewModel`: 3 campos kcal + metabolismo basal en paso 2.
+- `SettingsScreen/ViewModel`: 4 items editables en CardMacros.
 - Wizard paso 2: 3 campos de kcal en lugar de 1.
 
 **Cuando atacar**: de golpe, antes de Fase 2 o cuando el uso diario muestre que el número confunde. Impacta wizard, settings, home y el use case — atacar todo en una sola tarea.
