@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "kcal": { "type": "integer" },
+    "proteina_g": { "type": "number" },
+    "grasa_g": { "type": "number" },
+    "carbo_g": { "type": "number" },
+    "confianza": {
+      "type": "string",
+      "enum": ["alta", "media", "baja"]
+    },
+    "notas": { "type": "string" }
+  },
+  "required": ["kcal", "proteina_g", "grasa_g", "carbo_g", "confianza"]
+}

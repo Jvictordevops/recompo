@@ -44,6 +44,7 @@ import com.vic.recompo.ui.home.HomeViewModelFactory
 import com.vic.recompo.ui.mediciones.MedicionesScreen
 import com.vic.recompo.ui.mediciones.MedicionesViewModel
 import com.vic.recompo.ui.mediciones.MedicionesViewModelFactory
+import com.vic.recompo.data.ai.ParseComidaUseCase
 import com.vic.recompo.ui.nutricion.NutricionScreen
 import com.vic.recompo.ui.nutricion.NutricionViewModel
 import com.vic.recompo.ui.nutricion.NutricionViewModelFactory
@@ -63,9 +64,11 @@ class MainActivity : ComponentActivity() {
     }
 
     private val nutricionViewModel by viewModels<NutricionViewModel> {
+        val schemaJson = app.assets.open("tools/registrar_comida.json").bufferedReader().use { it.readText() }
         NutricionViewModelFactory(
             app.database.entradaComidaDao(),
-            app.database.comidaBaseDao()
+            app.database.comidaBaseDao(),
+            ParseComidaUseCase(app.claudeApi, schemaJson)
         )
     }
 

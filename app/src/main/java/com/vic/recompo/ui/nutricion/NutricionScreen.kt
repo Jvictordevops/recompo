@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,8 +22,10 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
@@ -82,6 +85,7 @@ fun NutricionScreen(viewModel: NutricionViewModel) {
             onProteinaChanged = viewModel::onProteinaChanged,
             onGrasaChanged = viewModel::onGrasaChanged,
             onCarboChanged = viewModel::onCarboChanged,
+            onParsearConIA = viewModel::parsearConIA,
             onGuardar = viewModel::guardar,
             onCancelar = viewModel::cerrarDialogo
         )
@@ -195,6 +199,7 @@ private fun AnadirComidaDialog(
     onProteinaChanged: (String) -> Unit,
     onGrasaChanged: (String) -> Unit,
     onCarboChanged: (String) -> Unit,
+    onParsearConIA: () -> Unit,
     onGuardar: () -> Unit,
     onCancelar: () -> Unit
 ) {
@@ -242,6 +247,54 @@ private fun AnadirComidaDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                if (!dialog.modoPlantilla && dialog.entradaEditando == null) {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Button(
+                            onClick = onParsearConIA,
+                            enabled = dialog.textoLibre.isNotBlank() && !dialog.parseando,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            if (dialog.parseando) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp,
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                    Text("Calculando...")
+                                }
+                            } else {
+                                Text("Calcular con IA")
+                            }
+                        }
+                        dialog.errorIA?.let { err ->
+                            OutlinedTextField(
+                                value = err,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Error IA", color = MaterialTheme.colorScheme.error) },
+                                modifier = Modifier.fillMaxWidth(),
+                                isError = true,
+                                maxLines = 5
+                            )
+                        }
+                        dialog.confianza?.let { conf ->
+                            Text(
+                                text = "Confianza: $conf",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = when (conf) {
+                                    "alta" -> MaterialTheme.colorScheme.primary
+                                    "baja" -> MaterialTheme.colorScheme.error
+                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
+                                }
+                            )
+                        }
+                    }
+                }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(

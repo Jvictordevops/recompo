@@ -3,6 +3,7 @@ package com.vic.recompo.ui.nutricion
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.vic.recompo.data.ai.ParseComidaUseCase
 import com.vic.recompo.data.db.dao.ComidaBaseDao
 import com.vic.recompo.data.db.dao.EntradaComidaDao
 import com.vic.recompo.data.db.entity.ComidaBase
@@ -42,12 +43,17 @@ data class DialogState(
     val kcal: String = "",
     val proteinaG: String = "",
     val grasaG: String = "",
-    val carboG: String = ""
+    val carboG: String = "",
+    val parseando: Boolean = false,
+    val confianza: String? = null,
+    val parseadaPorIA: Boolean = false,
+    val errorIA: String? = null
 )
 
 class NutricionViewModel(
     private val entradaComidaDao: EntradaComidaDao,
-    private val comidaBaseDao: ComidaBaseDao
+    private val comidaBaseDao: ComidaBaseDao,
+    private val parseComidaUseCase: ParseComidaUseCase
 ) : ViewModel() {
 
     private val hoy = LocalDate.now()
@@ -114,11 +120,34 @@ class NutricionViewModel(
         }
     }
 
-    fun onTextoLibreChanged(v: String) = _dialogState.update { it.copy(textoLibre = v) }
+    fun onTextoLibreChanged(v: String) = _dialogState.update { it.copy(textoLibre = v, confianza = null, parseadaPorIA = false, errorIA = null) }
     fun onKcalChanged(v: String) = _dialogState.update { it.copy(kcal = v) }
     fun onProteinaChanged(v: String) = _dialogState.update { it.copy(proteinaG = v) }
     fun onGrasaChanged(v: String) = _dialogState.update { it.copy(grasaG = v) }
     fun onCarboChanged(v: String) = _dialogState.update { it.copy(carboG = v) }
+
+    fun parsearConIA() {
+        val texto = _dialogState.value.textoLibre.ifBlank { return }
+        _dialogState.update { it.copy(parseando = true) }
+        viewModelScope.launch {
+            parseComidaUseCase.parsear(texto).onSuccess { parsed ->
+                _dialogState.update {
+                    it.copy(
+                        parseando = false,
+                        kcal = parsed.kcal.toString(),
+                        proteinaG = parsed.proteinaG.toString(),
+                        grasaG = parsed.grasaG.toString(),
+                        carboG = parsed.carboG.toString(),
+                        confianza = parsed.confianza,
+                        parseadaPorIA = true
+                    )
+                }
+            }.onFailure { e ->
+                android.util.Log.e("ParseComida", "ViewModel onFailure: ${e::class.simpleName}: ${e.message}")
+                _dialogState.update { it.copy(parseando = false, errorIA = "${e::class.simpleName}: ${e.message}") }
+            }
+        }
+    }
 
     fun guardar() {
         val d = _dialogState.value
@@ -137,7 +166,7 @@ class NutricionViewModel(
                 grasaG = grasa,
                 carboG = carbo,
                 comidaBaseId = d.plantillaSeleccionada?.id,
-                parseadaPorIA = false,
+                parseadaPorIA = d.parseadaPorIA,
                 timestamp = Instant.now()
             )
             if (d.entradaEditando != null) entradaComidaDao.update(entrada)
@@ -153,9 +182,10 @@ class NutricionViewModel(
 
 class NutricionViewModelFactory(
     private val entradaComidaDao: EntradaComidaDao,
-    private val comidaBaseDao: ComidaBaseDao
+    private val comidaBaseDao: ComidaBaseDao,
+    private val parseComidaUseCase: ParseComidaUseCase
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        NutricionViewModel(entradaComidaDao, comidaBaseDao) as T
+        NutricionViewModel(entradaComidaDao, comidaBaseDao, parseComidaUseCase) as T
 }

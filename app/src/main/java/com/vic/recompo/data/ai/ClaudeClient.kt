@@ -16,6 +16,7 @@ object ClaudeClient {
     private val json = Json {
         ignoreUnknownKeys = true
         explicitNulls = false
+        encodeDefaults = true
     }
 
     fun create(apiKey: String, debug: Boolean = false): ClaudeApi {
