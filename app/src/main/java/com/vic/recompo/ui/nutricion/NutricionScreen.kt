@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -44,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.vic.recompo.data.db.entity.ComidaBase
@@ -86,6 +86,13 @@ fun NutricionScreen(viewModel: NutricionViewModel) {
             onGrasaChanged = viewModel::onGrasaChanged,
             onCarboChanged = viewModel::onCarboChanged,
             onParsearConIA = viewModel::parsearConIA,
+            onRespuestaAclaracionChanged = viewModel::onRespuestaAclaracionChanged,
+            onEnviarAclaracion = viewModel::enviarAclaracion,
+            onAceptarYGuardar = viewModel::aceptarYGuardar,
+            onEditarAMano = viewModel::editarAMano,
+            onAbrirAfinar = viewModel::abrirAfinar,
+            onTextoAfinarChanged = viewModel::onTextoAfinarChanged,
+            onEnviarAfinar = viewModel::enviarAfinar,
             onGuardar = viewModel::guardar,
             onCancelar = viewModel::cerrarDialogo
         )
@@ -200,6 +207,13 @@ private fun AnadirComidaDialog(
     onGrasaChanged: (String) -> Unit,
     onCarboChanged: (String) -> Unit,
     onParsearConIA: () -> Unit,
+    onRespuestaAclaracionChanged: (String) -> Unit,
+    onEnviarAclaracion: () -> Unit,
+    onAceptarYGuardar: () -> Unit,
+    onEditarAMano: () -> Unit,
+    onAbrirAfinar: () -> Unit,
+    onTextoAfinarChanged: (String) -> Unit,
+    onEnviarAfinar: () -> Unit,
     onGuardar: () -> Unit,
     onCancelar: () -> Unit
 ) {
@@ -217,130 +231,233 @@ private fun AnadirComidaDialog(
         title = { Text(titulo) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                if (dialog.entradaEditando == null) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilterChip(
-                            selected = dialog.modoPlantilla,
-                            onClick = { onModoPlantillaChanged(true) },
-                            label = { Text("Plantilla") }
-                        )
-                        FilterChip(
-                            selected = !dialog.modoPlantilla,
-                            onClick = { onModoPlantillaChanged(false) },
-                            label = { Text("Libre") }
-                        )
-                    }
-                }
-
-                if (dialog.modoPlantilla && dialog.entradaEditando == null) {
-                    PlantillaDropdown(
-                        seleccionada = dialog.plantillaSeleccionada,
-                        opciones = plantillas,
-                        onSeleccion = onPlantillaSeleccionada
-                    )
-                }
-
-                OutlinedTextField(
-                    value = dialog.textoLibre,
-                    onValueChange = onTextoLibreChanged,
-                    label = { Text("Descripción") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                if (!dialog.modoPlantilla && dialog.entradaEditando == null) {
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Button(
-                            onClick = onParsearConIA,
-                            enabled = dialog.textoLibre.isNotBlank() && !dialog.parseando,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            if (dialog.parseando) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(16.dp),
-                                        strokeWidth = 2.dp,
-                                        color = MaterialTheme.colorScheme.onPrimary
-                                    )
-                                    Text("Calculando...")
-                                }
-                            } else {
-                                Text("Calcular con IA")
+                when {
+                    dialog.resultadoIA != null -> {
+                        ResultadoIACard(resultado = dialog.resultadoIA, onEditarAMano = onEditarAMano)
+                        if (dialog.afinando) {
+                            OutlinedTextField(
+                                value = dialog.textoAfinar,
+                                onValueChange = onTextoAfinarChanged,
+                                label = { Text("Añade una precisión") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Button(
+                                onClick = onEnviarAfinar,
+                                enabled = dialog.textoAfinar.isNotBlank() && !dialog.parseando,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                if (dialog.parseando) SpinnerConTexto("Recalculando...")
+                                else Text("Recalcular")
                             }
+                        } else {
+                            TextButton(
+                                onClick = onAbrirAfinar,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            ) { Text("Afinar con una precisión") }
                         }
                         dialog.errorIA?.let { err ->
                             OutlinedTextField(
-                                value = err,
-                                onValueChange = {},
-                                readOnly = true,
+                                value = err, onValueChange = {}, readOnly = true, isError = true,
                                 label = { Text("Error IA", color = MaterialTheme.colorScheme.error) },
-                                modifier = Modifier.fillMaxWidth(),
-                                isError = true,
-                                maxLines = 5
-                            )
-                        }
-                        dialog.confianza?.let { conf ->
-                            Text(
-                                text = "Confianza: $conf",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = when (conf) {
-                                    "alta" -> MaterialTheme.colorScheme.primary
-                                    "baja" -> MaterialTheme.colorScheme.error
-                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
-                                }
+                                modifier = Modifier.fillMaxWidth(), maxLines = 5
                             )
                         }
                     }
-                }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = dialog.kcal,
-                        onValueChange = onKcalChanged,
-                        label = { Text("kcal") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(1f)
-                    )
-                    OutlinedTextField(
-                        value = dialog.proteinaG,
-                        onValueChange = onProteinaChanged,
-                        label = { Text("Prot g") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = dialog.grasaG,
-                        onValueChange = onGrasaChanged,
-                        label = { Text("Grasa g") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.weight(1f)
-                    )
-                    OutlinedTextField(
-                        value = dialog.carboG,
-                        onValueChange = onCarboChanged,
-                        label = { Text("Carbo g") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.weight(1f)
-                    )
+                    dialog.preguntasIA != null -> {
+                        PreguntasIACard(preguntas = dialog.preguntasIA)
+                        OutlinedTextField(
+                            value = dialog.respuestaAclaracion,
+                            onValueChange = onRespuestaAclaracionChanged,
+                            label = { Text("Tu respuesta") },
+                            modifier = Modifier.fillMaxWidth(),
+                            maxLines = 3
+                        )
+                        if (dialog.parseando) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally).size(24.dp))
+                        }
+                        dialog.errorIA?.let { err ->
+                            OutlinedTextField(
+                                value = err, onValueChange = {}, readOnly = true, isError = true,
+                                label = { Text("Error IA", color = MaterialTheme.colorScheme.error) },
+                                modifier = Modifier.fillMaxWidth(), maxLines = 5
+                            )
+                        }
+                    }
+
+                    else -> {
+                        if (dialog.entradaEditando == null) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                FilterChip(
+                                    selected = dialog.modoPlantilla,
+                                    onClick = { onModoPlantillaChanged(true) },
+                                    label = { Text("Plantilla") }
+                                )
+                                FilterChip(
+                                    selected = !dialog.modoPlantilla,
+                                    onClick = { onModoPlantillaChanged(false) },
+                                    label = { Text("Libre") }
+                                )
+                            }
+                        }
+
+                        if (dialog.modoPlantilla && dialog.entradaEditando == null) {
+                            PlantillaDropdown(
+                                seleccionada = dialog.plantillaSeleccionada,
+                                opciones = plantillas,
+                                onSeleccion = onPlantillaSeleccionada
+                            )
+                        }
+
+                        OutlinedTextField(
+                            value = dialog.textoLibre,
+                            onValueChange = onTextoLibreChanged,
+                            label = { Text("Descripción") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        if (!dialog.modoPlantilla && dialog.entradaEditando == null) {
+                            Button(
+                                onClick = onParsearConIA,
+                                enabled = dialog.textoLibre.isNotBlank() && !dialog.parseando,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                if (dialog.parseando) SpinnerConTexto("Calculando...")
+                                else Text("Calcular con IA")
+                            }
+                            dialog.errorIA?.let { err ->
+                                OutlinedTextField(
+                                    value = err, onValueChange = {}, readOnly = true, isError = true,
+                                    label = { Text("Error IA", color = MaterialTheme.colorScheme.error) },
+                                    modifier = Modifier.fillMaxWidth(), maxLines = 5
+                                )
+                            }
+                        }
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedTextField(
+                                value = dialog.kcal, onValueChange = onKcalChanged,
+                                label = { Text("kcal") }, singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                modifier = Modifier.weight(1f)
+                            )
+                            OutlinedTextField(
+                                value = dialog.proteinaG, onValueChange = onProteinaChanged,
+                                label = { Text("Prot g") }, singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedTextField(
+                                value = dialog.grasaG, onValueChange = onGrasaChanged,
+                                label = { Text("Grasa g") }, singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                modifier = Modifier.weight(1f)
+                            )
+                            OutlinedTextField(
+                                value = dialog.carboG, onValueChange = onCarboChanged,
+                                label = { Text("Carbo g") }, singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = onGuardar, enabled = puedoGuardar) { Text("Guardar") }
+            when {
+                dialog.resultadoIA != null ->
+                    TextButton(onClick = onAceptarYGuardar) { Text("Aceptar") }
+                dialog.preguntasIA != null ->
+                    TextButton(
+                        onClick = onEnviarAclaracion,
+                        enabled = dialog.respuestaAclaracion.isNotBlank() && !dialog.parseando
+                    ) { Text("Responder") }
+                else ->
+                    TextButton(onClick = onGuardar, enabled = puedoGuardar) { Text("Guardar") }
+            }
         },
         dismissButton = {
             TextButton(onClick = onCancelar) { Text("Cancelar") }
         }
     )
+}
+
+@Composable
+private fun ResultadoIACard(resultado: ResultadoIAState, onEditarAMano: () -> Unit) {
+    val confianzaColor = when (resultado.confianza) {
+        "alta" -> Color(0xFF388E3C)
+        "baja" -> MaterialTheme.colorScheme.error
+        else -> Color(0xFFF57C00)
+    }
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("${resultado.kcal} kcal", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    "Confianza: ${resultado.confianza}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = confianzaColor
+                )
+            }
+            Text(
+                "${resultado.proteinaG.toInt()}g prot · ${resultado.grasaG.toInt()}g grasa · ${resultado.carboG.toInt()}g carbo",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            resultado.supuestos?.let { sup ->
+                HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp))
+                Text(
+                    "Asumido: $sup",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            TextButton(
+                onClick = onEditarAMano,
+                modifier = Modifier.align(Alignment.End)
+            ) { Text("Editar a mano") }
+        }
+    }
+}
+
+@Composable
+private fun PreguntasIACard(preguntas: List<String>) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+    ) {
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                "La IA necesita más información:",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+            preguntas.forEach { pregunta ->
+                Text(
+                    "• $pregunta",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SpinnerConTexto(texto: String) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
+        Text(texto)
+    }
 }
 
 @Composable

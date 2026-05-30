@@ -1,15 +1,17 @@
 {
   "type": "object",
   "properties": {
+    "necesita_pregunta": { "type": "boolean" },
+    "preguntas": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
     "kcal": { "type": "integer" },
     "proteina_g": { "type": "number" },
     "grasa_g": { "type": "number" },
     "carbo_g": { "type": "number" },
-    "confianza": {
-      "type": "string",
-      "enum": ["alta", "media", "baja"]
-    },
-    "notas": { "type": "string" }
+    "confianza": { "type": "string", "enum": ["alta", "media", "baja"] },
+    "supuestos": { "type": "string" }
   },
-  "required": ["kcal", "proteina_g", "grasa_g", "carbo_g", "confianza"]
+  "required": ["necesita_pregunta"]
 }

@@ -175,6 +175,206 @@ que las sesiones ya completadas sigan siendo editables.
 
 ## TODO
 
+---
+
+### T-017 — Generador de próxima sesión con IA
+**Estimación**: 3-4h
+**Fase**: 2
+
+**Descripción**
+Al cerrar una sesión de entreno (estado POST_SESION), botón "Generar próxima sesión" llama a Claude API con contexto de las últimas 3 sesiones del mismo tipo (A/B/C), RIR global, notas, y reglas de progresión del plan v2. La IA propone la siguiente sesión (ejercicios, series, reps, carga sugerida). El usuario puede aceptar, editar o regenerar.
+
+Contexto a inyectar: `ContextLimits.MAX_SESIONES_HISTORICO = 3`. System prompt desde `assets/prompts/system_sesion.txt` (ya existe con reglas de progresión + marcadores). Fallback si la IA falla: repetir sesión anterior con +1 rep en ejercicios donde RIR ≥ 3.
+
+**Hecho cuando**
+- Botón "Generar próxima sesión" activo en POST_SESION
+- IA propone sesión con cargas y reps concretos
+- Usuario puede editar la propuesta antes de aceptar
+- Sesión generada aparece en el listado con `generadaPor = IA`
+- Fallback funciona si la API falla
+
+---
+
+### T-018 — Chat conversacional (nutricional + entreno)
+**Estimación**: 4-5h
+**Fase**: 2
+
+**Descripción**
+Pantalla de chat bajo demanda (acceso desde Home o desde las pantallas de Nutrición/Entreno). Conversación persistida en `Conversacion` + `MensajeIA`. System prompt construido dinámicamente con contexto del día (macros consumidos, sesión de hoy, últimas 4 mediciones) desde `system_base.txt`. Límites: `MAX_MENSAJES_CHAT = 20`, `MAX_PROMPT_CHARS = 8000` con truncado por lo más antiguo.
+
+Sin historial visual de conversaciones anteriores en MVP (datos guardados pero sin pantalla de listado).
+
+**Hecho cuando**
+- Chat accesible desde Home
+- Mensajes persistidos en BD
+- Contexto del día inyectado en system prompt
+- Truncado automático si se excede límite
+- Mensaje de error claro si la API falla
+
+---
+
+### T-019 — Pantalla "Uso de IA" en Settings
+**Estimación**: 2h
+**Fase**: 2
+
+**Descripción**
+Card en Settings (ya hay un placeholder) con: tokens medios por llamada en la última semana (leídos de `MensajeIA.tokensIn/Out`), número de llamadas, estimación de coste en euros (Sonnet 4.6: $3/M input + $15/M output). Aviso si los tokens medios suben sostenidamente (posible prompt hinchado).
+
+**Hecho cuando**
+- Card visible con métricas reales de la semana
+- Estimación de coste calculada correctamente
+- Sin regresiones en Settings
+
+---
+
+### T-020 — Gráficas de progreso
+**Estimación**: 4-5h
+**Fase**: 3
+
+**Descripción**
+Pantalla nueva o sección en Mediciones con gráficas de evolución: peso, % grasa, masa magra, kcal medias por semana. Librería Vico (ya en el plan técnico). Rango temporal seleccionable (1 mes / 3 meses / todo).
+
+---
+
+### T-021 — Entreno versión completa
+**Estimación**: 6-8h
+**Fase**: 3
+
+**Descripción**
+Mejoras sobre la versión simple actual: timer de descanso entre series configurable con notificación al terminar, `FLAG_KEEP_SCREEN_ON` durante la sesión, recuperación robusta tras rotación / app en background, animaciones y RIR slider con feedback háptico.
+
+---
+
+### T-022 — Historial de conversaciones IA
+**Estimación**: 2-3h
+**Fase**: 3
+
+**Descripción**
+Pantalla de listado de conversaciones anteriores (ya guardadas en BD desde T-018). Lista por fecha, título auto-generado desde primera frase. Permite releer pero no continuar conversaciones pasadas.
+
+---
+
+### T-023 — Notificaciones
+**Estimación**: 2-3h
+**Fase**: 3
+
+**Descripción**
+Recordatorio mensual de tomar medición. Aviso de semana de deload próxima (basado en `DeloadCalendar`). Notificación de timer de descanso entre series (requiere T-021).
+
+---
+
+### T-024 — Polish UI + fotos en mediciones
+**Estimación**: 4-6h
+**Fase**: 3
+
+**Descripción**
+Fotos opcionales en mediciones (URI persistente con scoped storage). Animaciones de transición entre pantallas. Refinamiento visual general. Solo si la app lleva 2+ meses de uso activo.
+
+---
+
+### T-016 — Catálogo de ingredientes + plantillas-receta
+**Estimación**: 6-8h (bloque grande, hacer en una sola sesión)
+**Prioridad**: alta — desbloquea parseo de unidades con valores reales y plantillas editables
+
+#### Contexto de partida
+- T-015 (Parser IA) completado: flujo 2 fases (pregunta opcional → resultado con supuestos).
+- `ComidaBase` ya existe con totales directos (kcal/prot/grasa/carbo). Las 7 plantillas del seed siguen funcionando sin cambios.
+- `app/src/main/assets/seed/ingredientes_seed.json` ya creado con 41 ingredientes listos para seed.
+- Schema Room actual: versión vigente en `RecompoDatabase`. Al añadir tablas, subir versión y añadir migración (o usar destructive, que está activo).
+
+#### Parte 1 — Modelo de datos nuevo (Room)
+
+**Entidad `Ingrediente`**:
+```
+id: Long (PK autoincrement)
+nombre: String
+kcal100g: Double
+prot100g: Double
+grasa100g: Double
+carbo100g: Double
+gramosPorUnidad: Int?       (null = a granel, solo gramos)
+nombreUnidad: String?       (null si a granel; ej: "cazo", "loncha", "natilla")
+fiabilidad: Fiabilidad      (enum: VALIDADO, ESTIMADO)
+activo: Boolean = true
+```
+
+**Entidad `PlantillaIngrediente`** (tabla intermedia ComidaBase ↔ Ingrediente):
+```
+id: Long (PK autoincrement)
+comidaBaseId: Long (FK → ComidaBase.id)
+ingredienteId: Long (FK → Ingrediente.id)
+cantidadG: Double
+```
+
+**`ComidaBase`**: sin cambios en la entidad. Una `ComidaBase` "compuesta" se detecta porque tiene filas en `PlantillaIngrediente`. Las "simples" (solo totales directos) siguen funcionando igual.
+
+**DAOs necesarios**:
+- `IngredienteDao`: `insert`, `getAll()`, `count()`, `search(query)` (LIKE para autocompletado), `getById(id)`, `update`
+- `PlantillaIngredienteDao`: `insertAll(lista)`, `getByComidaBase(comidaBaseId): Flow<List<PlantillaIngrediente>>`, `deleteByComidaBase(id)`, `upsert`
+
+**Migración Room**: subir `DATABASE_VERSION` +1. Añadir migración que crea `ingrediente` y `plantilla_ingrediente`. Alternativa: destructive sigue activo pero perderá datos — decidir al inicio según si hay datos reales que conservar.
+
+#### Parte 2 — Seed de ingredientes
+
+Mismo patrón idempotente que ejercicios (en `App.kt`):
+- `seedIngredientesIfEmpty()`: si `ingredienteDao.count() == 0`, leer `assets/seed/ingredientes_seed.json`, parsear con `org.json.JSONArray` (ya disponible), insertar. El campo `nota` puede ignorarse o guardarse si se añade columna `nota: String?`.
+- El JSON ya está en `assets/seed/ingredientes_seed.json`. Campos: `nombre`, `kcal100g`, `prot100g`, `grasa100g`, `carbo100g`, `gramosPorUnidad` (nullable), `nombreUnidad` (nullable), `fiabilidad` ("VALIDADO"/"ESTIMADO"), `nota`.
+- `fiabilidad` se mapea a enum `Fiabilidad.valueOf(str.uppercase())`.
+
+#### Parte 3 — Las 3 funcionalidades
+
+**3a. Autocompletado desde historial** (en el campo "Descripción" del dialog de nutrición):
+- Al escribir ≥2 caracteres, consultar `entradaComidaDao.search(normalizado(texto))` (query LIKE `%texto%` en `textoLibre`).
+- Normalización: minúsculas + quitar tildes (`java.text.Normalizer`) + trim. Ordenar por más reciente.
+- Mostrar hasta 5 sugerencias como `DropdownMenu` bajo el campo.
+- Al seleccionar: rellenar textoLibre, kcal, prot, grasa, carbo desde la entrada histórica. Marcar `parseadaPorIA = entrada.parseadaPorIA`.
+- En el DAO: añadir `fun search(query: String): Flow<List<EntradaComida>>` con `SELECT * FROM entrada_comida WHERE textoLibre LIKE '%' || :query || '%' ORDER BY timestamp DESC LIMIT 5`.
+
+**3b. Botón "Guardar como plantilla"** (disponible en fase de resultado IA y en fase de edición manual si hay valores):
+- Aparece en `ResultadoIACard` y también en el dialog normal cuando hay textoLibre + macros rellenos.
+- Al pulsar: dialog de confirmación con campo nombre (pre-rellenado con `textoLibre`) y selector de slot.
+- Lógica: intentar descomponer en ingredientes del catálogo (buscar cada palabra del nombre en `Ingrediente`; si hay coincidencia, preguntar la cantidad). Si no hay coincidencias → guardar `ComidaBase` con totales directos.
+- Para la primera versión: guardar siempre con totales directos (sin ingredientes) — la descomposición puede ser Momento 2.
+
+**3c. Plantillas-receta editables** (en el modo Plantilla del dialog, cuando la ComidaBase seleccionada tiene `PlantillaIngrediente`):
+- Si `comidaBaseId` tiene ingredientes en `PlantillaIngrediente`, mostrar lista de ingredientes con cantidades editables.
+- Cada ingrediente: nombre + campo numérico de gramos (o unidades si `gramosPorUnidad != null`).
+- Al cambiar cualquier cantidad: recalcular totales en tiempo real: `kcal = Σ (ingrediente.kcal100g * cantidad / 100)`.
+- Botón "Usar esta combinación": guarda como `EntradaComida` con los totales recalculados.
+
+#### Parte 4 — Alta de ingredientes desde la app
+
+Cuando el parser IA calcula una comida y el texto menciona un alimento no reconocido en el catálogo:
+- Mostrar chip/botón "¿Añadir '[nombre]' al catálogo?".
+- Dialog de alta: nombre (pre-rellenado), campos kcal/prot/grasa/carbo por 100g (pre-rellenados desde lo que estimó la IA), gramosPorUnidad (opcional), nombreUnidad (opcional).
+- La IA estima los valores por 100g desde el texto: añadir instrucción al prompt de `ParseComidaUseCase` para que también devuelva `ingrediente_nuevo: {nombre, kcal100g, prot100g, grasa100g, carbo100g}` cuando detecta un alimento no estándar (ajuste menor al schema del tool).
+- El usuario valida/corrige y guarda → `Ingrediente` con `fiabilidad = ESTIMADO`.
+
+#### Parte 5 — Interpretación de unidades en el parser (refuerzo del prompt)
+
+Cuando el usuario diga "una natilla", "un cazo de whey", "3 lonchas de pavo":
+- Antes de llamar a la IA: buscar en `Ingrediente` si algún nombre coincide con el texto.
+- Si hay coincidencia con `gramosPorUnidad != null`: inyectar en el prompt la equivalencia. Ej: "Nota: 'natilla proteica Mercadona' = 120g por unidad, kcal/100g=108, prot/100g=12.5".
+- La IA usa esos valores en lugar de genéricos. Esto mejora la confianza del resultado sin cambiar el flujo.
+- Implementación: helper `resolverUnidades(texto, ingredientes): String` que devuelve el texto + las notas de contexto a inyectar.
+
+#### Orden de implementación sugerido
+1. Room: entidades + DAOs + migración + seed → build verde
+2. Autocompletado (más visible, útil de inmediato)
+3. "Guardar como plantilla" (totales directos primero)
+4. Plantillas-receta editables (requiere que haya ComidaBase con ingredientes)
+5. Alta de ingredientes desde la app
+6. Interpretación de unidades en el parser
+
+#### Hecho cuando
+- Build verde, tests verdes (añadir al menos test de IngredienteDao y cálculo de totales de plantilla)
+- Seed de ingredientes funciona: primera instalación carga los 41
+- Autocompletado muestra sugerencias al escribir en el campo descripción
+- "Guardar como plantilla" crea ComidaBase y aparece en el dropdown
+- Plantilla con ingredientes muestra lista editable con recálculo en vivo
+- Sin regresiones en T-015 (parser IA sigue funcionando)
+
+---
 
 ### T-013 — Smoke test MVP completo
 **Estimación**: 1-2h

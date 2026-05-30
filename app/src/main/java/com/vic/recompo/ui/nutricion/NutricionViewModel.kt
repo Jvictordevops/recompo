@@ -8,6 +8,7 @@ import com.vic.recompo.data.db.dao.ComidaBaseDao
 import com.vic.recompo.data.db.dao.EntradaComidaDao
 import com.vic.recompo.data.db.entity.ComidaBase
 import com.vic.recompo.data.db.entity.EntradaComida
+import com.vic.recompo.domain.ai.ParseComidaResult
 import com.vic.recompo.domain.model.SlotComida
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,6 +34,15 @@ data class NutricionUiState(
     val plantillasPorSlot: Map<SlotComida, List<ComidaBase>> = emptyMap()
 )
 
+data class ResultadoIAState(
+    val kcal: Int,
+    val proteinaG: Double,
+    val grasaG: Double,
+    val carboG: Double,
+    val confianza: String,
+    val supuestos: String?
+)
+
 data class DialogState(
     val abierto: Boolean = false,
     val slot: SlotComida = SlotComida.DESAYUNO,
@@ -45,9 +55,13 @@ data class DialogState(
     val grasaG: String = "",
     val carboG: String = "",
     val parseando: Boolean = false,
-    val confianza: String? = null,
     val parseadaPorIA: Boolean = false,
-    val errorIA: String? = null
+    val errorIA: String? = null,
+    val preguntasIA: List<String>? = null,
+    val respuestaAclaracion: String = "",
+    val resultadoIA: ResultadoIAState? = null,
+    val afinando: Boolean = false,
+    val textoAfinar: String = ""
 )
 
 class NutricionViewModel(
@@ -102,7 +116,8 @@ class NutricionViewModel(
             it.copy(
                 modoPlantilla = modoPlantilla,
                 plantillaSeleccionada = null,
-                textoLibre = "", kcal = "", proteinaG = "", grasaG = "", carboG = ""
+                textoLibre = "", kcal = "", proteinaG = "", grasaG = "", carboG = "",
+                preguntasIA = null, resultadoIA = null, errorIA = null
             )
         }
     }
@@ -120,32 +135,123 @@ class NutricionViewModel(
         }
     }
 
-    fun onTextoLibreChanged(v: String) = _dialogState.update { it.copy(textoLibre = v, confianza = null, parseadaPorIA = false, errorIA = null) }
+    fun onTextoLibreChanged(v: String) = _dialogState.update {
+        it.copy(textoLibre = v, preguntasIA = null, resultadoIA = null, errorIA = null, parseadaPorIA = false)
+    }
     fun onKcalChanged(v: String) = _dialogState.update { it.copy(kcal = v) }
     fun onProteinaChanged(v: String) = _dialogState.update { it.copy(proteinaG = v) }
     fun onGrasaChanged(v: String) = _dialogState.update { it.copy(grasaG = v) }
     fun onCarboChanged(v: String) = _dialogState.update { it.copy(carboG = v) }
 
+    fun onRespuestaAclaracionChanged(v: String) = _dialogState.update { it.copy(respuestaAclaracion = v) }
+    fun onTextoAfinarChanged(v: String) = _dialogState.update { it.copy(textoAfinar = v) }
+    fun abrirAfinar() = _dialogState.update { it.copy(afinando = true, textoAfinar = "", errorIA = null) }
+
     fun parsearConIA() {
         val texto = _dialogState.value.textoLibre.ifBlank { return }
-        _dialogState.update { it.copy(parseando = true) }
+        _dialogState.update { it.copy(parseando = true, errorIA = null, preguntasIA = null, resultadoIA = null) }
         viewModelScope.launch {
-            parseComidaUseCase.parsear(texto).onSuccess { parsed ->
-                _dialogState.update {
-                    it.copy(
-                        parseando = false,
-                        kcal = parsed.kcal.toString(),
-                        proteinaG = parsed.proteinaG.toString(),
-                        grasaG = parsed.grasaG.toString(),
-                        carboG = parsed.carboG.toString(),
-                        confianza = parsed.confianza,
-                        parseadaPorIA = true
-                    )
+            parseComidaUseCase.parsear(texto)
+                .onSuccess { handleResultado(it) }
+                .onFailure { e -> onErrorIA(e) }
+        }
+    }
+
+    fun enviarAclaracion() {
+        val d = _dialogState.value
+        val aclaracion = d.respuestaAclaracion.ifBlank { return }
+        _dialogState.update { it.copy(parseando = true, errorIA = null) }
+        viewModelScope.launch {
+            parseComidaUseCase.parsearConContexto(d.textoLibre, aclaracion, forzarCalculo = true)
+                .onSuccess { handleResultado(it, forced = true) }
+                .onFailure { e -> onErrorIA(e) }
+        }
+    }
+
+    fun enviarAfinar() {
+        val d = _dialogState.value
+        val afinar = d.textoAfinar.ifBlank { return }
+        _dialogState.update { it.copy(parseando = true, errorIA = null) }
+        viewModelScope.launch {
+            parseComidaUseCase.parsearConContexto(d.textoLibre, afinar, forzarCalculo = true)
+                .onSuccess { handleResultado(it, forced = true) }
+                .onFailure { e -> onErrorIA(e) }
+        }
+    }
+
+    private fun handleResultado(resultado: ParseComidaResult, forced: Boolean = false) {
+        when (resultado) {
+            is ParseComidaResult.NecesitaAclaracion -> {
+                if (forced) {
+                    _dialogState.update {
+                        it.copy(parseando = false, errorIA = "La IA no pudo calcular los macros. Introduce los valores a mano.")
+                    }
+                } else {
+                    _dialogState.update {
+                        it.copy(parseando = false, preguntasIA = resultado.preguntas, resultadoIA = null, respuestaAclaracion = "")
+                    }
                 }
-            }.onFailure { e ->
-                android.util.Log.e("ParseComida", "ViewModel onFailure: ${e::class.simpleName}: ${e.message}")
-                _dialogState.update { it.copy(parseando = false, errorIA = "${e::class.simpleName}: ${e.message}") }
             }
+            is ParseComidaResult.Calculado -> _dialogState.update {
+                it.copy(
+                    parseando = false,
+                    preguntasIA = null,
+                    afinando = false,
+                    textoAfinar = "",
+                    resultadoIA = ResultadoIAState(
+                        kcal = resultado.kcal,
+                        proteinaG = resultado.proteinaG,
+                        grasaG = resultado.grasaG,
+                        carboG = resultado.carboG,
+                        confianza = resultado.confianza,
+                        supuestos = resultado.supuestos
+                    )
+                )
+            }
+        }
+    }
+
+    private fun onErrorIA(e: Throwable) {
+        android.util.Log.e("ParseComida", "ViewModel onFailure: ${e.message}")
+        _dialogState.update { it.copy(parseando = false, errorIA = "${e::class.simpleName}: ${e.message}") }
+    }
+
+    fun aceptarYGuardar() {
+        val d = _dialogState.value
+        val resultado = d.resultadoIA ?: return
+        viewModelScope.launch {
+            val entrada = EntradaComida(
+                id = d.entradaEditando?.id ?: 0,
+                fecha = hoy,
+                slot = d.slot,
+                textoLibre = d.textoLibre,
+                kcal = resultado.kcal,
+                proteinaG = resultado.proteinaG,
+                grasaG = resultado.grasaG,
+                carboG = resultado.carboG,
+                comidaBaseId = null,
+                parseadaPorIA = true,
+                timestamp = Instant.now()
+            )
+            if (d.entradaEditando != null) entradaComidaDao.update(entrada)
+            else entradaComidaDao.insert(entrada)
+            cerrarDialogo()
+        }
+    }
+
+    fun editarAMano() {
+        val resultado = _dialogState.value.resultadoIA ?: return
+        _dialogState.update {
+            it.copy(
+                resultadoIA = null,
+                preguntasIA = null,
+                afinando = false,
+                kcal = resultado.kcal.toString(),
+                proteinaG = resultado.proteinaG.toString(),
+                grasaG = resultado.grasaG.toString(),
+                carboG = resultado.carboG.toString(),
+                parseadaPorIA = true
+            )
         }
     }
 
