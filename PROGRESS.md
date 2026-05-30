@@ -8,6 +8,35 @@ _(vacío)_
 
 ## DONE (reciente)
 
+### T-017 — Generador de próxima sesión con IA
+**Commit**: pendiente
+
+**Estado**: build verde, 73 tests verdes, probado en móvil ✓ (2026-05-30).
+
+- `domain/model/Enums.kt` — `TipoSesion` eliminado como enum. `EstadoSesion`: PREPARADA (renombrado de PLANIFICADA), EN_CURSO, COMPLETADA, OMITIDA. `EstadoSerie`: COMPLETADA, OMITIDA. `MotivoOmision`: TIEMPO, INNECESARIA, MOLESTIA. `OrigenSesion`: MANUAL, IA.
+- `data/db/entity/TipoSesion.kt` — nueva entidad Room (`tableName="tipo_sesion"`): id, nombre, descripcion, esSeed, activo.
+- `data/db/entity/Sesion.kt` — `tipoSesionId: Long` (FK), `fechaEjecutada: Instant?` (null hasta EN_CURSO), `estado: EstadoSesion`, `generadaPor: OrigenSesion`, notasIA, notasGlobales, rirGlobal.
+- `data/db/entity/Serie.kt` — `estado: EstadoSerie`, `motivoOmision: MotivoOmision?`, `repsReales/cargaKg/rir` nullable.
+- `data/db/Converters.kt` — converters para `EstadoSerie` y `MotivoOmision`.
+- `data/db/dao/TipoSesionDao.kt` — CRUD completo: insert, update, delete, getAll, getActivos, getById, count.
+- `data/db/dao/SesionDao.kt` — getActivas() (EN_CURSO+PREPARADA ordenadas), getPendientes(), getPreparadaByTipo(), getCompletadasByTipo(limit).
+- `data/db/RecompoDatabase.kt` — versión 3, entidad TipoSesion añadida, `tipoSesionDao()`.
+- `App.kt` — `seedTiposSesionIfEmpty()`: inserta A/B/C con esSeed=true si la tabla está vacía.
+- `domain/usecase/GenerarSesionUseCase.kt` — llamada a Claude con tool `proponer_sesion`; contexto con historial de las 3 últimas sesiones COMPLETADAS del tipo, notas de molestias, equipamiento y deload; fallback automático si la API falla (repite última sesión +1 rep donde RIR≥3).
+- `assets/tools/generar_sesion.json` — schema del tool `proponer_sesion`.
+- `ui/entreno/EntrenoViewModel.kt` — reescrito: `SesionConTipo`, flujo IA (abrirNuevaSesion → iniciarGeneracionIA → propuestaSesion), gestión de tipos, aceptar/regenerar/descartar propuesta, serie OMITIDA con MotivoOmision.
+- `ui/entreno/EntrenoScreen.kt` — reescrito: 4 fases (LISTA/PRE_SESION/EN_CURSO/POST_SESION), `PropuestaCard` inline, `DialogGestionTipos`, `DialogSaltarSerie` con FilterChip de motivo.
+- `ui/home/HomeViewModel.kt` — usa `sesionDao.getActivas()`, resuelve `tipoNombre` via `tipoSesionDao.getById()` dentro del combine (suspend), `sesionActiva + sesionActivaTipoNombre` en UiState.
+- `ui/home/HomeScreen.kt` — `TarjetaSesion(sesion, tipoNombre)`, `TarjetaIA` cuando no hay sesión activa con CTA a Entreno.
+- `MainActivity.kt` — `HomeViewModelFactory` con `tipoSesionDao`, `EntrenoViewModelFactory` con `GenerarSesionUseCase`.
+- `data/backup/BackupDto.kt` — versión 2: `TipoSesionDto`, `SesionDto` con `tipoSesionId` (sin `tipo`/`fechaPrevista`), `SerieDto` con nullable fields y `motivoOmision`.
+- `data/backup/BackupSerializer.kt` + `XlsxExporter.kt` — referencias al schema nuevo.
+- `data/ai/ParseComidaUseCase.kt` — `android.util.Log` reemplazado por Timber (fix test).
+- `test/SesionDaoTest.kt` — reescrito para nuevo schema.
+- `test/TipoSesionDaoTest.kt` — nuevo, 8 tests CRUD.
+
+---
+
 ### T-014 — Cliente Claude API
 **Commit**: pendiente
 

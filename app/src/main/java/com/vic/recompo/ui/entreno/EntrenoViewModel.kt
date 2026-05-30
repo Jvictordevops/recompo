@@ -1,28 +1,36 @@
 package com.vic.recompo.ui.entreno
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.vic.recompo.data.ai.ClaudeApi
 import com.vic.recompo.data.db.dao.EjercicioDao
 import com.vic.recompo.data.db.dao.EjercicioEnSesionDao
 import com.vic.recompo.data.db.dao.SerieDao
 import com.vic.recompo.data.db.dao.SesionDao
+import com.vic.recompo.data.db.dao.TipoSesionDao
 import com.vic.recompo.data.db.entity.Ejercicio
 import com.vic.recompo.data.db.entity.EjercicioEnSesion
 import com.vic.recompo.data.db.entity.Serie
 import com.vic.recompo.data.db.entity.Sesion
+import com.vic.recompo.data.db.entity.TipoSesion
+import com.vic.recompo.domain.model.EstadoSerie
 import com.vic.recompo.domain.model.EstadoSesion
+import com.vic.recompo.domain.model.MotivoOmision
 import com.vic.recompo.domain.model.OrigenSesion
-import android.content.Context
-import com.vic.recompo.domain.model.TipoSesion
+import com.vic.recompo.domain.usecase.EjercicioPropuesto
+import com.vic.recompo.domain.usecase.GenerarSesionUseCase
+import com.vic.recompo.domain.usecase.ProximaSesionPropuesta
+import com.vic.recompo.domain.usecase.SesionConDetalle
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.json.JSONArray
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import java.time.Instant
-import java.time.LocalDate
 
 enum class EntrenoFase { LISTA, PRE_SESION, EN_CURSO, POST_SESION }
 
@@ -30,6 +38,11 @@ data class EjercicioConSeries(
     val ejercicioEnSesion: EjercicioEnSesion,
     val ejercicio: Ejercicio,
     val series: List<Serie>
+)
+
+data class SesionConTipo(
+    val sesion: Sesion,
+    val tipoNombre: String
 )
 
 data class FormAgregarEjercicio(
@@ -51,21 +64,40 @@ data class FormSerie(
 )
 
 data class EntrenoUiState(
-    val sesiones: List<Sesion> = emptyList(),
+    val sesiones: List<SesionConTipo> = emptyList(),
+    val tiposSesion: List<TipoSesion> = emptyList(),
     val fase: EntrenoFase = EntrenoFase.LISTA,
-    val sesionActual: Sesion? = null,
+    val sesionActual: SesionConTipo? = null,
     val ejerciciosConSeries: List<EjercicioConSeries> = emptyList(),
     val ejerciciosDisponibles: List<Ejercicio> = emptyList(),
-    val dialogCrearSesion: Boolean = false,
-    val tipoNuevaSesion: TipoSesion = TipoSesion.A,
-    val fechaNuevaSesion: LocalDate = LocalDate.now(),
-    val showDatePicker: Boolean = false,
-    val errorCrearSesion: String? = null,
+    // dialog nueva sesión (manual o con IA)
+    val dialogNuevaSesion: Boolean = false,
+    val tipoNuevaSesionId: Long? = null,
+    val errorNuevaSesion: String? = null,
+    // dialogs confirmación
+    val dialogConfirmarBorrado: SesionConTipo? = null,
+    val dialogConfirmarReemplazarPreparada: Long? = null, // tipoSesionId
+    // generación IA
+    val generandoSesion: Boolean = false,
+    val propuestaSesion: ProximaSesionPropuesta? = null,
+    val propuestaTipoId: Long? = null,
+    val errorGeneracion: String? = null,
+    // dialog contexto sin histórico
+    val dialogContextoSinHistorico: Long? = null, // tipoSesionId
+    // sesión en curso
     val dialogAgregarEjercicio: FormAgregarEjercicio? = null,
     val dialogSerie: FormSerie? = null,
-    val dialogConfirmarBorrado: Sesion? = null,
+    val dialogSaltarSerie: Long? = null, // ejercicioEnSesionId
+    val motivoOmisionSeleccionado: MotivoOmision? = null,
+    // post-sesión
     val notasGlobales: String = "",
-    val rirGlobal: String = ""
+    val rirGlobal: String = "",
+    // gestión tipos
+    val dialogGestionTipos: Boolean = false,
+    val dialogCrearTipo: Boolean = false,
+    val nombreNuevoTipo: String = "",
+    val dialogRenombrarTipo: TipoSesion? = null,
+    val nombreRenombrar: String = ""
 )
 
 class EntrenoViewModel(
@@ -73,7 +105,9 @@ class EntrenoViewModel(
     private val sesionDao: SesionDao,
     private val ejercicioEnSesionDao: EjercicioEnSesionDao,
     private val serieDao: SerieDao,
-    private val ejercicioDao: EjercicioDao
+    private val ejercicioDao: EjercicioDao,
+    private val tipoSesionDao: TipoSesionDao,
+    private val generarSesionUseCase: GenerarSesionUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(EntrenoUiState())
@@ -81,53 +115,44 @@ class EntrenoViewModel(
 
     init {
         viewModelScope.launch {
-            sesionDao.getAll().collect { sesiones ->
-                _state.update { it.copy(sesiones = sesiones) }
+            combine(
+                sesionDao.getAll(),
+                tipoSesionDao.getActivos()
+            ) { sesiones, tipos ->
+                val tipoMap = tipos.associateBy { it.id }
+                val sesionesConTipo = sesiones.map { sesion ->
+                    SesionConTipo(sesion, tipoMap[sesion.tipoSesionId]?.nombre ?: "?")
+                }
+                sesionesConTipo to tipos
+            }.collect { (sesiones, tipos) ->
+                _state.update { it.copy(sesiones = sesiones, tiposSesion = tipos) }
             }
         }
     }
 
-    // --- LISTA ---
+    // ── LISTA ──────────────────────────────────────────────────────────────────
 
-    fun abrirCrearSesion() = _state.update {
-        it.copy(
-            dialogCrearSesion = true,
-            tipoNuevaSesion = TipoSesion.A,
-            fechaNuevaSesion = LocalDate.now(),
-            errorCrearSesion = null
-        )
+    fun abrirNuevaSesion() = _state.update {
+        val defaultTipoId = it.tiposSesion.firstOrNull()?.id
+        it.copy(dialogNuevaSesion = true, tipoNuevaSesionId = defaultTipoId, errorNuevaSesion = null)
     }
 
-    fun cerrarCrearSesion() = _state.update {
-        it.copy(dialogCrearSesion = false, errorCrearSesion = null)
+    fun cerrarNuevaSesion() = _state.update {
+        it.copy(dialogNuevaSesion = false, errorNuevaSesion = null)
     }
 
-    fun onTipoNuevaSesionChanged(tipo: TipoSesion) = _state.update {
-        it.copy(tipoNuevaSesion = tipo, errorCrearSesion = null)
+    fun onTipoNuevaSesionChanged(tipoId: Long) = _state.update {
+        it.copy(tipoNuevaSesionId = tipoId, errorNuevaSesion = null)
     }
 
-    fun onFechaNuevaSesionChanged(fecha: LocalDate) = _state.update {
-        it.copy(fechaNuevaSesion = fecha, errorCrearSesion = null)
-    }
-
-    fun mostrarDatePicker(show: Boolean) = _state.update { it.copy(showDatePicker = show) }
-
-    fun crearSesion() {
-        val st = _state.value
+    fun crearSesionManual() {
+        val tipoId = _state.value.tipoNuevaSesionId ?: return
         viewModelScope.launch {
-            val existente = sesionDao.getByFechaYTipo(st.fechaNuevaSesion, st.tipoNuevaSesion)
-            if (existente != null) {
-                _state.update {
-                    it.copy(errorCrearSesion = "Ya existe una sesión ${st.tipoNuevaSesion.name} para esa fecha")
-                }
-                return@launch
-            }
             val id = sesionDao.insert(
                 Sesion(
-                    tipo = st.tipoNuevaSesion,
-                    fechaPrevista = st.fechaNuevaSesion,
+                    tipoSesionId = tipoId,
                     fechaEjecutada = null,
-                    estado = EstadoSesion.PLANIFICADA,
+                    estado = EstadoSesion.PREPARADA,
                     generadaPor = OrigenSesion.MANUAL,
                     notasIA = null,
                     notasGlobales = null,
@@ -135,45 +160,165 @@ class EntrenoViewModel(
                 )
             )
             val sesion = sesionDao.getById(id) ?: return@launch
-            poblarDesdeTemplate(sesion)
-            navegarAPreSesion(sesion)
+            val tipo = tipoSesionDao.getById(tipoId)
+            if (tipo?.esSeed == true) poblarDesdeTemplate(sesion, tipo.nombre)
+            val sesionConTipo = SesionConTipo(sesion, tipo?.nombre ?: "?")
+            navegarAPreSesion(sesionConTipo)
         }
     }
 
-    private suspend fun poblarDesdeTemplate(sesion: Sesion) {
-        val json = context.assets.open("seed/sesiones_template.json").bufferedReader().use { it.readText() }
-        val array = JSONArray(json)
-        for (i in 0 until array.length()) {
-            val obj = array.getJSONObject(i)
-            if (obj.getString("tipo") != sesion.tipo.name) continue
-            val ejerciciosJson = obj.getJSONArray("ejercicios")
-            for (j in 0 until ejerciciosJson.length()) {
-                val ej = ejerciciosJson.getJSONObject(j)
-                val ejercicio = ejercicioDao.getByNombre(ej.getString("nombreEjercicio")) ?: continue
-                ejercicioEnSesionDao.insert(
-                    EjercicioEnSesion(
-                        sesionId = sesion.id,
-                        ejercicioId = ejercicio.id,
-                        orden = j + 1,
-                        seriesObjetivo = ej.getInt("seriesObjetivo"),
-                        repsObjetivoMin = ej.getInt("repsObjetivoMin"),
-                        repsObjetivoMax = ej.getInt("repsObjetivoMax"),
-                        cargaObjetivoKg = ej.getDouble("cargaObjetivoKg").takeIf { it > 0.0 },
-                        notas = ej.optString("notas").takeIf { it.isNotEmpty() },
-                        rir = null
-                    )
+    fun iniciarGeneracionIA() {
+        val tipoId = _state.value.tipoNuevaSesionId ?: return
+        _state.update { it.copy(dialogNuevaSesion = false) }
+        viewModelScope.launch {
+            val preparadaExistente = sesionDao.getPreparadaByTipo(tipoId)
+            if (preparadaExistente != null) {
+                _state.update { it.copy(dialogConfirmarReemplazarPreparada = tipoId) }
+                return@launch
+            }
+            val historial = cargarHistorial(tipoId)
+            if (historial.isEmpty()) {
+                _state.update { it.copy(dialogContextoSinHistorico = tipoId) }
+            } else {
+                generarConHistorial(tipoId, historial, null)
+            }
+        }
+    }
+
+    fun confirmarReemplazarPreparada() {
+        val tipoId = _state.value.dialogConfirmarReemplazarPreparada ?: return
+        _state.update { it.copy(dialogConfirmarReemplazarPreparada = null) }
+        viewModelScope.launch {
+            val preparada = sesionDao.getPreparadaByTipo(tipoId)
+            if (preparada != null) {
+                val ejerciciosIds = ejercicioEnSesionDao.getIdsBySesion(preparada.id)
+                ejerciciosIds.forEach { serieDao.deleteByEjercicioEnSesion(it) }
+                ejercicioEnSesionDao.deleteBySesion(preparada.id)
+                sesionDao.delete(preparada)
+            }
+            val historial = cargarHistorial(tipoId)
+            if (historial.isEmpty()) {
+                _state.update { it.copy(dialogContextoSinHistorico = tipoId) }
+            } else {
+                generarConHistorial(tipoId, historial, null)
+            }
+        }
+    }
+
+    fun cancelarReemplazarPreparada() = _state.update {
+        it.copy(dialogConfirmarReemplazarPreparada = null)
+    }
+
+    fun confirmarContextoSinHistorico(equipamiento: String, tiempoMinutos: Int?) {
+        val tipoId = _state.value.dialogContextoSinHistorico ?: return
+        _state.update { it.copy(dialogContextoSinHistorico = null) }
+        val contexto = GenerarSesionUseCase.ContextoSinHistorico(equipamiento, tiempoMinutos)
+        viewModelScope.launch { generarConHistorial(tipoId, emptyList(), contexto) }
+    }
+
+    fun cancelarContextoSinHistorico() = _state.update { it.copy(dialogContextoSinHistorico = null) }
+
+    private suspend fun generarConHistorial(
+        tipoId: Long,
+        historial: List<SesionConDetalle>,
+        contexto: GenerarSesionUseCase.ContextoSinHistorico?
+    ) {
+        val tipoNombre = tipoSesionDao.getById(tipoId)?.nombre ?: return
+        _state.update { it.copy(generandoSesion = true, errorGeneracion = null, propuestaSesion = null, propuestaTipoId = tipoId) }
+        val resultado = generarSesionUseCase.generar(tipoNombre, historial, contexto)
+        when (resultado) {
+            is GenerarSesionUseCase.Resultado.Exito -> _state.update {
+                it.copy(generandoSesion = false, propuestaSesion = resultado.propuesta)
+            }
+            is GenerarSesionUseCase.Resultado.Fallo -> _state.update {
+                it.copy(
+                    generandoSesion = false,
+                    errorGeneracion = resultado.mensaje,
+                    propuestaSesion = resultado.fallback
                 )
             }
-            break
         }
     }
 
-    fun abrirPreSesion(sesion: Sesion) {
+    fun aceptarPropuesta() {
+        val propuesta = _state.value.propuestaSesion ?: return
+        val tipoId = _state.value.propuestaTipoId ?: return
         viewModelScope.launch {
-            when (sesion.estado) {
-                EstadoSesion.COMPLETADA -> navegarAPostSesion(sesion)
-                EstadoSesion.EN_CURSO -> navegarAEnCurso(sesion)
-                else -> navegarAPreSesion(sesion)
+            val id = sesionDao.insert(
+                Sesion(
+                    tipoSesionId = tipoId,
+                    fechaEjecutada = null,
+                    estado = EstadoSesion.PREPARADA,
+                    generadaPor = OrigenSesion.IA,
+                    notasIA = propuesta.razonamiento,
+                    notasGlobales = null,
+                    rirGlobal = null
+                )
+            )
+            insertarEjerciciosDePropuesta(id, propuesta.ejercicios)
+            _state.update { it.copy(propuestaSesion = null, propuestaTipoId = null, errorGeneracion = null) }
+            val sesion = sesionDao.getById(id) ?: return@launch
+            val tipo = tipoSesionDao.getById(tipoId)
+            navegarAPreSesion(SesionConTipo(sesion, tipo?.nombre ?: "?"))
+        }
+    }
+
+    fun regenerarPropuesta() {
+        val tipoId = _state.value.propuestaTipoId ?: return
+        _state.update { it.copy(propuestaSesion = null, errorGeneracion = null) }
+        viewModelScope.launch {
+            val historial = cargarHistorial(tipoId)
+            generarConHistorial(tipoId, historial, null)
+        }
+    }
+
+    fun descartarPropuesta() = _state.update {
+        it.copy(propuestaSesion = null, propuestaTipoId = null, errorGeneracion = null, generandoSesion = false)
+    }
+
+    fun usarFallback() {
+        val tipoId = _state.value.propuestaTipoId ?: return
+        viewModelScope.launch {
+            val historial = cargarHistorial(tipoId)
+            val fallback = generarSesionUseCase.generarFallback(historial) ?: return@launch
+            _state.update { it.copy(propuestaSesion = fallback, errorGeneracion = null) }
+        }
+    }
+
+    private suspend fun cargarHistorial(tipoId: Long): List<SesionConDetalle> {
+        val tipo = tipoSesionDao.getById(tipoId) ?: return emptyList()
+        val sesiones = sesionDao.getCompletadasByTipo(tipoId, GenerarSesionUseCase.MAX_HISTORIAL)
+        return sesiones.map { sesion ->
+            val ejerciciosConSeries = cargarEjerciciosConSeries(sesion.id)
+            SesionConDetalle(sesion, tipo.nombre, ejerciciosConSeries)
+        }
+    }
+
+    private suspend fun insertarEjerciciosDePropuesta(sesionId: Long, ejercicios: List<EjercicioPropuesto>) {
+        ejercicios.forEachIndexed { idx, ep ->
+            val ejercicio = ejercicioDao.getByNombre(ep.nombreEjercicio) ?: return@forEachIndexed
+            ejercicioEnSesionDao.insert(
+                EjercicioEnSesion(
+                    sesionId = sesionId,
+                    ejercicioId = ejercicio.id,
+                    orden = idx + 1,
+                    seriesObjetivo = ep.seriesObjetivo,
+                    repsObjetivoMin = ep.repsMin,
+                    repsObjetivoMax = ep.repsMax,
+                    cargaObjetivoKg = ep.cargaObjetivoKg,
+                    notas = ep.notas,
+                    rir = null
+                )
+            )
+        }
+    }
+
+    fun abrirPreSesion(sesionConTipo: SesionConTipo) {
+        viewModelScope.launch {
+            when (sesionConTipo.sesion.estado) {
+                EstadoSesion.COMPLETADA -> navegarAPostSesion(sesionConTipo)
+                EstadoSesion.EN_CURSO -> navegarAEnCurso(sesionConTipo)
+                else -> navegarAPreSesion(sesionConTipo)
             }
         }
     }
@@ -182,24 +327,24 @@ class EntrenoViewModel(
         it.copy(fase = EntrenoFase.LISTA, sesionActual = null, ejerciciosConSeries = emptyList())
     }
 
-    fun pedirConfirmarBorrado(sesion: Sesion) = _state.update {
-        it.copy(dialogConfirmarBorrado = sesion)
+    fun pedirConfirmarBorrado(sesionConTipo: SesionConTipo) = _state.update {
+        it.copy(dialogConfirmarBorrado = sesionConTipo)
     }
 
     fun cerrarConfirmarBorrado() = _state.update { it.copy(dialogConfirmarBorrado = null) }
 
     fun confirmarEliminarSesion() {
-        val sesion = _state.value.dialogConfirmarBorrado ?: return
+        val sesionConTipo = _state.value.dialogConfirmarBorrado ?: return
         viewModelScope.launch {
-            val ejerciciosIds = ejercicioEnSesionDao.getIdsBySesion(sesion.id)
+            val ejerciciosIds = ejercicioEnSesionDao.getIdsBySesion(sesionConTipo.sesion.id)
             ejerciciosIds.forEach { serieDao.deleteByEjercicioEnSesion(it) }
-            ejercicioEnSesionDao.deleteBySesion(sesion.id)
-            sesionDao.delete(sesion)
+            ejercicioEnSesionDao.deleteBySesion(sesionConTipo.sesion.id)
+            sesionDao.delete(sesionConTipo.sesion)
             _state.update { it.copy(dialogConfirmarBorrado = null) }
         }
     }
 
-    // --- PRE-SESIÓN ---
+    // ── PRE-SESIÓN ─────────────────────────────────────────────────────────────
 
     fun abrirAgregarEjercicio() {
         viewModelScope.launch {
@@ -216,7 +361,7 @@ class EntrenoViewModel(
         _state.update { it.copy(dialogAgregarEjercicio = form) }
 
     fun confirmarAgregarEjercicio() {
-        val sesionId = _state.value.sesionActual?.id ?: return
+        val sesionId = _state.value.sesionActual?.sesion?.id ?: return
         val form = _state.value.dialogAgregarEjercicio ?: return
         val ejercicioId = form.ejercicioId ?: return
         val series = form.seriesObjetivo.toIntOrNull() ?: return
@@ -251,15 +396,23 @@ class EntrenoViewModel(
     }
 
     fun iniciarSesion() {
-        val sesion = _state.value.sesionActual ?: return
+        val sesionConTipo = _state.value.sesionActual ?: return
         viewModelScope.launch {
-            val updated = sesion.copy(estado = EstadoSesion.EN_CURSO, fechaEjecutada = Instant.now())
+            val updated = sesionConTipo.sesion.copy(
+                estado = EstadoSesion.EN_CURSO,
+                fechaEjecutada = Instant.now()
+            )
             sesionDao.update(updated)
-            _state.update { it.copy(fase = EntrenoFase.EN_CURSO, sesionActual = updated) }
+            _state.update {
+                it.copy(
+                    fase = EntrenoFase.EN_CURSO,
+                    sesionActual = sesionConTipo.copy(sesion = updated)
+                )
+            }
         }
     }
 
-    // --- EN CURSO ---
+    // ── EN CURSO ───────────────────────────────────────────────────────────────
 
     fun abrirRegistrarSerie(ejercicioEnSesionId: Long) {
         val ec = _state.value.ejerciciosConSeries.find { it.ejercicioEnSesion.id == ejercicioEnSesionId }
@@ -293,7 +446,7 @@ class EntrenoViewModel(
                     repsReales = reps,
                     cargaKg = carga,
                     rir = form.rir,
-                    completada = true
+                    estado = EstadoSerie.COMPLETADA
                 )
             )
             if (form.esUltimaSerie) {
@@ -308,22 +461,56 @@ class EntrenoViewModel(
         }
     }
 
+    fun abrirSaltarSerie(ejercicioEnSesionId: Long) = _state.update {
+        it.copy(dialogSaltarSerie = ejercicioEnSesionId, motivoOmisionSeleccionado = null)
+    }
+
+    fun cerrarSaltarSerie() = _state.update {
+        it.copy(dialogSaltarSerie = null, motivoOmisionSeleccionado = null)
+    }
+
+    fun onMotivoOmisionChanged(motivo: MotivoOmision?) = _state.update {
+        it.copy(motivoOmisionSeleccionado = motivo)
+    }
+
+    fun confirmarSaltarSerie() {
+        val ejercicioEnSesionId = _state.value.dialogSaltarSerie ?: return
+        val ec = _state.value.ejerciciosConSeries.find { it.ejercicioEnSesion.id == ejercicioEnSesionId }
+            ?: return
+        val numero = ec.series.size + 1
+        viewModelScope.launch {
+            serieDao.insert(
+                Serie(
+                    ejercicioEnSesionId = ejercicioEnSesionId,
+                    numero = numero,
+                    repsReales = null,
+                    cargaKg = null,
+                    rir = null,
+                    estado = EstadoSerie.OMITIDA,
+                    motivoOmision = _state.value.motivoOmisionSeleccionado
+                )
+            )
+            recargarEjercicios()
+            _state.update { it.copy(dialogSaltarSerie = null, motivoOmisionSeleccionado = null) }
+        }
+    }
+
     fun irAPostSesion() = _state.update {
         it.copy(fase = EntrenoFase.POST_SESION, notasGlobales = "", rirGlobal = "")
     }
 
     fun volverAEnCurso() = _state.update { it.copy(fase = EntrenoFase.EN_CURSO) }
 
-    // --- POST-SESIÓN ---
+    // ── POST-SESIÓN ────────────────────────────────────────────────────────────
 
     fun onNotasGlobalesChanged(v: String) = _state.update { it.copy(notasGlobales = v) }
     fun onRirGlobalChanged(v: String) = _state.update { it.copy(rirGlobal = v) }
 
     fun cerrarSesion() {
-        val sesion = _state.value.sesionActual ?: return
+        val sesionConTipo = _state.value.sesionActual ?: return
         viewModelScope.launch {
             sesionDao.update(
-                sesion.copy(
+                sesionConTipo.sesion.copy(
                     estado = EstadoSesion.COMPLETADA,
                     notasGlobales = _state.value.notasGlobales.trim().takeIf { it.isNotEmpty() },
                     rirGlobal = _state.value.rirGlobal.toIntOrNull()
@@ -335,41 +522,106 @@ class EntrenoViewModel(
         }
     }
 
-    // --- helpers ---
+    // ── GESTIÓN TIPOS ──────────────────────────────────────────────────────────
 
-    private suspend fun navegarAPreSesion(sesion: Sesion) {
-        val ejerciciosConSeries = cargarEjerciciosConSeries(sesion.id)
+    fun abrirGestionTipos() = _state.update { it.copy(dialogGestionTipos = true) }
+    fun cerrarGestionTipos() = _state.update { it.copy(dialogGestionTipos = false) }
+
+    fun abrirCrearTipo() = _state.update { it.copy(dialogCrearTipo = true, nombreNuevoTipo = "") }
+    fun cerrarCrearTipo() = _state.update { it.copy(dialogCrearTipo = false, nombreNuevoTipo = "") }
+    fun onNombreNuevoTipoChanged(v: String) = _state.update { it.copy(nombreNuevoTipo = v) }
+
+    fun confirmarCrearTipo() {
+        val nombre = _state.value.nombreNuevoTipo.trim().takeIf { it.isNotEmpty() } ?: return
+        viewModelScope.launch {
+            tipoSesionDao.insert(TipoSesion(nombre = nombre, descripcion = null, esSeed = false))
+            _state.update { it.copy(dialogCrearTipo = false, nombreNuevoTipo = "") }
+        }
+    }
+
+    fun abrirRenombrarTipo(tipo: TipoSesion) = _state.update {
+        it.copy(dialogRenombrarTipo = tipo, nombreRenombrar = tipo.nombre)
+    }
+
+    fun cerrarRenombrarTipo() = _state.update { it.copy(dialogRenombrarTipo = null, nombreRenombrar = "") }
+    fun onNombreRenombrarChanged(v: String) = _state.update { it.copy(nombreRenombrar = v) }
+
+    fun confirmarRenombrarTipo() {
+        val tipo = _state.value.dialogRenombrarTipo ?: return
+        val nombre = _state.value.nombreRenombrar.trim().takeIf { it.isNotEmpty() } ?: return
+        viewModelScope.launch {
+            tipoSesionDao.update(tipo.copy(nombre = nombre))
+            _state.update { it.copy(dialogRenombrarTipo = null, nombreRenombrar = "") }
+        }
+    }
+
+    fun toggleActivoTipo(tipo: TipoSesion) {
+        viewModelScope.launch { tipoSesionDao.update(tipo.copy(activo = !tipo.activo)) }
+    }
+
+    // ── HELPERS ────────────────────────────────────────────────────────────────
+
+    private suspend fun poblarDesdeTemplate(sesion: Sesion, tipoNombre: String) {
+        val json = context.assets.open("seed/sesiones_template.json").bufferedReader().use { it.readText() }
+        val array = JSONArray(json)
+        for (i in 0 until array.length()) {
+            val obj = array.getJSONObject(i)
+            if (obj.getString("tipo") != tipoNombre) continue
+            val ejerciciosJson = obj.getJSONArray("ejercicios")
+            for (j in 0 until ejerciciosJson.length()) {
+                val ej = ejerciciosJson.getJSONObject(j)
+                val ejercicio = ejercicioDao.getByNombre(ej.getString("nombreEjercicio")) ?: continue
+                ejercicioEnSesionDao.insert(
+                    EjercicioEnSesion(
+                        sesionId = sesion.id,
+                        ejercicioId = ejercicio.id,
+                        orden = j + 1,
+                        seriesObjetivo = ej.getInt("seriesObjetivo"),
+                        repsObjetivoMin = ej.getInt("repsObjetivoMin"),
+                        repsObjetivoMax = ej.getInt("repsObjetivoMax"),
+                        cargaObjetivoKg = ej.getDouble("cargaObjetivoKg").takeIf { it > 0.0 },
+                        notas = ej.optString("notas").takeIf { it.isNotEmpty() },
+                        rir = null
+                    )
+                )
+            }
+            break
+        }
+    }
+
+    private suspend fun navegarAPreSesion(sesionConTipo: SesionConTipo) {
+        val ejerciciosConSeries = cargarEjerciciosConSeries(sesionConTipo.sesion.id)
         _state.update {
             it.copy(
                 fase = EntrenoFase.PRE_SESION,
-                sesionActual = sesion,
+                sesionActual = sesionConTipo,
                 ejerciciosConSeries = ejerciciosConSeries,
-                dialogCrearSesion = false,
-                errorCrearSesion = null
+                dialogNuevaSesion = false,
+                errorNuevaSesion = null
             )
         }
     }
 
-    private suspend fun navegarAEnCurso(sesion: Sesion) {
-        val ejerciciosConSeries = cargarEjerciciosConSeries(sesion.id)
+    private suspend fun navegarAEnCurso(sesionConTipo: SesionConTipo) {
+        val ejerciciosConSeries = cargarEjerciciosConSeries(sesionConTipo.sesion.id)
         _state.update {
             it.copy(
                 fase = EntrenoFase.EN_CURSO,
-                sesionActual = sesion,
+                sesionActual = sesionConTipo,
                 ejerciciosConSeries = ejerciciosConSeries
             )
         }
     }
 
-    private suspend fun navegarAPostSesion(sesion: Sesion) {
-        val ejerciciosConSeries = cargarEjerciciosConSeries(sesion.id)
+    private suspend fun navegarAPostSesion(sesionConTipo: SesionConTipo) {
+        val ejerciciosConSeries = cargarEjerciciosConSeries(sesionConTipo.sesion.id)
         _state.update {
             it.copy(
                 fase = EntrenoFase.POST_SESION,
-                sesionActual = sesion,
+                sesionActual = sesionConTipo,
                 ejerciciosConSeries = ejerciciosConSeries,
-                notasGlobales = sesion.notasGlobales.orEmpty(),
-                rirGlobal = sesion.rirGlobal?.toString().orEmpty()
+                notasGlobales = sesionConTipo.sesion.notasGlobales.orEmpty(),
+                rirGlobal = sesionConTipo.sesion.rirGlobal?.toString().orEmpty()
             )
         }
     }
@@ -384,7 +636,7 @@ class EntrenoViewModel(
     }
 
     private suspend fun recargarEjercicios() {
-        val sesionId = _state.value.sesionActual?.id ?: return
+        val sesionId = _state.value.sesionActual?.sesion?.id ?: return
         _state.update { it.copy(ejerciciosConSeries = cargarEjerciciosConSeries(sesionId)) }
     }
 }
@@ -394,9 +646,14 @@ class EntrenoViewModelFactory(
     private val sesionDao: SesionDao,
     private val ejercicioEnSesionDao: EjercicioEnSesionDao,
     private val serieDao: SerieDao,
-    private val ejercicioDao: EjercicioDao
+    private val ejercicioDao: EjercicioDao,
+    private val tipoSesionDao: TipoSesionDao,
+    private val generarSesionUseCase: GenerarSesionUseCase
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        EntrenoViewModel(context, sesionDao, ejercicioEnSesionDao, serieDao, ejercicioDao) as T
+        EntrenoViewModel(
+            context, sesionDao, ejercicioEnSesionDao, serieDao,
+            ejercicioDao, tipoSesionDao, generarSesionUseCase
+        ) as T
 }

@@ -74,11 +74,10 @@ class ParseComidaUseCase(
             Result.success(parseInput(input))
         } catch (e: HttpException) {
             val errBody = runCatching { e.response()?.errorBody()?.string() }.getOrNull() ?: "sin body"
-            android.util.Log.e("ParseComida", "HTTP ${e.code()}: $errBody")
+            Timber.w("ParseComida HTTP ${e.code()}: $errBody")
             Result.failure(RuntimeException("HTTP ${e.code()}: $errBody", e))
         } catch (e: Exception) {
             Timber.w(e, "ParseComida failed")
-            android.util.Log.e("ParseComida", "parsear failed: ${e::class.simpleName}: ${e.message}", e)
             Result.failure(e)
         }
     }

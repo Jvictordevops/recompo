@@ -1,6 +1,7 @@
 package com.vic.recompo.data.ai
 
 import com.vic.recompo.data.ai.dto.ClaudeRequest
+import com.vic.recompo.domain.ai.ParseComidaResult
 import com.vic.recompo.data.ai.dto.ClaudeResponse
 import com.vic.recompo.data.ai.dto.ContentBlock
 import com.vic.recompo.data.ai.dto.Usage
@@ -58,7 +59,7 @@ class ParseComidaUseCaseTest {
         val result = useCase.parsear("leche con avena y whey")
 
         assertTrue(result.isSuccess)
-        val parsed = result.getOrThrow()
+        val parsed = result.getOrThrow() as ParseComidaResult.Calculado
         assertEquals(374, parsed.kcal)
         assertEquals(38.0, parsed.proteinaG, 0.01)
         assertEquals(8.0, parsed.grasaG, 0.01)

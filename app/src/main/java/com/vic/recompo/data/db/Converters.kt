@@ -1,14 +1,15 @@
 package com.vic.recompo.data.db
 
 import androidx.room.TypeConverter
+import com.vic.recompo.domain.model.EstadoSerie
 import com.vic.recompo.domain.model.EstadoSesion
 import com.vic.recompo.domain.model.GrupoMuscular
+import com.vic.recompo.domain.model.MotivoOmision
 import com.vic.recompo.domain.model.OrigenSesion
 import com.vic.recompo.domain.model.PatronMovimiento
 import com.vic.recompo.domain.model.RolMensaje
 import com.vic.recompo.domain.model.SlotComida
 import com.vic.recompo.domain.model.TipoConversacion
-import com.vic.recompo.domain.model.TipoSesion
 import java.time.Instant
 import java.time.LocalDate
 
@@ -29,11 +30,14 @@ class Converters {
     @TypeConverter fun patronMovimientoToString(v: PatronMovimiento?): String? = v?.name
     @TypeConverter fun stringToPatronMovimiento(v: String?): PatronMovimiento? = v?.let { PatronMovimiento.valueOf(it) }
 
-    @TypeConverter fun tipoSesionToString(v: TipoSesion?): String? = v?.name
-    @TypeConverter fun stringToTipoSesion(v: String?): TipoSesion? = v?.let { TipoSesion.valueOf(it) }
-
     @TypeConverter fun estadoSesionToString(v: EstadoSesion?): String? = v?.name
     @TypeConverter fun stringToEstadoSesion(v: String?): EstadoSesion? = v?.let { EstadoSesion.valueOf(it) }
+
+    @TypeConverter fun estadoSerieToString(v: EstadoSerie?): String? = v?.name
+    @TypeConverter fun stringToEstadoSerie(v: String?): EstadoSerie? = v?.let { EstadoSerie.valueOf(it) }
+
+    @TypeConverter fun motivoOmisionToString(v: MotivoOmision?): String? = v?.name
+    @TypeConverter fun stringToMotivoOmision(v: String?): MotivoOmision? = v?.let { MotivoOmision.valueOf(it) }
 
     @TypeConverter fun origenSesionToString(v: OrigenSesion?): String? = v?.name
     @TypeConverter fun stringToOrigenSesion(v: String?): OrigenSesion? = v?.let { OrigenSesion.valueOf(it) }

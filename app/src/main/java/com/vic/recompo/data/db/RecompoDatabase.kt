@@ -15,6 +15,7 @@ import com.vic.recompo.data.db.dao.MedicionDao
 import com.vic.recompo.data.db.dao.MensajeIADao
 import com.vic.recompo.data.db.dao.SerieDao
 import com.vic.recompo.data.db.dao.SesionDao
+import com.vic.recompo.data.db.dao.TipoSesionDao
 import com.vic.recompo.data.db.entity.Actividad
 import com.vic.recompo.data.db.entity.ComidaBase
 import com.vic.recompo.data.db.entity.Conversacion
@@ -25,9 +26,11 @@ import com.vic.recompo.data.db.entity.Medicion
 import com.vic.recompo.data.db.entity.MensajeIA
 import com.vic.recompo.data.db.entity.Serie
 import com.vic.recompo.data.db.entity.Sesion
+import com.vic.recompo.data.db.entity.TipoSesion
 
 @Database(
     entities = [
+        TipoSesion::class,
         ComidaBase::class,
         Ejercicio::class,
         Sesion::class,
@@ -39,12 +42,13 @@ import com.vic.recompo.data.db.entity.Sesion
         Conversacion::class,
         MensajeIA::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class RecompoDatabase : RoomDatabase() {
 
+    abstract fun tipoSesionDao(): TipoSesionDao
     abstract fun comidaBaseDao(): ComidaBaseDao
     abstract fun ejercicioDao(): EjercicioDao
     abstract fun sesionDao(): SesionDao

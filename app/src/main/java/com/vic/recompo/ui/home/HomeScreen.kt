@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +38,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
+fun HomeScreen(viewModel: HomeViewModel, onNavigateToEntreno: () -> Unit) {
     val state by viewModel.uiState.collectAsState()
 
     LazyColumn(
@@ -68,8 +69,16 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 kcalConsumidas = state.kcalConsumidas
             )
         }
-        state.sesionDelDia?.let { sesion ->
-            item { TarjetaSesion(sesion = sesion) }
+        val sesionActiva = state.sesionActiva
+        if (sesionActiva != null) {
+            item {
+                TarjetaSesion(
+                    sesion = sesionActiva,
+                    tipoNombre = state.sesionActivaTipoNombre
+                )
+            }
+        } else {
+            item { TarjetaIA(onNavigateToEntreno = onNavigateToEntreno) }
         }
         item {
             BackupChip(
@@ -228,9 +237,9 @@ private fun FilaMacro(etiqueta: String, consumido: String, objetivo: String, pro
 }
 
 @Composable
-private fun TarjetaSesion(sesion: Sesion) {
+private fun TarjetaSesion(sesion: Sesion, tipoNombre: String?) {
     val estadoTexto = when (sesion.estado) {
-        EstadoSesion.PLANIFICADA -> "Planificada"
+        EstadoSesion.PREPARADA -> "Preparada"
         EstadoSesion.EN_CURSO -> "En curso"
         else -> sesion.estado.name
     }
@@ -240,9 +249,40 @@ private fun TarjetaSesion(sesion: Sesion) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Sesión ${sesion.tipo}", style = MaterialTheme.typography.titleMedium)
-            Text(estadoTexto, style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                "Sesión ${tipoNombre ?: "?"}",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                estadoTexto,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun TarjetaIA(onNavigateToEntreno: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                "Próxima sesión",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.tertiary
+            )
+            Text(
+                "Genera tu próxima sesión de entreno con IA.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            FilledTonalButton(
+                onClick = onNavigateToEntreno,
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("Ir a Entrenos") }
         }
     }
 }

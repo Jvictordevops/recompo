@@ -7,6 +7,7 @@ import com.vic.recompo.data.ai.ClaudeClient
 import com.vic.recompo.data.db.RecompoDatabase
 import com.vic.recompo.data.db.entity.ComidaBase
 import com.vic.recompo.data.db.entity.Ejercicio
+import com.vic.recompo.data.db.entity.TipoSesion
 import com.vic.recompo.domain.model.GrupoMuscular
 import com.vic.recompo.domain.model.PatronMovimiento
 import com.vic.recompo.domain.model.SlotComida
@@ -25,8 +26,18 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        appScope.launch { seedTipoSesionIfEmpty() }
         appScope.launch { seedEjerciciosIfEmpty() }
         appScope.launch { seedComidasBaseIfEmpty() }
+    }
+
+    private suspend fun seedTipoSesionIfEmpty() {
+        if (database.tipoSesionDao().count() > 0) return
+        listOf(
+            TipoSesion(nombre = "A", descripcion = "Tren superior", esSeed = true),
+            TipoSesion(nombre = "B", descripcion = "Tren inferior", esSeed = true),
+            TipoSesion(nombre = "C", descripcion = "Full body", esSeed = true),
+        ).forEach { database.tipoSesionDao().insert(it) }
     }
 
     private suspend fun seedComidasBaseIfEmpty() {

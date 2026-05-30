@@ -7,6 +7,7 @@ import com.vic.recompo.data.UserSettingsStore
 import com.vic.recompo.data.db.dao.ActividadDao
 import com.vic.recompo.data.db.dao.EntradaComidaDao
 import com.vic.recompo.data.db.dao.SesionDao
+import com.vic.recompo.data.db.dao.TipoSesionDao
 import com.vic.recompo.data.db.entity.Sesion
 import com.vic.recompo.domain.model.EstadoSesion
 import com.vic.recompo.domain.usecase.CalcularKcalObjetivoUseCase
@@ -30,7 +31,8 @@ data class HomeUiState(
     val metabolismoBasalKcal: Int = 0,
     val kcalActividad: Int = 0,
     val kcalGastoReal: Int = 0,
-    val sesionDelDia: Sesion? = null,
+    val sesionActiva: Sesion? = null,
+    val sesionActivaTipoNombre: String? = null,
     val backupUri: String? = null,
     val ultimoBackupOk: Instant? = null,
     val ultimoBackupError: String? = null
@@ -40,7 +42,8 @@ class HomeViewModel(
     settingsStore: UserSettingsStore,
     entradaComidaDao: EntradaComidaDao,
     sesionDao: SesionDao,
-    actividadDao: ActividadDao
+    actividadDao: ActividadDao,
+    private val tipoSesionDao: TipoSesionDao
 ) : ViewModel() {
 
     private val hoy = LocalDate.now()
@@ -52,16 +55,14 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = combine(
         settingsStore.settings,
         entradaComidaDao.getByFecha(hoy),
-        sesionDao.getByFecha(hoy),
+        sesionDao.getActivas(),
         actividadDao.getByFecha(hoy),
         _tipoDiaOverride
     ) { settings, entradas, sesiones, actividades, override ->
-        val sesionActiva = sesiones.firstOrNull {
-            it.estado == EstadoSesion.PLANIFICADA || it.estado == EstadoSesion.EN_CURSO
-        }
+        val sesionActiva = sesiones.firstOrNull()
+        val tipoNombre = sesionActiva?.let { tipoSesionDao.getById(it.tipoSesionId)?.nombre }
         val tieneBici = actividades.any { it.tipo.lowercase() == "bici" }
         val tipoDiaAuto = when {
-            tieneBici && sesionActiva != null -> TipoDia.BICI
             tieneBici -> TipoDia.BICI
             sesionActiva != null -> TipoDia.MUSCULACION
             else -> TipoDia.DESCANSO
@@ -85,7 +86,8 @@ class HomeViewModel(
             metabolismoBasalKcal = metabolismo,
             kcalActividad = kcalActividad,
             kcalGastoReal = calcularKcal.calcularGastoReal(metabolismo, actividades),
-            sesionDelDia = sesionActiva,
+            sesionActiva = sesionActiva,
+            sesionActivaTipoNombre = tipoNombre,
             backupUri = settings?.carpetaBackupUri,
             ultimoBackupOk = settings?.ultimoBackupOk,
             ultimoBackupError = settings?.ultimoBackupError
@@ -97,9 +99,10 @@ class HomeViewModelFactory(
     private val settingsStore: UserSettingsStore,
     private val entradaComidaDao: EntradaComidaDao,
     private val sesionDao: SesionDao,
-    private val actividadDao: ActividadDao
+    private val actividadDao: ActividadDao,
+    private val tipoSesionDao: TipoSesionDao
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        HomeViewModel(settingsStore, entradaComidaDao, sesionDao, actividadDao) as T
+        HomeViewModel(settingsStore, entradaComidaDao, sesionDao, actividadDao, tipoSesionDao) as T
 }

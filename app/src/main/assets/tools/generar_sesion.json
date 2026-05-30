@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "properties": {
+    "razonamiento": {
+      "type": "string",
+      "description": "Justificación en 2-4 líneas: qué cambió respecto a la sesión anterior y por qué (paso aplicado, ejercicio que progresa y cómo)."
+    },
+    "ejercicios": {
+      "type": "array",
+      "description": "Lista de ejercicios propuestos para la próxima sesión, en el mismo orden que el histórico.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nombreEjercicio": { "type": "string" },
+          "seriesObjetivo": { "type": "integer" },
+          "repsMin": { "type": "integer" },
+          "repsMax": { "type": "integer" },
+          "cargaObjetivoKg": { "type": "number" },
+          "notas": { "type": "string" }
+        },
+        "required": ["nombreEjercicio", "seriesObjetivo", "repsMin", "repsMax"]
+      }
+    }
+  },
+  "required": ["razonamiento", "ejercicios"]
+}

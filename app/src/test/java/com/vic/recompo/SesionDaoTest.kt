@@ -5,20 +5,22 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.room.Room
 import com.vic.recompo.data.db.RecompoDatabase
 import com.vic.recompo.data.db.dao.SesionDao
+import com.vic.recompo.data.db.dao.TipoSesionDao
 import com.vic.recompo.data.db.entity.Sesion
+import com.vic.recompo.data.db.entity.TipoSesion
 import com.vic.recompo.domain.model.EstadoSesion
 import com.vic.recompo.domain.model.OrigenSesion
-import com.vic.recompo.domain.model.TipoSesion
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
@@ -26,6 +28,10 @@ class SesionDaoTest {
 
     private lateinit var db: RecompoDatabase
     private lateinit var dao: SesionDao
+    private lateinit var tipoSesionDao: TipoSesionDao
+
+    private var tipoIdA: Long = 0
+    private var tipoIdB: Long = 0
 
     @Before
     fun setup() {
@@ -34,18 +40,21 @@ class SesionDaoTest {
             RecompoDatabase::class.java
         ).allowMainThreadQueries().build()
         dao = db.sesionDao()
+        tipoSesionDao = db.tipoSesionDao()
+        runBlocking {
+            tipoIdA = tipoSesionDao.insert(TipoSesion(nombre = "A", descripcion = null, esSeed = true))
+            tipoIdB = tipoSesionDao.insert(TipoSesion(nombre = "B", descripcion = null, esSeed = true))
+        }
     }
 
     @After
     fun teardown() = db.close()
 
     private fun sesion(
-        tipo: TipoSesion = TipoSesion.A,
-        fecha: LocalDate = LocalDate.of(2025, 6, 2),
-        estado: EstadoSesion = EstadoSesion.PLANIFICADA
+        tipoId: Long = tipoIdA,
+        estado: EstadoSesion = EstadoSesion.PREPARADA
     ) = Sesion(
-        tipo = tipo,
-        fechaPrevista = fecha,
+        tipoSesionId = tipoId,
         fechaEjecutada = null,
         estado = estado,
         generadaPor = OrigenSesion.MANUAL,
@@ -59,30 +68,77 @@ class SesionDaoTest {
         val id = dao.insert(sesion())
         val resultado = dao.getById(id)
         assertNotNull(resultado)
-        assertEquals(TipoSesion.A, resultado!!.tipo)
+        assertEquals(tipoIdA, resultado!!.tipoSesionId)
     }
 
     @Test
-    fun getByFecha_devuelve_sesiones_del_dia() = runTest {
-        val fecha = LocalDate.of(2025, 6, 2)
-        dao.insert(sesion(fecha = fecha))
-        dao.insert(sesion(tipo = TipoSesion.B, fecha = LocalDate.of(2025, 6, 3)))
+    fun getActivas_solo_devuelve_preparada_y_en_curso() = runTest {
+        dao.insert(sesion(estado = EstadoSesion.PREPARADA))
+        dao.insert(sesion(tipoId = tipoIdB, estado = EstadoSesion.EN_CURSO))
+        dao.insert(sesion(estado = EstadoSesion.COMPLETADA))
+        dao.insert(sesion(tipoId = tipoIdB, estado = EstadoSesion.OMITIDA))
 
-        val sesiones = dao.getByFecha(fecha).first()
-        assertEquals(1, sesiones.size)
-        assertEquals(TipoSesion.A, sesiones[0].tipo)
+        val activas = dao.getActivas().first()
+        assertEquals(2, activas.size)
+        assert(activas.all { it.estado == EstadoSesion.PREPARADA || it.estado == EstadoSesion.EN_CURSO })
     }
 
     @Test
-    fun getPendientes_excluye_completadas_y_omitidas() = runTest {
-        dao.insert(sesion(estado = EstadoSesion.PLANIFICADA))
-        dao.insert(sesion(tipo = TipoSesion.B, estado = EstadoSesion.EN_CURSO))
-        dao.insert(sesion(tipo = TipoSesion.C, estado = EstadoSesion.COMPLETADA))
-        dao.insert(sesion(estado = EstadoSesion.OMITIDA, fecha = LocalDate.of(2025, 6, 5)))
+    fun getActivas_ordena_en_curso_primero() = runTest {
+        dao.insert(sesion(estado = EstadoSesion.PREPARADA))
+        dao.insert(sesion(tipoId = tipoIdB, estado = EstadoSesion.EN_CURSO))
+
+        val activas = dao.getActivas().first()
+        assertEquals(EstadoSesion.EN_CURSO, activas[0].estado)
+        assertEquals(EstadoSesion.PREPARADA, activas[1].estado)
+    }
+
+    @Test
+    fun getPendientes_devuelve_preparada_y_en_curso() = runTest {
+        dao.insert(sesion(estado = EstadoSesion.PREPARADA))
+        dao.insert(sesion(tipoId = tipoIdB, estado = EstadoSesion.EN_CURSO))
+        dao.insert(sesion(estado = EstadoSesion.COMPLETADA))
 
         val pendientes = dao.getPendientes().first()
         assertEquals(2, pendientes.size)
-        assert(pendientes.all { it.estado in listOf(EstadoSesion.PLANIFICADA, EstadoSesion.EN_CURSO) })
+        assert(pendientes.all { it.estado == EstadoSesion.PREPARADA || it.estado == EstadoSesion.EN_CURSO })
+    }
+
+    @Test
+    fun getPreparadaByTipo_devuelve_solo_la_de_ese_tipo() = runTest {
+        dao.insert(sesion(tipoId = tipoIdA, estado = EstadoSesion.PREPARADA))
+        dao.insert(sesion(tipoId = tipoIdB, estado = EstadoSesion.PREPARADA))
+
+        val preparadaA = dao.getPreparadaByTipo(tipoIdA)
+        assertNotNull(preparadaA)
+        assertEquals(tipoIdA, preparadaA!!.tipoSesionId)
+    }
+
+    @Test
+    fun getPreparadaByTipo_devuelve_null_si_no_existe() = runTest {
+        dao.insert(sesion(tipoId = tipoIdA, estado = EstadoSesion.COMPLETADA))
+
+        val preparada = dao.getPreparadaByTipo(tipoIdA)
+        assertNull(preparada)
+    }
+
+    @Test
+    fun getCompletadasByTipo_respeta_limit() = runTest {
+        repeat(5) { dao.insert(sesion(tipoId = tipoIdA, estado = EstadoSesion.COMPLETADA)) }
+
+        val resultados = dao.getCompletadasByTipo(tipoIdA, limit = 3)
+        assertEquals(3, resultados.size)
+        assert(resultados.all { it.estado == EstadoSesion.COMPLETADA && it.tipoSesionId == tipoIdA })
+    }
+
+    @Test
+    fun getCompletadasByTipo_no_mezcla_tipos() = runTest {
+        dao.insert(sesion(tipoId = tipoIdA, estado = EstadoSesion.COMPLETADA))
+        dao.insert(sesion(tipoId = tipoIdB, estado = EstadoSesion.COMPLETADA))
+
+        val resultados = dao.getCompletadasByTipo(tipoIdA, limit = 10)
+        assertEquals(1, resultados.size)
+        assertEquals(tipoIdA, resultados[0].tipoSesionId)
     }
 
     @Test
@@ -94,13 +150,15 @@ class SesionDaoTest {
     }
 
     @Test
-    fun getAll_devuelve_sesiones_ordenadas_por_fecha_desc() = runTest {
-        dao.insert(sesion(fecha = LocalDate.of(2025, 6, 1)))
-        dao.insert(sesion(fecha = LocalDate.of(2025, 6, 3)))
-        dao.insert(sesion(fecha = LocalDate.of(2025, 6, 2)))
+    fun getAll_ordena_en_curso_preparada_completada() = runTest {
+        dao.insert(sesion(tipoId = tipoIdA, estado = EstadoSesion.COMPLETADA))
+        dao.insert(sesion(tipoId = tipoIdB, estado = EstadoSesion.EN_CURSO))
+        dao.insert(sesion(tipoId = tipoIdA, estado = EstadoSesion.PREPARADA))
 
         val todas = dao.getAll().first()
         assertEquals(3, todas.size)
-        assertEquals(LocalDate.of(2025, 6, 3), todas[0].fechaPrevista)
+        assertEquals(EstadoSesion.EN_CURSO, todas[0].estado)
+        assertEquals(EstadoSesion.PREPARADA, todas[1].estado)
+        assertEquals(EstadoSesion.COMPLETADA, todas[2].estado)
     }
 }

@@ -4,12 +4,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BackupData(
-    val version: Int = 1,
+    val version: Int = 2,
     val exportadoEn: String,
     val settings: SettingsDto?,
     val mediciones: List<MedicionDto>,
     val entradasComida: List<EntradaComidaDto>,
     val actividades: List<ActividadDto>,
+    val tiposSesion: List<TipoSesionDto>,
     val sesiones: List<SesionDto>,
     val ejerciciosEnSesion: List<EjercicioEnSesionDto>,
     val series: List<SerieDto>,
@@ -83,10 +84,18 @@ data class ActividadDto(
 )
 
 @Serializable
+data class TipoSesionDto(
+    val id: Long,
+    val nombre: String,
+    val descripcion: String?,
+    val esSeed: Boolean,
+    val activo: Boolean
+)
+
+@Serializable
 data class SesionDto(
     val id: Long,
-    val tipo: String,
-    val fechaPrevista: String,
+    val tipoSesionId: Long,
     val fechaEjecutada: String?,
     val estado: String,
     val generadaPor: String,
@@ -114,10 +123,11 @@ data class SerieDto(
     val id: Long,
     val ejercicioEnSesionId: Long,
     val numero: Int,
-    val repsReales: Int,
-    val cargaKg: Double,
-    val rir: Int,
-    val completada: Boolean
+    val repsReales: Int?,
+    val cargaKg: Double?,
+    val rir: Int?,
+    val estado: String,
+    val motivoOmision: String?
 )
 
 @Serializable

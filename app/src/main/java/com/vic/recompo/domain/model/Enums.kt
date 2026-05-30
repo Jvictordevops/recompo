@@ -24,9 +24,13 @@ enum class PatronMovimiento {
     CORE, CARDIO
 }
 
-enum class TipoSesion { A, B, C }
+// TipoSesion es ahora una entidad Room (data/db/entity/TipoSesion.kt)
 
-enum class EstadoSesion { PLANIFICADA, EN_CURSO, COMPLETADA, OMITIDA }
+enum class EstadoSesion { PREPARADA, EN_CURSO, COMPLETADA, OMITIDA }
+
+enum class EstadoSerie { COMPLETADA, OMITIDA }
+
+enum class MotivoOmision { TIEMPO, INNECESARIA, MOLESTIA }
 
 enum class OrigenSesion { SEED, IA, MANUAL }
 

@@ -45,6 +45,7 @@ import com.vic.recompo.ui.mediciones.MedicionesScreen
 import com.vic.recompo.ui.mediciones.MedicionesViewModel
 import com.vic.recompo.ui.mediciones.MedicionesViewModelFactory
 import com.vic.recompo.data.ai.ParseComidaUseCase
+import com.vic.recompo.domain.usecase.GenerarSesionUseCase
 import com.vic.recompo.ui.nutricion.NutricionScreen
 import com.vic.recompo.ui.nutricion.NutricionViewModel
 import com.vic.recompo.ui.nutricion.NutricionViewModelFactory
@@ -84,7 +85,8 @@ class MainActivity : ComponentActivity() {
             app.userSettingsStore,
             app.database.entradaComidaDao(),
             app.database.sesionDao(),
-            app.database.actividadDao()
+            app.database.actividadDao(),
+            app.database.tipoSesionDao()
         )
     }
 
@@ -93,12 +95,15 @@ class MainActivity : ComponentActivity() {
     }
 
     private val entrenoViewModel by viewModels<EntrenoViewModel> {
+        val schemaJson = app.assets.open("tools/generar_sesion.json").bufferedReader().use { it.readText() }
         EntrenoViewModelFactory(
             applicationContext,
             app.database.sesionDao(),
             app.database.ejercicioEnSesionDao(),
             app.database.serieDao(),
-            app.database.ejercicioDao()
+            app.database.ejercicioDao(),
+            app.database.tipoSesionDao(),
+            GenerarSesionUseCase(app.claudeApi, schemaJson, applicationContext)
         )
     }
 
@@ -177,7 +182,15 @@ private fun MainAppContent(
             startDestination = Screen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Home.route) { HomeScreen(homeViewModel) }
+            composable(Screen.Home.route) {
+                HomeScreen(homeViewModel, onNavigateToEntreno = {
+                    navController.navigate(Screen.Entreno.route) {
+                        popUpTo(Screen.Home.route) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                })
+            }
             composable(Screen.Nutricion.route) { NutricionScreen(nutricionViewModel) }
             composable(Screen.Entreno.route) { EntrenoScreen(entrenoViewModel) }
             composable(Screen.Actividad.route) { ActividadScreen(actividadViewModel) }

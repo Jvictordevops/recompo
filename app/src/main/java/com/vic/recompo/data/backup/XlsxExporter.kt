@@ -2,9 +2,11 @@ package com.vic.recompo.data.backup
 
 import com.vic.recompo.data.UserSettingsStore
 import com.vic.recompo.data.db.RecompoDatabase
+import com.vic.recompo.domain.model.EstadoSerie
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.zip.ZipEntry
@@ -26,6 +28,7 @@ class XlsxExporter(
         val mediciones = db.medicionDao().getAll().first()
         val entradas = db.entradaComidaDao().getAll()
         val actividades = db.actividadDao().getAll().first()
+        val tipoMap = db.tipoSesionDao().getAll().first().associateBy({ it.id }, { it.nombre })
         val sesiones = db.sesionDao().getAll().first()
         val ejerciciosEnSesion = db.ejercicioEnSesionDao().getAll()
         val series = db.serieDao().getAll()
@@ -84,13 +87,16 @@ class XlsxExporter(
             val sesion = sesionesPorId[ejEn.sesionId] ?: return@forEach
             val nombreEj = ejercicios[ejEn.ejercicioId]?.nombre ?: ejEn.ejercicioId.toString()
             val seriesEj = seriesPorEjEn[ejEn.id] ?: emptyList()
-            val completadas = seriesEj.filter { it.completada }
+            val completadas = seriesEj.filter { it.estado == EstadoSerie.COMPLETADA }
             val repsProm = if (completadas.isEmpty()) "" else
-                String.format(Locale.US, "%.1f", completadas.map { it.repsReales }.average())
+                String.format(Locale.US, "%.1f", completadas.mapNotNull { it.repsReales }.average())
             val cargaProm = if (completadas.isEmpty()) "" else
-                String.format(Locale.US, "%.1f", completadas.map { it.cargaKg }.average())
+                String.format(Locale.US, "%.1f", completadas.mapNotNull { it.cargaKg }.average())
+            val fechaStr = sesion.fechaEjecutada
+                ?.atZone(ZoneId.systemDefault())?.toLocalDate()?.format(FMT) ?: ""
+            val tipoNombre = tipoMap[sesion.tipoSesionId] ?: sesion.tipoSesionId.toString()
             filasTrn += listOf(
-                sesion.fechaPrevista.format(FMT), sesion.tipo.name, sesion.estado.name,
+                fechaStr, tipoNombre, sesion.estado.name,
                 nombreEj, ejEn.seriesObjetivo.toString(),
                 "${ejEn.repsObjetivoMin}-${ejEn.repsObjetivoMax}",
                 ejEn.cargaObjetivoKg?.toString() ?: "",

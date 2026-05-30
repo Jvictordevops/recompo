@@ -87,9 +87,15 @@ class BackupSerializer(
                     kcalQuemadas = a.kcalQuemadas
                 )
             },
+            tiposSesion = db.tipoSesionDao().getAll().first().map { t ->
+                TipoSesionDto(
+                    id = t.id, nombre = t.nombre, descripcion = t.descripcion,
+                    esSeed = t.esSeed, activo = t.activo
+                )
+            },
             sesiones = db.sesionDao().getAll().first().map { s ->
                 SesionDto(
-                    id = s.id, tipo = s.tipo.name, fechaPrevista = s.fechaPrevista.toString(),
+                    id = s.id, tipoSesionId = s.tipoSesionId,
                     fechaEjecutada = s.fechaEjecutada?.toString(), estado = s.estado.name,
                     generadaPor = s.generadaPor.name, notasIA = s.notasIA,
                     notasGlobales = s.notasGlobales, rirGlobal = s.rirGlobal
@@ -107,7 +113,7 @@ class BackupSerializer(
                 SerieDto(
                     id = s.id, ejercicioEnSesionId = s.ejercicioEnSesionId,
                     numero = s.numero, repsReales = s.repsReales, cargaKg = s.cargaKg,
-                    rir = s.rir, completada = s.completada
+                    rir = s.rir, estado = s.estado.name, motivoOmision = s.motivoOmision?.name
                 )
             },
             ejercicios = db.ejercicioDao().getAll().first().map { e ->
