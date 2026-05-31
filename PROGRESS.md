@@ -8,6 +8,26 @@ _(vacío)_
 
 ## DONE (reciente)
 
+### Entreno: seedId, histórico seed y 6 bugs (2026-05-30)
+**Commit**: `feat(entreno): seedId en entidades, seed histórico, recuperación y 6 bugs`
+
+**Estado**: build verde, probado en móvil ✓ (2026-05-30).
+
+- `data/db/entity/Sesion.kt` + `Ejercicio.kt` — añadidos `seedId: String?` y `activo: Boolean` (Sesion).
+- `data/db/RecompoDatabase.kt` — versión 3→4; `MIGRATION_3_4` añade columnas `seedId`/`activo` en Sesion y `seedId` en Ejercicio.
+- `data/db/dao/SesionDao.kt` — `getBySeedIdAny()` sin filtro `activo` para recovery; todos los SELECT existentes filtran `activo = 1`.
+- `App.kt` — `seedEjerciciosGymFase2()`: inserta ejercicios por `seedId` (idempotente). `seedSesionesHistoricoIfNeeded()`: inserta 15 sesiones históricas con guard DataStore `sesionesHistoricoSeeded`. `recoverMissingSeedSesiones()`: restaura seeds PREPARADA perdidos — maneja soft-deleted (reactiva), OMITIDA (revierte a PREPARADA), sin seedId (reusa sesión existente del tipo).
+- `assets/seed/sesiones_seed.json` + `ejercicios_gym_fase2.json` — añadidos campos `seedId`.
+- **Bug 1** — peso corporal: `cargaKg` null permitido en `guardarSerie()`; muestra `"PC"` en pantalla (antes `"nullkg"`).
+- **Bug 2** — cancelar EN_CURSO: `confirmarCancelarSesion()` revierte a PREPARADA + `fechaEjecutada = null` + borra series del intento (antes ponía OMITIDA).
+- **Bug 3** — sesión vacía: `irAPostSesion()` bloquea con `DialogSesionVacia` si no hay ninguna serie; opciones: continuar igualmente o descartar.
+- **Bug 4** — múltiples EN_CURSO: `iniciarSesion()` detecta conflicto y muestra `DialogEnCursoConflicto`; usuario elige reanudar la existente o cancelarla y arrancar la nueva.
+- **Bug 5** — soft-delete: `confirmarEliminarSesion()` y `confirmarReemplazarPreparada()` usan `activo = false`; ningún camino hace `DELETE` físico de sesión.
+- **Bug 6** — sesión manual: `crearSesionManual()` + `duplicarSesion()` reemplazan `poblarDesdeTemplate()` (leía JSON inexistente); copia ejercicios de la última sesión completada del tipo.
+- **Fix crítico** — back desde PostSesión: `volverDesdePostSesion()` va a LISTA si la sesión es COMPLETADA, a EN_CURSO si sigue EN_CURSO (evitaba mostrar "Cancelar" en sesiones ya cerradas).
+
+---
+
 ### T-017 — Generador de próxima sesión con IA
 **Commit**: pendiente
 
