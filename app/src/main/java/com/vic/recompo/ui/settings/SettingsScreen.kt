@@ -339,6 +339,7 @@ private fun etiquetaFuncion(funcion: com.vic.recompo.domain.model.FuncionIA): St
     com.vic.recompo.domain.model.FuncionIA.PARSEO_COMIDA -> "Parseo de comida"
     com.vic.recompo.domain.model.FuncionIA.GENERACION_SESION -> "Generación de sesión"
     com.vic.recompo.domain.model.FuncionIA.CHAT -> "Chat"
+    com.vic.recompo.domain.model.FuncionIA.DESCOMPOSICION_COMIDA -> "Descomposición de comida"
 }
 
 @Composable

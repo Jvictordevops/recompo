@@ -7,6 +7,9 @@ import com.vic.recompo.data.ai.ClaudeClient
 import com.vic.recompo.data.db.RecompoDatabase
 import com.vic.recompo.data.db.entity.ComidaBase
 import com.vic.recompo.data.db.entity.Ejercicio
+import com.vic.recompo.data.db.entity.Ingrediente
+import com.vic.recompo.data.db.entity.PlantillaIngrediente
+import com.vic.recompo.domain.model.Fiabilidad
 import com.vic.recompo.data.db.entity.EjercicioEnSesion
 import com.vic.recompo.data.db.entity.Serie
 import com.vic.recompo.data.db.entity.Sesion
@@ -46,7 +49,11 @@ class App : Application() {
             seedSesionesHistoricoIfNeeded()
             recoverMissingSeedSesiones()
         }
-        appScope.launch { seedComidasBaseIfEmpty() }
+        appScope.launch {
+            seedComidasBaseIfEmpty()
+            seedIngredientesIfEmpty()
+            seedPlantillasIngredienteIfNeeded()
+        }
     }
 
     private suspend fun seedTipoSesionIfEmpty() {
@@ -240,6 +247,54 @@ class App : Application() {
                 continue
             }
             insertarSeedSesion(s, tipo)
+        }
+    }
+
+    private suspend fun seedIngredientesIfEmpty() {
+        if (database.ingredienteDao().count() > 0) return
+        val json = assets.open("seed/ingredientes_seed.json").bufferedReader().use { it.readText() }
+        val array = JSONArray(json)
+        val entities = (0 until array.length()).map { i ->
+            val obj = array.getJSONObject(i)
+            Ingrediente(
+                nombre = obj.getString("nombre"),
+                kcal100g = obj.getDouble("kcal100g"),
+                prot100g = obj.getDouble("prot100g"),
+                grasa100g = obj.getDouble("grasa100g"),
+                carbo100g = obj.getDouble("carbo100g"),
+                gramosPorUnidad = if (obj.isNull("gramosPorUnidad")) null else obj.getInt("gramosPorUnidad"),
+                nombreUnidad = if (obj.isNull("nombreUnidad")) null else obj.optString("nombreUnidad").takeIf { it.isNotEmpty() },
+                fiabilidad = Fiabilidad.valueOf(obj.getString("fiabilidad").uppercase()),
+                activo = true
+            )
+        }
+        database.ingredienteDao().insertAll(entities)
+    }
+
+    private suspend fun seedPlantillasIngredienteIfNeeded() {
+        if (database.plantillaIngredienteDao().count() > 0) return
+        val cbDao = database.comidaBaseDao()
+        val ingDao = database.ingredienteDao()
+        val piDao = database.plantillaIngredienteDao()
+
+        val recetas = listOf(
+            "Leche+avena+whey" to listOf("Leche semidesnatada" to 250.0, "Avena en copos" to 40.0, "Proteína whey HSN Evowhey (chocolate blanco)" to 30.0),
+            "Tostada atún" to listOf("Pan integral panadería Mercadona (bollo)" to 60.0, "Atún en aceite escurrido" to 50.0),
+            "Tostada lomo" to listOf("Pan integral panadería Mercadona (bollo)" to 60.0, "Lomo embuchado Mercadona" to 50.0),
+            "Tostada pavo" to listOf("Pan integral panadería Mercadona (bollo)" to 60.0, "Pechuga de pavo Mercadona" to 40.0),
+            "Natillas" to listOf("Natilla proteica Mercadona" to 120.0),
+            "Natillas + plátano" to listOf("Natilla proteica Mercadona" to 120.0, "Plátano" to 100.0),
+            "Natillas + plátano + uvas" to listOf("Natilla proteica Mercadona" to 120.0, "Plátano" to 100.0, "Uvas" to 50.0)
+        )
+        for ((variante, ingredientes) in recetas) {
+            val cb = cbDao.getByVariante(variante) ?: continue
+            for ((nombre, cantidad) in ingredientes) {
+                val ing = ingDao.getByNombre(nombre) ?: run {
+                    Timber.w("seedPlantillas: ingrediente '$nombre' no encontrado")
+                    continue
+                }
+                piDao.insert(PlantillaIngrediente(comidaBaseId = cb.id, ingredienteId = ing.id, cantidadG = cantidad))
+            }
         }
     }
 

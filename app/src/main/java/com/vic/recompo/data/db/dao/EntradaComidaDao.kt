@@ -39,4 +39,7 @@ interface EntradaComidaDao {
         FROM EntradaComida WHERE fecha = :fecha
     """)
     suspend fun getTotalesDelDia(fecha: LocalDate): TotalesComida?
+
+    @Query("SELECT * FROM EntradaComida WHERE textoLibre LIKE '%' || :query || '%' ORDER BY timestamp DESC LIMIT 20")
+    suspend fun search(query: String): List<EntradaComida>
 }

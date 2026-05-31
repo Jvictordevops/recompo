@@ -38,6 +38,8 @@ enum class TipoConversacion { NUTRICIONAL, ENTRENO }
 
 enum class RolMensaje { USER, ASSISTANT }
 
-enum class FuncionIA { PARSEO_COMIDA, GENERACION_SESION, CHAT }
+enum class FuncionIA { PARSEO_COMIDA, GENERACION_SESION, CHAT, DESCOMPOSICION_COMIDA }
 
 enum class ProveedorIA { CLAUDE_NATIVO, OPENROUTER }
+
+enum class Fiabilidad { VALIDADO, ESTIMADO }

@@ -335,6 +335,56 @@ Fotos opcionales en mediciones (URI persistente con scoped storage). Animaciones
 
 ---
 
+### T-025 — Soporte multi-proveedor de IA vía OpenRouter (híbrido)
+**Estimación**: 8-12h
+**Fase**: 3
+
+**Descripción**
+Añadir modelos alternativos (Gemini, Grok, DeepSeek, etc.) vía OpenRouter como gateway, manteniendo Claude nativo como proveedor por defecto e inamovible. OpenRouter es opcional y nunca un punto de fallo.
+
+**Principios de arquitectura**
+- Claude nativo no depende de OpenRouter. Si OpenRouter falla o no está configurado, todo funciona como ahora.
+- OpenRouter se integra como gateway compatible con formato OpenAI. La interfaz del cliente de IA se diseña para poder apuntar a otro gateway (ej. LiteLLM) cambiando solo URL base y API key — sin tocar el resto de la app. No implementar LiteLLM ahora.
+
+**Settings — sección IA (ampliar la de T-019)**
+- Selector de proveedor: Claude nativo (por defecto) / OpenRouter.
+- Si OpenRouter: campo para API key (misma gestión segura que la de Claude). Lista de modelos consultada dinámicamente desde la API de OpenRouter. Cacheable y refrescable. Sin hardcoding de modelos.
+- Filtro "solo gratuitos" activado por defecto (modelos `:free` / precio 0 en metadatos). El usuario puede desactivarlo. Buscador por nombre dentro de la lista filtrada.
+
+**Asignación de modelo por función**
+- Parseo de comida, generación de sesión y chat pueden usar modelos distintos. Por defecto los tres usan Claude nativo.
+- Aviso de tool calling: si se asigna a parseo o generación un modelo sin tool calling fiable (indicado en metadatos OpenRouter), mostrar advertencia clara. El usuario puede continuar pero queda avisado. El chat no requiere aviso.
+
+**Aviso de privacidad**
+Mostrar una sola vez al activar OpenRouter o seleccionar un modelo gratuito: "Los modelos gratuitos de OpenRouter pueden usar tus datos (prompts) para entrenamiento. Tus prompts incluyen información de tu plan, comidas y mediciones. Claude nativo no entrena con tus datos." El usuario lo confirma; no se repite.
+
+**Comparador de modelos**
+Pantalla/función que lanza el mismo prompt a dos modelos y muestra ambas respuestas lado a lado. Alcance: chat/texto libre; no es necesario comparar tool calling estructurado.
+
+**Manejo de errores y fallback**
+- Llamada OpenRouter fallida (modelo caído, límite gratuito alcanzado, red): mensaje descriptivo con causa + opción de reintentar o volver a Claude nativo para esa petición.
+- Respuesta no parseable de un modelo sin tool calling en parseo/generación: detectar, no guardar basura, avisar y ofrecer reintentar con Claude.
+
+**Panel de uso (ampliar T-019)**
+Distinguir llamadas y coste por proveedor: Claude nativo vs OpenRouter. Para gratuitos el coste es 0, pero mostrar número de llamadas.
+
+**Fuera de alcance**
+- LiteLLM ni otro gateway self-hosted (solo dejar diseño preparado).
+- Integración nativa de Gemini/Grok/otros fuera de OpenRouter.
+- No cambiar el comportamiento por defecto: sin tocar settings, todo sigue igual que ahora.
+
+**Hecho cuando**
+- Claude nativo sigue siendo el comportamiento por defecto sin cambios.
+- Puedo configurar la key de OpenRouter y ver la lista de modelos gratuitos filtrada.
+- Puedo asignar un modelo gratuito al chat y conversar.
+- Si asigno un gratuito a parseo/generación, recibo el aviso de tool calling.
+- Veo el aviso de privacidad una vez al activar OpenRouter.
+- El comparador muestra dos respuestas lado a lado.
+- Si un gratuito falla o alcanza límite, la app lo indica claramente y puedo volver a Claude.
+- Probado en móvil.
+
+---
+
 ### T-016 — Catálogo de ingredientes + plantillas-receta
 **Estimación**: 6-8h (bloque grande, hacer en una sola sesión)
 **Prioridad**: alta — desbloquea parseo de unidades con valores reales y plantillas editables

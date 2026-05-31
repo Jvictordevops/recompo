@@ -30,4 +30,13 @@ interface ComidaBaseDao {
 
     @Query("SELECT COUNT(*) FROM ComidaBase")
     suspend fun count(): Int
+
+    @Query("SELECT * FROM ComidaBase WHERE variante = :variante LIMIT 1")
+    suspend fun getByVariante(variante: String): ComidaBase?
+
+    @Query("SELECT * FROM ComidaBase WHERE variante LIKE '%' || :query || '%' AND activo = 1 ORDER BY variante LIMIT 5")
+    suspend fun searchByVariante(query: String): List<ComidaBase>
+
+    @Query("UPDATE ComidaBase SET activo = :activo WHERE id = :id")
+    suspend fun setActivo(id: Long, activo: Boolean)
 }

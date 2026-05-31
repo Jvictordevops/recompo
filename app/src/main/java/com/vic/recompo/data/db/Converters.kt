@@ -2,6 +2,7 @@ package com.vic.recompo.data.db
 
 import androidx.room.TypeConverter
 import com.vic.recompo.domain.model.EstadoSerie
+import com.vic.recompo.domain.model.Fiabilidad
 import com.vic.recompo.domain.model.EstadoSesion
 import com.vic.recompo.domain.model.FuncionIA
 import com.vic.recompo.domain.model.GrupoMuscular
@@ -55,4 +56,7 @@ class Converters {
 
     @TypeConverter fun proveedorIAToString(v: ProveedorIA?): String? = v?.name
     @TypeConverter fun stringToProveedorIA(v: String?): ProveedorIA? = v?.let { ProveedorIA.valueOf(it) }
+
+    @TypeConverter fun fiabilidadToString(v: Fiabilidad?): String? = v?.name
+    @TypeConverter fun stringToFiabilidad(v: String?): Fiabilidad? = v?.let { Fiabilidad.valueOf(it) }
 }
