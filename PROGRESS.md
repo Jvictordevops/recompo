@@ -8,6 +8,25 @@ _(vacío)_
 
 ## DONE (reciente)
 
+### T-019 — Pantalla "Uso de IA" en Settings (2026-05-31)
+**Estado**: build verde, tests verdes, probado en móvil ✓ (2026-05-31).
+
+- `data/db/entity/UsoIA.kt` — nueva entidad: timestamp, funcion (FuncionIA), proveedor (ProveedorIA), modelo, tokensIn, tokensOut, costeUsd.
+- `data/db/dao/UsoIADao.kt` — insert + getDesde(epochMilli): Flow.
+- `domain/ai/TarifasIA.kt` — tabla centralizada de tarifas por modelo (Sonnet 4.6: $3/M in + $15/M out; modelos desconocidos: 0).
+- `domain/model/Enums.kt` — añadidos FuncionIA (PARSEO_COMIDA / GENERACION_SESION / CHAT) y ProveedorIA (CLAUDE_NATIVO / OPENROUTER).
+- `data/db/Converters.kt` — type converters para FuncionIA y ProveedorIA.
+- `data/db/RecompoDatabase.kt` — versión 4→5; MIGRATION_4_5 crea tabla UsoIA con índices.
+- `data/ai/ParseComidaUseCase.kt` — inserta en UsoIA tras cada llamada real a la API.
+- `domain/usecase/GenerarSesionUseCase.kt` — inserta en UsoIA tras cada llamada real (fallback no cuenta).
+- `ui/chat/ChatViewModel.kt` — inserta en UsoIA tras cada respuesta del asistente (además de MensajeIA para historial).
+- `MainActivity.kt` — usoIADao cableado a los tres puntos de entrada.
+- `ui/settings/SettingsViewModel.kt` — UsoIaStats con costeEurSemana + desglose por función; alerta si tokens suben >20% vs semana anterior.
+- `ui/settings/SettingsScreen.kt` — CardIA con total + fila por función activa.
+- `test/ParseComidaUseCaseTest.kt` — fake UsoIADao añadido.
+
+---
+
 ### T-018 — Chat conversacional (2026-05-31)
 **Estado**: build verde, tests verdes, probado en móvil ✓ (2026-05-31).
 

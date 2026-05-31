@@ -22,7 +22,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 enum class CampoTexto { NOMBRE, FASE }
 enum class CampoEntero { ALTURA, KCAL_DESCANSO, KCAL_MUSCULACION, KCAL_BICI, METABOLISMO_BASAL, PROTEINA }
@@ -66,11 +68,25 @@ sealed class SettingsDialog {
     ) : SettingsDialog()
 }
 
+data class DesgloseFuncion(
+    val funcion: com.vic.recompo.domain.model.FuncionIA,
+    val llamadas: Int,
+    val costeEur: Double
+)
+
+data class UsoIaStats(
+    val llamadasSemana: Int,
+    val costeEurSemana: Double,
+    val desglose: List<DesgloseFuncion>,
+    val alertaTokensAltos: Boolean
+)
+
 data class SettingsUiState(
     val settings: UserSettings? = null,
     val dialog: SettingsDialog? = null,
     val exportando: Boolean = false,
-    val mensajeResultado: String? = null
+    val mensajeResultado: String? = null,
+    val usoIa: UsoIaStats? = null
 )
 
 class SettingsViewModel(
@@ -86,13 +102,23 @@ class SettingsViewModel(
     private val _dialog = MutableStateFlow<SettingsDialog?>(null)
     private val _exportando = MutableStateFlow(false)
     private val _mensajeResultado = MutableStateFlow<String?>(null)
+    private val _usoIa = MutableStateFlow<UsoIaStats?>(null)
+
+    init {
+        val hace14dias = Instant.now().minus(14, ChronoUnit.DAYS).toEpochMilli()
+        viewModelScope.launch {
+            database.usoIADao().getDesde(hace14dias).collect { registros ->
+                _usoIa.value = computarStats(registros)
+            }
+        }
+    }
 
     val uiState: StateFlow<SettingsUiState> = combine(
-        store.settings,
-        _dialog,
-        _exportando,
-        _mensajeResultado
-    ) { s, d, exp, msg -> SettingsUiState(settings = s, dialog = d, exportando = exp, mensajeResultado = msg) }
+        combine(store.settings, _dialog, _exportando, _mensajeResultado) { s, d, exp, msg ->
+            SettingsUiState(settings = s, dialog = d, exportando = exp, mensajeResultado = msg)
+        },
+        _usoIa
+    ) { state, ia -> state.copy(usoIa = ia) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsUiState())
 
     fun abrirDialog(dialog: SettingsDialog) { _dialog.value = dialog }
@@ -253,6 +279,33 @@ class SettingsViewModel(
         }
     }
 
+    private fun computarStats(registros: List<com.vic.recompo.data.db.entity.UsoIA>): UsoIaStats {
+        val ahora = Instant.now()
+        val hace7dias = ahora.minus(7, ChronoUnit.DAYS)
+        val hace14dias = ahora.minus(14, ChronoUnit.DAYS)
+
+        val semanaActual = registros.filter { it.timestamp >= hace7dias }
+        val semanaPasada = registros.filter { it.timestamp >= hace14dias && it.timestamp < hace7dias }
+
+        val llamadas = semanaActual.size
+        val costeEurSemana = semanaActual.sumOf { it.costeUsd } * EUR_PER_USD
+
+        val desglose = com.vic.recompo.domain.model.FuncionIA.entries
+            .mapNotNull { funcion ->
+                val filas = semanaActual.filter { it.funcion == funcion }
+                if (filas.isEmpty()) null
+                else DesgloseFuncion(funcion, filas.size, filas.sumOf { it.costeUsd } * EUR_PER_USD)
+            }
+
+        val avgTokensActual = if (semanaActual.isEmpty()) 0.0
+            else semanaActual.map { (it.tokensIn + it.tokensOut).toDouble() }.average()
+        val avgTokensPasada = if (semanaPasada.isEmpty()) 0.0
+            else semanaPasada.map { (it.tokensIn + it.tokensOut).toDouble() }.average()
+        val alerta = llamadas >= 3 && avgTokensPasada > 0 && avgTokensActual > avgTokensPasada * 1.2
+
+        return UsoIaStats(llamadas, costeEurSemana, desglose, alerta)
+    }
+
     private fun setError(d: SettingsDialog, msg: String?) {
         _dialog.value = when (d) {
             is SettingsDialog.Texto -> d.copy(error = msg)
@@ -262,6 +315,10 @@ class SettingsViewModel(
             is SettingsDialog.EditarSexo -> d.copy(error = msg)
             is SettingsDialog.ConfirmarQuitarBackup -> d.copy(error = msg)
         }
+    }
+
+    companion object {
+        private const val EUR_PER_USD = 0.92
     }
 }
 

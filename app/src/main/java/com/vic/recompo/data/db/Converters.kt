@@ -3,10 +3,12 @@ package com.vic.recompo.data.db
 import androidx.room.TypeConverter
 import com.vic.recompo.domain.model.EstadoSerie
 import com.vic.recompo.domain.model.EstadoSesion
+import com.vic.recompo.domain.model.FuncionIA
 import com.vic.recompo.domain.model.GrupoMuscular
 import com.vic.recompo.domain.model.MotivoOmision
 import com.vic.recompo.domain.model.OrigenSesion
 import com.vic.recompo.domain.model.PatronMovimiento
+import com.vic.recompo.domain.model.ProveedorIA
 import com.vic.recompo.domain.model.RolMensaje
 import com.vic.recompo.domain.model.SlotComida
 import com.vic.recompo.domain.model.TipoConversacion
@@ -47,4 +49,10 @@ class Converters {
 
     @TypeConverter fun rolMensajeToString(v: RolMensaje?): String? = v?.name
     @TypeConverter fun stringToRolMensaje(v: String?): RolMensaje? = v?.let { RolMensaje.valueOf(it) }
+
+    @TypeConverter fun funcionIAToString(v: FuncionIA?): String? = v?.name
+    @TypeConverter fun stringToFuncionIA(v: String?): FuncionIA? = v?.let { FuncionIA.valueOf(it) }
+
+    @TypeConverter fun proveedorIAToString(v: ProveedorIA?): String? = v?.name
+    @TypeConverter fun stringToProveedorIA(v: String?): ProveedorIA? = v?.let { ProveedorIA.valueOf(it) }
 }

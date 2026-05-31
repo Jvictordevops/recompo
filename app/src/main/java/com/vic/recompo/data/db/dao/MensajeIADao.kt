@@ -19,4 +19,7 @@ interface MensajeIADao {
 
     @Query("DELETE FROM MensajeIA WHERE conversacionId = :conversacionId")
     suspend fun deleteByConversacion(conversacionId: Long)
+
+    @Query("SELECT * FROM MensajeIA WHERE rol = 'ASSISTANT' AND timestamp >= :desdeEpochMilli")
+    fun getAsistenteDesde(desdeEpochMilli: Long): Flow<List<MensajeIA>>
 }

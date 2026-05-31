@@ -18,6 +18,7 @@ import com.vic.recompo.data.db.dao.MensajeIADao
 import com.vic.recompo.data.db.dao.SerieDao
 import com.vic.recompo.data.db.dao.SesionDao
 import com.vic.recompo.data.db.dao.TipoSesionDao
+import com.vic.recompo.data.db.dao.UsoIADao
 import com.vic.recompo.data.db.entity.Actividad
 import com.vic.recompo.data.db.entity.ComidaBase
 import com.vic.recompo.data.db.entity.Conversacion
@@ -29,6 +30,7 @@ import com.vic.recompo.data.db.entity.MensajeIA
 import com.vic.recompo.data.db.entity.Serie
 import com.vic.recompo.data.db.entity.Sesion
 import com.vic.recompo.data.db.entity.TipoSesion
+import com.vic.recompo.data.db.entity.UsoIA
 
 @Database(
     entities = [
@@ -43,8 +45,9 @@ import com.vic.recompo.data.db.entity.TipoSesion
         Medicion::class,
         Conversacion::class,
         MensajeIA::class,
+        UsoIA::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -61,6 +64,7 @@ abstract class RecompoDatabase : RoomDatabase() {
     abstract fun medicionDao(): MedicionDao
     abstract fun conversacionDao(): ConversacionDao
     abstract fun mensajeIADao(): MensajeIADao
+    abstract fun usoIADao(): UsoIADao
 
     companion object {
         @Volatile private var INSTANCE: RecompoDatabase? = null
@@ -78,9 +82,28 @@ abstract class RecompoDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS UsoIA (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        timestamp INTEGER NOT NULL,
+                        funcion TEXT NOT NULL,
+                        proveedor TEXT NOT NULL,
+                        modelo TEXT NOT NULL,
+                        tokensIn INTEGER NOT NULL,
+                        tokensOut INTEGER NOT NULL,
+                        costeUsd REAL NOT NULL
+                    )
+                """.trimIndent())
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_UsoIA_timestamp ON UsoIA(timestamp)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_UsoIA_funcion ON UsoIA(funcion)")
+            }
+        }
+
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(context, RecompoDatabase::class.java, "recompo.db")
-                .addMigrations(MIGRATION_3_4)
+                .addMigrations(MIGRATION_3_4, MIGRATION_4_5)
                 .fallbackToDestructiveMigration(true)
                 .build()
     }

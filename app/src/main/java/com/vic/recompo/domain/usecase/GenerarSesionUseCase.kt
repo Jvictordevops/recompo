@@ -2,12 +2,19 @@ package com.vic.recompo.domain.usecase
 
 import android.content.Context
 import com.vic.recompo.data.ai.ClaudeApi
+import com.vic.recompo.data.ai.ClaudeModels
 import com.vic.recompo.data.ai.dto.ClaudeRequest
 import com.vic.recompo.data.ai.dto.Message
 import com.vic.recompo.data.ai.dto.Tool
+import com.vic.recompo.data.db.dao.UsoIADao
+import com.vic.recompo.data.db.entity.UsoIA
 import com.vic.recompo.domain.ai.ContextLimits
 import com.vic.recompo.domain.ai.DeloadCalendar
+import com.vic.recompo.domain.ai.TarifasIA
 import com.vic.recompo.domain.model.EstadoSerie
+import com.vic.recompo.domain.model.FuncionIA
+import com.vic.recompo.domain.model.ProveedorIA
+import java.time.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.doubleOrNull
@@ -23,7 +30,8 @@ import java.time.format.DateTimeFormatter
 class GenerarSesionUseCase(
     private val claudeApi: ClaudeApi,
     private val schemaJson: String,
-    private val context: Context
+    private val context: Context,
+    private val usoIADao: UsoIADao
 ) {
 
     sealed class Resultado {
@@ -76,6 +84,15 @@ class GenerarSesionUseCase(
                 toolChoice = toolChoice
             )
             val response = claudeApi.messages(request)
+            usoIADao.insert(UsoIA(
+                timestamp = Instant.now(),
+                funcion = FuncionIA.GENERACION_SESION,
+                proveedor = ProveedorIA.CLAUDE_NATIVO,
+                modelo = ClaudeModels.DEFAULT_MODEL,
+                tokensIn = response.usage.inputTokens,
+                tokensOut = response.usage.outputTokens,
+                costeUsd = TarifasIA.calcularCosteUsd(ClaudeModels.DEFAULT_MODEL, response.usage.inputTokens, response.usage.outputTokens)
+            ))
             val toolUse = response.content.firstOrNull { it.type == "tool_use" && it.name == TOOL_NAME }
                 ?: return Resultado.Fallo("Respuesta inesperada de la IA", generarFallback(historial))
 

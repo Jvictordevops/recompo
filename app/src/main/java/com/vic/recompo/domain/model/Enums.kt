@@ -37,3 +37,7 @@ enum class OrigenSesion { SEED, IA, MANUAL }
 enum class TipoConversacion { NUTRICIONAL, ENTRENO }
 
 enum class RolMensaje { USER, ASSISTANT }
+
+enum class FuncionIA { PARSEO_COMIDA, GENERACION_SESION, CHAT }
+
+enum class ProveedorIA { CLAUDE_NATIVO, OPENROUTER }

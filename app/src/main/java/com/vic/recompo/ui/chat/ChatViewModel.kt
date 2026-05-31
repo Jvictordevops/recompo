@@ -10,12 +10,18 @@ import com.vic.recompo.data.db.dao.ActividadDao
 import com.vic.recompo.data.db.dao.ConversacionDao
 import com.vic.recompo.data.db.dao.EntradaComidaDao
 import com.vic.recompo.data.db.dao.MedicionDao
+import com.vic.recompo.data.ai.ClaudeModels
 import com.vic.recompo.data.db.dao.MensajeIADao
 import com.vic.recompo.data.db.dao.SesionDao
 import com.vic.recompo.data.db.dao.TipoSesionDao
+import com.vic.recompo.data.db.dao.UsoIADao
 import com.vic.recompo.data.db.entity.Conversacion
 import com.vic.recompo.data.db.entity.MensajeIA
+import com.vic.recompo.data.db.entity.UsoIA
 import com.vic.recompo.domain.ai.ContextLimits
+import com.vic.recompo.domain.ai.TarifasIA
+import com.vic.recompo.domain.model.FuncionIA
+import com.vic.recompo.domain.model.ProveedorIA
 import com.vic.recompo.domain.model.RolMensaje
 import com.vic.recompo.domain.model.TipoConversacion
 import com.vic.recompo.domain.model.UserSettings
@@ -43,6 +49,7 @@ data class ChatUiState(
 class ChatViewModel(
     private val conversacionDao: ConversacionDao,
     private val mensajeIADao: MensajeIADao,
+    private val usoIADao: UsoIADao,
     private val settingsStore: UserSettingsStore,
     private val entradaComidaDao: EntradaComidaDao,
     private val sesionDao: SesionDao,
@@ -116,6 +123,7 @@ class ChatViewModel(
 
             when (val resultado = chatUseCase.enviar(systemPrompt, mensajesApi)) {
                 is ChatUseCase.Resultado.Exito -> {
+                    val ahora = Instant.now()
                     mensajeIADao.insert(
                         MensajeIA(
                             conversacionId = conversacionId,
@@ -123,9 +131,18 @@ class ChatViewModel(
                             contenido = resultado.texto,
                             tokensIn = resultado.tokensIn,
                             tokensOut = resultado.tokensOut,
-                            timestamp = Instant.now()
+                            timestamp = ahora
                         )
                     )
+                    usoIADao.insert(UsoIA(
+                        timestamp = ahora,
+                        funcion = FuncionIA.CHAT,
+                        proveedor = ProveedorIA.CLAUDE_NATIVO,
+                        modelo = ClaudeModels.DEFAULT_MODEL,
+                        tokensIn = resultado.tokensIn,
+                        tokensOut = resultado.tokensOut,
+                        costeUsd = TarifasIA.calcularCosteUsd(ClaudeModels.DEFAULT_MODEL, resultado.tokensIn, resultado.tokensOut)
+                    ))
                     _uiState.update { it.copy(enviando = false) }
                 }
                 is ChatUseCase.Resultado.Fallo ->
@@ -224,6 +241,7 @@ class ChatViewModel(
 class ChatViewModelFactory(
     private val conversacionDao: ConversacionDao,
     private val mensajeIADao: MensajeIADao,
+    private val usoIADao: UsoIADao,
     private val settingsStore: UserSettingsStore,
     private val entradaComidaDao: EntradaComidaDao,
     private val sesionDao: SesionDao,
@@ -236,7 +254,7 @@ class ChatViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
         ChatViewModel(
-            conversacionDao, mensajeIADao, settingsStore,
+            conversacionDao, mensajeIADao, usoIADao, settingsStore,
             entradaComidaDao, sesionDao, actividadDao, medicionDao, tipoSesionDao,
             chatUseCase, context
         ) as T

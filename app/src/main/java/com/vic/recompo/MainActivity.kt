@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
         NutricionViewModelFactory(
             app.database.entradaComidaDao(),
             app.database.comidaBaseDao(),
-            ParseComidaUseCase(app.claudeApi, schemaJson)
+            ParseComidaUseCase(app.claudeApi, schemaJson, app.database.usoIADao())
         )
     }
 
@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
             app.database.serieDao(),
             app.database.ejercicioDao(),
             app.database.tipoSesionDao(),
-            GenerarSesionUseCase(app.claudeApi, schemaJson, applicationContext)
+            GenerarSesionUseCase(app.claudeApi, schemaJson, applicationContext, app.database.usoIADao())
         )
     }
 
@@ -119,6 +119,7 @@ class MainActivity : ComponentActivity() {
         ChatViewModelFactory(
             app.database.conversacionDao(),
             app.database.mensajeIADao(),
+            app.database.usoIADao(),
             app.userSettingsStore,
             app.database.entradaComidaDao(),
             app.database.sesionDao(),

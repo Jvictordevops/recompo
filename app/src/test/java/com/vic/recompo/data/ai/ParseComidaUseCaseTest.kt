@@ -14,6 +14,12 @@ import org.junit.Test
 
 class ParseComidaUseCaseTest {
 
+    private val fakeUsoIADao = object : com.vic.recompo.data.db.dao.UsoIADao {
+        override suspend fun insert(uso: com.vic.recompo.data.db.entity.UsoIA): Long = 0L
+        override fun getDesde(desdeEpochMilli: Long): kotlinx.coroutines.flow.Flow<List<com.vic.recompo.data.db.entity.UsoIA>> =
+            kotlinx.coroutines.flow.flowOf(emptyList())
+    }
+
     private val schema = """
         {
           "type": "object",
@@ -54,7 +60,7 @@ class ParseComidaUseCaseTest {
             put("carbo_g", 38.0)
             put("confianza", "alta")
         }
-        val useCase = ParseComidaUseCase(fakeApi(fakeResponse(input)), schema)
+        val useCase = ParseComidaUseCase(fakeApi(fakeResponse(input)), schema, fakeUsoIADao)
 
         val result = useCase.parsear("leche con avena y whey")
 
@@ -78,7 +84,7 @@ class ParseComidaUseCaseTest {
             stopReason = "end_turn",
             usage = Usage(inputTokens = 50, outputTokens = 20)
         )
-        val useCase = ParseComidaUseCase(fakeApi(response), schema)
+        val useCase = ParseComidaUseCase(fakeApi(response), schema, fakeUsoIADao)
 
         val result = useCase.parsear("algo")
 
@@ -91,7 +97,7 @@ class ParseComidaUseCaseTest {
             override suspend fun messages(request: ClaudeRequest): ClaudeResponse =
                 throw RuntimeException("timeout")
         }
-        val useCase = ParseComidaUseCase(errorApi, schema)
+        val useCase = ParseComidaUseCase(errorApi, schema, fakeUsoIADao)
 
         val result = useCase.parsear("algo")
 

@@ -71,7 +71,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
         CardMacros(settings, viewModel)
         CardBackup(settings, viewModel, state.exportando)
         CardExport(settings, viewModel, state.exportando)
-        CardIA()
+        CardIA(state.usoIa)
         Spacer(Modifier.height(16.dp))
     }
 
@@ -299,15 +299,46 @@ private fun CardExport(s: UserSettings, vm: SettingsViewModel, exportando: Boole
 }
 
 @Composable
-private fun CardIA() {
+private fun CardIA(usoIa: UsoIaStats?) {
     CardSeccion("Uso de IA") {
-        Text(
-            text = "Disponible en Fase 2 (Claude API).",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
+        if (usoIa == null || usoIa.llamadasSemana == 0) {
+            Text(
+                text = "Sin llamadas a la IA en los últimos 7 días.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+        } else {
+            CampoItem(
+                titulo = "Total (7 días)",
+                valor = "~€${"%.4f".format(usoIa.costeEurSemana)}",
+                supporting = "${usoIa.llamadasSemana} llamadas · \$3/M in + \$15/M out · 1 USD ≈ 0,92 EUR"
+            )
+            usoIa.desglose.forEach { d ->
+                HorizontalDivider()
+                CampoItem(
+                    titulo = etiquetaFuncion(d.funcion),
+                    valor = "~€${"%.4f".format(d.costeEur)}",
+                    supporting = "${d.llamadas} llamadas"
+                )
+            }
+            if (usoIa.alertaTokensAltos) {
+                HorizontalDivider()
+                Text(
+                    text = "⚠ Los tokens medios han subido más de un 20 % respecto a la semana anterior. Posible prompt hinchado.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+        }
     }
+}
+
+private fun etiquetaFuncion(funcion: com.vic.recompo.domain.model.FuncionIA): String = when (funcion) {
+    com.vic.recompo.domain.model.FuncionIA.PARSEO_COMIDA -> "Parseo de comida"
+    com.vic.recompo.domain.model.FuncionIA.GENERACION_SESION -> "Generación de sesión"
+    com.vic.recompo.domain.model.FuncionIA.CHAT -> "Chat"
 }
 
 @Composable
