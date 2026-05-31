@@ -40,7 +40,8 @@ data class TotalesDelDia(
 data class NutricionUiState(
     val entradasPorSlot: Map<SlotComida, List<EntradaComida>> = emptyMap(),
     val totales: TotalesDelDia = TotalesDelDia(),
-    val plantillasPorSlot: Map<SlotComida, List<ComidaBase>> = emptyMap()
+    val plantillasPorSlot: Map<SlotComida, List<ComidaBase>> = emptyMap(),
+    val idsEscalables: Set<Long> = emptySet()
 )
 
 data class ResultadoIAState(
@@ -117,7 +118,9 @@ data class DialogState(
     val ingredientesParaRevisar: List<IngredienteParaRevisar> = emptyList(),
     val nombrePlantillaDescompuesta: String = "",
     val slotPlantillaDescompuesta: SlotComida = SlotComida.DESAYUNO,
-    val guardandoDescomposicion: Boolean = false
+    val guardandoDescomposicion: Boolean = false,
+    // Gestor de plantillas
+    val gestorPlantillasAbierto: Boolean = false
 )
 
 class NutricionViewModel(
@@ -133,11 +136,19 @@ class NutricionViewModel(
     private val _dialogState = MutableStateFlow(DialogState())
     val dialogState: StateFlow<DialogState> = _dialogState.asStateFlow()
     private var sugerenciasJob: Job? = null
+    private val _idsEscalables = MutableStateFlow<Set<Long>>(emptySet())
+
+    init {
+        viewModelScope.launch {
+            _idsEscalables.value = plantillaIngredienteDao.getAllComidaBaseIdsConIngredientes().toSet()
+        }
+    }
 
     val uiState: StateFlow<NutricionUiState> = combine(
         entradaComidaDao.getByFecha(hoy),
-        comidaBaseDao.getAllActivos()
-    ) { entradas, plantillas ->
+        comidaBaseDao.getAllActivos(),
+        _idsEscalables
+    ) { entradas, plantillas, idsEscalables ->
         NutricionUiState(
             entradasPorSlot = entradas.groupBy { it.slot },
             totales = TotalesDelDia(
@@ -146,7 +157,8 @@ class NutricionViewModel(
                 grasaG = entradas.sumOf { it.grasaG },
                 carboG = entradas.sumOf { it.carboG }
             ),
-            plantillasPorSlot = plantillas.groupBy { it.slot }
+            plantillasPorSlot = plantillas.groupBy { it.slot },
+            idsEscalables = idsEscalables
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), NutricionUiState())
 
@@ -465,6 +477,7 @@ class NutricionViewModel(
                     )
                 )
             }
+            _idsEscalables.value = plantillaIngredienteDao.getAllComidaBaseIdsConIngredientes().toSet()
             cerrarDialogo()
         }
     }
@@ -493,8 +506,19 @@ class NutricionViewModel(
         }
     }
 
+    fun abrirGestorPlantillas() {
+        _dialogState.update { it.copy(gestorPlantillasAbierto = true) }
+    }
+
+    fun cerrarGestorPlantillas() {
+        _dialogState.update { it.copy(gestorPlantillasAbierto = false) }
+    }
+
     fun eliminarPlantilla(id: Long) {
-        viewModelScope.launch { comidaBaseDao.setActivo(id, false) }
+        viewModelScope.launch {
+            comidaBaseDao.deleteById(id)
+            _idsEscalables.value = plantillaIngredienteDao.getAllComidaBaseIdsConIngredientes().toSet()
+        }
     }
 
     // ── Parseo IA ─────────────────────────────────────────────────────────────

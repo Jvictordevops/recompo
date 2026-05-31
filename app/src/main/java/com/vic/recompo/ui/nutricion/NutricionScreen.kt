@@ -56,7 +56,6 @@ import com.vic.recompo.domain.model.SlotComida
 fun NutricionScreen(viewModel: NutricionViewModel) {
     val state by viewModel.uiState.collectAsState()
     val dialog by viewModel.dialogState.collectAsState()
-    var mostrandoGestorPlantillas by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -77,7 +76,7 @@ fun NutricionScreen(viewModel: NutricionViewModel) {
         }
         item {
             TextButton(
-                onClick = { mostrandoGestorPlantillas = true },
+                onClick = viewModel::abrirGestorPlantillas,
                 modifier = Modifier.fillMaxWidth()
             ) { Text("Gestionar plantillas", style = MaterialTheme.typography.bodySmall) }
         }
@@ -87,6 +86,7 @@ fun NutricionScreen(viewModel: NutricionViewModel) {
         AnadirComidaDialog(
             dialog = dialog,
             plantillas = state.plantillasPorSlot.values.flatten(),
+            idsEscalables = state.idsEscalables,
             onModoPlantillaChanged = viewModel::onModoPlantillaChanged,
             onPlantillaSeleccionada = viewModel::onPlantillaSeleccionada,
             onTextoLibreChanged = viewModel::onTextoLibreChanged,
@@ -130,12 +130,12 @@ fun NutricionScreen(viewModel: NutricionViewModel) {
         )
     }
 
-    if (mostrandoGestorPlantillas) {
-        val todasLasPlantillas = state.plantillasPorSlot.values.flatten()
+    if (dialog.gestorPlantillasAbierto) {
         GestionarPlantillasDialog(
-            plantillas = todasLasPlantillas,
+            plantillas = state.plantillasPorSlot.values.flatten(),
+            idsEscalables = state.idsEscalables,
             onEliminar = viewModel::eliminarPlantilla,
-            onCerrar = { mostrandoGestorPlantillas = false }
+            onCerrar = viewModel::cerrarGestorPlantillas
         )
     }
 }
@@ -240,6 +240,7 @@ private fun EntradaItem(
 private fun AnadirComidaDialog(
     dialog: DialogState,
     plantillas: List<ComidaBase>,
+    idsEscalables: Set<Long>,
     onModoPlantillaChanged: (Boolean) -> Unit,
     onPlantillaSeleccionada: (ComidaBase) -> Unit,
     onTextoLibreChanged: (String) -> Unit,
@@ -368,6 +369,7 @@ private fun AnadirComidaDialog(
                             valor = dialog.textoLibre,
                             sugerencias = dialog.sugerencias,
                             plantillasSugeridas = dialog.plantillasSugeridas,
+                            idsEscalables = idsEscalables,
                             onValorChanged = onTextoLibreChanged,
                             onSeleccionarSugerencia = onSeleccionarSugerencia,
                             onSeleccionarPlantillaSugerida = onSeleccionarSugerenciaPlantilla,
@@ -485,6 +487,7 @@ private fun CampoDescripcionConSugerencias(
     valor: String,
     sugerencias: List<EntradaComida>,
     plantillasSugeridas: List<ComidaBase>,
+    idsEscalables: Set<Long>,
     onValorChanged: (String) -> Unit,
     onSeleccionarSugerencia: (EntradaComida) -> Unit,
     onSeleccionarPlantillaSugerida: (ComidaBase) -> Unit,
@@ -517,15 +520,19 @@ private fun CampoDescripcionConSugerencias(
                     enabled = false
                 )
                 plantillasSugeridas.forEach { plantilla ->
+                    val esEscalable = plantilla.id in idsEscalables
                     DropdownMenuItem(
                         text = {
                             Column {
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                                     Text(plantilla.variante, style = MaterialTheme.typography.bodyMedium)
                                     Text(
-                                        "↺",
+                                        if (esEscalable) "Escalable" else "Foto",
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.primary
+                                        color = if (esEscalable)
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                                 Text(
@@ -830,15 +837,28 @@ private fun DescomposicionDialog(
 @Composable
 private fun GestionarPlantillasDialog(
     plantillas: List<ComidaBase>,
+    idsEscalables: Set<Long>,
     onEliminar: (Long) -> Unit,
     onCerrar: () -> Unit
 ) {
-    // Agrupar por nombre normalizado, mostrar grupos con ≥2 elementos
-    fun normalizar(text: String) = text.lowercase()
-        .map { c -> when (c) { 'á','à','â','ä'->'a'; 'é','è','ê','ë'->'e'; 'í','ì','î','ï'->'i'; 'ó','ò','ô','ö'->'o'; 'ú','ù','û','ü'->'u'; 'ñ'->'n'; else->c } }
-        .joinToString("").replace(Regex("[^a-z0-9]"), "")
+    var confirmar by remember { mutableStateOf<ComidaBase?>(null) }
 
-    val grupos = plantillas.groupBy { normalizar(it.variante) }.values.filter { it.size >= 2 }
+    confirmar?.let { cb ->
+        AlertDialog(
+            onDismissRequest = { confirmar = null },
+            title = { Text("¿Borrar plantilla?") },
+            text = { Text("\"${cb.variante}\" se eliminará definitivamente. Esta acción no tiene vuelta atrás.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    onEliminar(cb.id)
+                    confirmar = null
+                }) { Text("Borrar", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmar = null }) { Text("Cancelar") }
+            }
+        )
+    }
 
     AlertDialog(
         onDismissRequest = onCerrar,
@@ -846,46 +866,52 @@ private fun GestionarPlantillasDialog(
         text = {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                if (grupos.isEmpty()) {
+                if (plantillas.isEmpty()) {
                     Text(
-                        "No hay plantillas duplicadas.",
+                        "No hay plantillas guardadas.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 } else {
-                    Text(
-                        "Plantillas duplicadas — elimina las que sobren:",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    grupos.forEach { grupo ->
-                        Card(modifier = Modifier.fillMaxWidth()) {
-                            Column(modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                grupo.forEach { cb ->
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(cb.variante, style = MaterialTheme.typography.bodySmall)
-                                            Text(
-                                                "${cb.kcal} kcal · ${cb.slot.etiqueta()}",
-                                                style = MaterialTheme.typography.labelSmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
-                                        IconButton(onClick = { onEliminar(cb.id) }) {
-                                            Icon(Icons.Default.Delete, contentDescription = "Eliminar",
-                                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                modifier = Modifier.size(18.dp))
-                                        }
-                                    }
+                    plantillas.sortedWith(compareBy({ it.slot }, { it.variante })).forEach { cb ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(cb.variante, style = MaterialTheme.typography.bodySmall)
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        "${cb.kcal} kcal · ${cb.slot.etiqueta()}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        if (cb.id in idsEscalables) "Escalable" else "Foto",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = if (cb.id in idsEscalables)
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                                 }
                             }
+                            IconButton(onClick = { confirmar = cb }) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "Borrar",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
                         }
+                        HorizontalDivider()
                     }
                 }
             }

@@ -1,48 +1,44 @@
 {
-  "name": "descomponer_comida",
-  "description": "Descompone una comida en su lista de ingredientes con cantidades y valores nutricionales por 100g",
-  "input_schema": {
-    "type": "object",
-    "properties": {
-      "ingredientes": {
-        "type": "array",
-        "description": "Lista de ingredientes del plato con sus cantidades",
-        "items": {
-          "type": "object",
-          "properties": {
-            "nombre": {
-              "type": "string",
-              "description": "Nombre descriptivo y normalizado del ingrediente en español"
-            },
-            "cantidad_g": {
-              "type": "number",
-              "description": "Cantidad en gramos usada en esta preparación"
-            },
-            "kcal_100g": {
-              "type": "number",
-              "description": "Kilocalorías por 100g del ingrediente"
-            },
-            "prot_100g": {
-              "type": "number",
-              "description": "Proteína en gramos por 100g"
-            },
-            "grasa_100g": {
-              "type": "number",
-              "description": "Grasa en gramos por 100g"
-            },
-            "carbo_100g": {
-              "type": "number",
-              "description": "Carbohidratos en gramos por 100g"
-            }
+  "type": "object",
+  "properties": {
+    "ingredientes": {
+      "type": "array",
+      "description": "Lista de ingredientes del plato con sus cantidades",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "description": "Nombre descriptivo y normalizado del ingrediente en español"
           },
-          "required": ["nombre", "cantidad_g", "kcal_100g", "prot_100g", "grasa_100g", "carbo_100g"]
-        }
-      },
-      "supuestos": {
-        "type": "string",
-        "description": "Notas sobre los supuestos usados en la descomposición"
+          "cantidad_g": {
+            "type": "number",
+            "description": "Cantidad en gramos usada en esta preparación"
+          },
+          "kcal_100g": {
+            "type": "number",
+            "description": "Kilocalorías por 100g del ingrediente"
+          },
+          "prot_100g": {
+            "type": "number",
+            "description": "Proteína en gramos por 100g"
+          },
+          "grasa_100g": {
+            "type": "number",
+            "description": "Grasa en gramos por 100g"
+          },
+          "carbo_100g": {
+            "type": "number",
+            "description": "Carbohidratos en gramos por 100g"
+          }
+        },
+        "required": ["nombre", "cantidad_g", "kcal_100g", "prot_100g", "grasa_100g", "carbo_100g"]
       }
     },
-    "required": ["ingredientes"]
-  }
+    "supuestos": {
+      "type": "string",
+      "description": "Notas sobre los supuestos usados en la descomposición"
+    }
+  },
+  "required": ["ingredientes"]
 }

@@ -36,7 +36,4 @@ interface ComidaBaseDao {
 
     @Query("SELECT * FROM ComidaBase WHERE variante LIKE '%' || :query || '%' AND activo = 1 ORDER BY variante LIMIT 5")
     suspend fun searchByVariante(query: String): List<ComidaBase>
-
-    @Query("UPDATE ComidaBase SET activo = :activo WHERE id = :id")
-    suspend fun setActivo(id: Long, activo: Boolean)
 }

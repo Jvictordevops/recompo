@@ -31,4 +31,7 @@ interface PlantillaIngredienteDao {
     @Transaction
     @Query("SELECT * FROM PlantillaIngrediente WHERE comidaBaseId = :comidaBaseId ORDER BY id")
     suspend fun getByComidaBase(comidaBaseId: Long): List<PlantillaConIngrediente>
+
+    @Query("SELECT DISTINCT comidaBaseId FROM PlantillaIngrediente")
+    suspend fun getAllComidaBaseIdsConIngredientes(): List<Long>
 }
