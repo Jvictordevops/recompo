@@ -18,6 +18,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
@@ -82,6 +83,7 @@ fun EntrenoScreen(viewModel: EntrenoViewModel) {
             onPedirBorrado = viewModel::pedirConfirmarBorrado,
             onCerrarBorrado = viewModel::cerrarConfirmarBorrado,
             onConfirmarBorrado = viewModel::confirmarEliminarSesion,
+            onDuplicar = viewModel::duplicarSesion,
             onAceptarPropuesta = viewModel::aceptarPropuesta,
             onRegenerarPropuesta = viewModel::regenerarPropuesta,
             onDescartarPropuesta = viewModel::descartarPropuesta,
@@ -111,7 +113,9 @@ fun EntrenoScreen(viewModel: EntrenoViewModel) {
             onCerrarDialogEjercicio = viewModel::cerrarAgregarEjercicio,
             onFormEjercicioChanged = viewModel::onFormAgregarEjercicioChanged,
             onConfirmarEjercicio = viewModel::confirmarAgregarEjercicio,
-            onIniciar = viewModel::iniciarSesion
+            onIniciar = viewModel::iniciarSesion,
+            onReanudarEnCurso = viewModel::reanudarSesionEnCurso,
+            onCancelarEnCursoYIniciar = viewModel::cancelarEnCursoYIniciar
         )
 
         EntrenoFase.EN_CURSO -> PantallaEnCurso(
@@ -124,12 +128,17 @@ fun EntrenoScreen(viewModel: EntrenoViewModel) {
             onCerrarSaltarSerie = viewModel::cerrarSaltarSerie,
             onMotivoChanged = viewModel::onMotivoOmisionChanged,
             onConfirmarSaltarSerie = viewModel::confirmarSaltarSerie,
-            onIrAPostSesion = viewModel::irAPostSesion
+            onIrAPostSesion = viewModel::irAPostSesion,
+            onPedirCancelar = viewModel::pedirCancelarSesion,
+            onCerrarCancelar = viewModel::cerrarCancelarSesion,
+            onConfirmarCancelar = viewModel::confirmarCancelarSesion,
+            onCerrarSesionVaciaySeguir = viewModel::cerrarSesionVaciaySeguir,
+            onDescartarSesionVacia = viewModel::descartarSesionVacia
         )
 
         EntrenoFase.POST_SESION -> PantallaPostSesion(
             state = state,
-            onVolverEnCurso = viewModel::volverAEnCurso,
+            onVolverEnCurso = viewModel::volverDesdePostSesion,
             onNotasChanged = viewModel::onNotasGlobalesChanged,
             onRirChanged = viewModel::onRirGlobalChanged,
             onCerrar = viewModel::cerrarSesion
@@ -152,6 +161,7 @@ private fun PantallaLista(
     onPedirBorrado: (SesionConTipo) -> Unit,
     onCerrarBorrado: () -> Unit,
     onConfirmarBorrado: () -> Unit,
+    onDuplicar: (SesionConTipo) -> Unit,
     onAceptarPropuesta: () -> Unit,
     onRegenerarPropuesta: () -> Unit,
     onDescartarPropuesta: () -> Unit,
@@ -246,7 +256,8 @@ private fun PantallaLista(
                         TarjetaSesionLista(
                             sct = sct,
                             onClick = { onAbrirSesion(sct) },
-                            onEliminar = { onPedirBorrado(sct) }
+                            onEliminar = { onPedirBorrado(sct) },
+                            onDuplicar = { onDuplicar(sct) }
                         )
                     }
                 }
@@ -258,7 +269,8 @@ private fun PantallaLista(
                     TarjetaSesionLista(
                         sct = sct,
                         onClick = { onAbrirSesion(sct) },
-                        onEliminar = { onPedirBorrado(sct) }
+                        onEliminar = { onPedirBorrado(sct) },
+                        onDuplicar = { onDuplicar(sct) }
                     )
                 }
             }
@@ -367,7 +379,8 @@ private fun CabeceraSeccion(texto: String) {
 private fun TarjetaSesionLista(
     sct: SesionConTipo,
     onClick: () -> Unit,
-    onEliminar: () -> Unit
+    onEliminar: () -> Unit,
+    onDuplicar: () -> Unit
 ) {
     val fmtFecha = DateTimeFormatter.ofPattern("d MMM", Locale("es"))
     val fechaStr = sct.sesion.fechaEjecutada
@@ -407,6 +420,13 @@ private fun TarjetaSesionLista(
                         maxLines = 1
                     )
                 }
+            }
+            IconButton(onClick = onDuplicar) {
+                Icon(
+                    Icons.Default.ContentCopy,
+                    contentDescription = "Duplicar sesión",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
             IconButton(onClick = onEliminar) {
                 Icon(
@@ -589,7 +609,7 @@ private fun DialogConfirmarBorrado(
         onDismissRequest = onDismiss,
         title = { Text("Borrar sesión") },
         text = {
-            Text("¿Borrar la sesión ${sct.tipoNombre}? Se eliminarán también todos sus ejercicios y series.")
+            Text("¿Seguro? Esto no se puede deshacer.")
         },
         confirmButton = {
             TextButton(
@@ -799,7 +819,9 @@ private fun PantallaPreSesion(
     onCerrarDialogEjercicio: () -> Unit,
     onFormEjercicioChanged: (FormAgregarEjercicio) -> Unit,
     onConfirmarEjercicio: () -> Unit,
-    onIniciar: () -> Unit
+    onIniciar: () -> Unit,
+    onReanudarEnCurso: () -> Unit,
+    onCancelarEnCursoYIniciar: () -> Unit
 ) {
     val sesionConTipo = state.sesionActual ?: return
     Scaffold(
@@ -866,6 +888,14 @@ private fun PantallaPreSesion(
             onFormChanged = onFormEjercicioChanged,
             onConfirmar = onConfirmarEjercicio,
             onDismiss = onCerrarDialogEjercicio
+        )
+    }
+
+    state.dialogEnCursoConflicto?.let { enCurso ->
+        DialogEnCursoConflicto(
+            tipoNombre = enCurso.tipoNombre,
+            onReanudar = onReanudarEnCurso,
+            onCancelarYIniciar = onCancelarEnCursoYIniciar
         )
     }
 }
@@ -994,7 +1024,12 @@ private fun PantallaEnCurso(
     onCerrarSaltarSerie: () -> Unit,
     onMotivoChanged: (MotivoOmision?) -> Unit,
     onConfirmarSaltarSerie: () -> Unit,
-    onIrAPostSesion: () -> Unit
+    onIrAPostSesion: () -> Unit,
+    onPedirCancelar: () -> Unit,
+    onCerrarCancelar: () -> Unit,
+    onConfirmarCancelar: () -> Unit,
+    onCerrarSesionVaciaySeguir: () -> Unit,
+    onDescartarSesionVacia: () -> Unit
 ) {
     val sesionConTipo = state.sesionActual ?: return
     Scaffold(
@@ -1016,11 +1051,25 @@ private fun PantallaEnCurso(
                     )
                 }
             }
-            Button(
-                onClick = onIrAPostSesion,
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text("Cerrar sesión")
+                if (sesionConTipo.sesion.estado == EstadoSesion.EN_CURSO) {
+                    OutlinedButton(
+                        onClick = onPedirCancelar,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("Cancelar")
+                    }
+                }
+                Button(
+                    onClick = onIrAPostSesion,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Cerrar sesión")
+                }
             }
         }
     }
@@ -1040,6 +1089,20 @@ private fun PantallaEnCurso(
             onMotivoChanged = onMotivoChanged,
             onConfirmar = onConfirmarSaltarSerie,
             onDismiss = onCerrarSaltarSerie
+        )
+    }
+
+    if (state.dialogCancelarSesion) {
+        DialogCancelarSesion(
+            onConfirmar = onConfirmarCancelar,
+            onDismiss = onCerrarCancelar
+        )
+    }
+
+    if (state.dialogSesionVacia) {
+        DialogSesionVacia(
+            onSeguir = onCerrarSesionVaciaySeguir,
+            onDescartar = onDescartarSesionVacia
         )
     }
 }
@@ -1084,8 +1147,10 @@ private fun TarjetaEjercicioEnCurso(
             if (ec.series.isNotEmpty()) {
                 ec.series.forEach { serie ->
                     val serieTexto = when (serie.estado) {
-                        EstadoSerie.COMPLETADA ->
-                            "S${serie.numero}: ${serie.repsReales} reps · ${serie.cargaKg}kg"
+                        EstadoSerie.COMPLETADA -> {
+                            val cargaStr = serie.cargaKg?.let { "${it}kg" } ?: "PC"
+                            "S${serie.numero}: ${serie.repsReales} reps · $cargaStr"
+                        }
                         EstadoSerie.OMITIDA -> {
                             val motivo = serie.motivoOmision?.name?.let { " [$it]" } ?: ""
                             "S${serie.numero}: OMITIDA$motivo"
@@ -1228,10 +1293,64 @@ private fun DialogRegistrarSerie(
         confirmButton = {
             TextButton(
                 onClick = onConfirmar,
-                enabled = form.reps.toIntOrNull() != null && form.cargaKg.toDoubleOrNull() != null
+                enabled = form.reps.toIntOrNull() != null
             ) { Text("Guardar") }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
+    )
+}
+
+@Composable
+private fun DialogCancelarSesion(onConfirmar: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Cancelar sesión") },
+        text = { Text("La sesión vuelve a PREPARADA. Las series registradas en este intento se descartarán.") },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirmar,
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+            ) { Text("Cancelar sesión") }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Seguir entrenando") } }
+    )
+}
+
+@Composable
+private fun DialogSesionVacia(onSeguir: () -> Unit, onDescartar: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onSeguir,
+        title = { Text("Sin series registradas") },
+        text = { Text("No has registrado ninguna serie. ¿Descartar la sesión o cerrarla igualmente?") },
+        confirmButton = {
+            TextButton(
+                onClick = onDescartar,
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+            ) { Text("Descartar") }
+        },
+        dismissButton = { TextButton(onClick = onSeguir) { Text("Cerrar igualmente") } }
+    )
+}
+
+@Composable
+private fun DialogEnCursoConflicto(
+    tipoNombre: String,
+    onReanudar: () -> Unit,
+    onCancelarYIniciar: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onReanudar,
+        title = { Text("Sesión en curso") },
+        text = { Text("Ya tienes la sesión $tipoNombre en curso. ¿Qué quieres hacer?") },
+        confirmButton = {
+            Button(onClick = onReanudar) { Text("Reanudar sesión $tipoNombre") }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onCancelarYIniciar,
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+            ) { Text("Cancelar y empezar nueva") }
+        }
     )
 }
 
@@ -1293,8 +1412,10 @@ private fun PantallaPostSesion(
                     )
                     ec.series.forEach { serie ->
                         val serieTexto = when (serie.estado) {
-                            EstadoSerie.COMPLETADA ->
-                                "  S${serie.numero}: ${serie.repsReales} reps · ${serie.cargaKg}kg"
+                            EstadoSerie.COMPLETADA -> {
+                                val cargaStr = serie.cargaKg?.let { "${it}kg" } ?: "PC"
+                                "  S${serie.numero}: ${serie.repsReales} reps · $cargaStr"
+                            }
                             EstadoSerie.OMITIDA -> {
                                 val motivo = serie.motivoOmision?.name?.let { " [$it]" } ?: ""
                                 "  S${serie.numero}: OMITIDA$motivo"

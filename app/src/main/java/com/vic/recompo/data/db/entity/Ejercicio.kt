@@ -15,5 +15,6 @@ data class Ejercicio(
     val equipamientoCasa: Boolean,
     val equipamientoGym: Boolean,
     val notasTecnica: String?,
-    val activo: Boolean
+    val activo: Boolean,
+    val seedId: String? = null
 )

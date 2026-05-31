@@ -42,6 +42,7 @@ class UserSettingsStore(context: Context) {
         val KEY_ULTIMO_BACKUP_OK = longPreferencesKey("ultimo_backup_ok")
         val KEY_ULTIMO_BACKUP_ERROR = stringPreferencesKey("ultimo_backup_error")
         val KEY_ULTIMO_BACKUP_BYTES = longPreferencesKey("ultimo_backup_bytes")
+        val KEY_SESIONES_HISTORICO_SEEDED = booleanPreferencesKey("sesiones_historico_seeded")
     }
 
     val setupDone: Flow<Boolean> = dataStore.data.map { prefs ->
@@ -114,6 +115,12 @@ class UserSettingsStore(context: Context) {
         value: T?
     ) {
         if (value != null) prefs[key] = value else prefs.remove(key)
+    }
+
+    val sesionesHistoricoSeeded: Flow<Boolean> = dataStore.data.map { it[KEY_SESIONES_HISTORICO_SEEDED] ?: false }
+
+    suspend fun markSesionesHistoricoSeeded() {
+        dataStore.edit { it[KEY_SESIONES_HISTORICO_SEEDED] = true }
     }
 
     suspend fun markSetupDone() {

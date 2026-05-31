@@ -1,0 +1,142 @@
+[
+  {
+    "seedId": "seed-ej-remo-en-maquina-o-barra-t",
+    "nombre": "Remo en máquina o barra T",
+    "grupoMuscularPrincipal": "DORSAL",
+    "gruposSecundarios": "BICEPS,HOMBRO_POSTERIOR",
+    "patron": "TIRON_HORIZONTAL",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Único tirón horizontal de la semana en Fase 2. Carga a mapear en el gym (referencia inicial ~30kg)."
+  },
+  {
+    "seedId": "seed-ej-press-militar-en-maquina",
+    "nombre": "Press militar en máquina",
+    "grupoMuscularPrincipal": "HOMBRO_FRONTAL",
+    "gruposSecundarios": "TRICEPS",
+    "patron": "EMPUJE_VERTICAL",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Máquina selectorizada, más amable para clavícula. Carga a mapear (empezar bajo 10-15kg). Respetar protocolo hombro."
+  },
+  {
+    "seedId": "seed-ej-triceps-en-polea-con-cuerda",
+    "nombre": "Tríceps en polea con cuerda",
+    "grupoMuscularPrincipal": "TRICEPS",
+    "gruposSecundarios": "",
+    "patron": "AISLAMIENTO",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Sustituye tríceps overhead. El codo agradece la polea. Carga a mapear."
+  },
+  {
+    "seedId": "seed-ej-jalon-al-pecho-dominadas-asistidas",
+    "nombre": "Jalón al pecho / dominadas asistidas",
+    "grupoMuscularPrincipal": "DORSAL",
+    "gruposSecundarios": "BICEPS",
+    "patron": "TIRON_VERTICAL",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Único tirón vertical de la semana. Asistencia regresiva (reducir kilo a kilo). Solo si hombro limpio. Carga a mapear."
+  },
+  {
+    "seedId": "seed-ej-pullover-en-maquina-o-polea",
+    "nombre": "Pullover en máquina o polea",
+    "grupoMuscularPrincipal": "DORSAL",
+    "gruposSecundarios": "PECHO",
+    "patron": "TIRON_VERTICAL",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Sustituye pullover KB suelo. Sube cobertura dorsal vertical. Carga a mapear."
+  },
+  {
+    "seedId": "seed-ej-curl-femoral-en-maquina",
+    "nombre": "Curl femoral en máquina",
+    "grupoMuscularPrincipal": "ISQUIOS",
+    "gruposSecundarios": "",
+    "patron": "AISLAMIENTO",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Isquio aislado. Resuelve solapamiento de cuádriceps entre días. Carga a mapear, empezar bajo."
+  },
+  {
+    "seedId": "seed-ej-gemelos-en-maquina",
+    "nombre": "Gemelos en máquina",
+    "grupoMuscularPrincipal": "GEMELOS",
+    "gruposSecundarios": "",
+    "patron": "AISLAMIENTO",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Máquina permite carga progresiva real. Pausa 1s arriba. Carga a mapear."
+  },
+  {
+    "seedId": "seed-ej-hip-thrust-con-barra",
+    "nombre": "Hip thrust con barra",
+    "grupoMuscularPrincipal": "GLUTEO",
+    "gruposSecundarios": "ISQUIOS",
+    "patron": "EXTENSION_CADERA",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Glúteo admite mucha carga. Barra en banco. Carga a mapear (barra 20kg + discos)."
+  },
+  {
+    "seedId": "seed-ej-sentadilla-en-hack-o-multipower",
+    "nombre": "Sentadilla en hack o multipower",
+    "grupoMuscularPrincipal": "CUADRICEPS",
+    "gruposSecundarios": "GLUTEO",
+    "patron": "SENTADILLA",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Multipower es buena transición desde goblet KB. Carga a mapear (30-50kg hack / 30-40kg multipower)."
+  },
+  {
+    "seedId": "seed-ej-peso-muerto-rumano-con-barra",
+    "nombre": "Peso muerto rumano con barra",
+    "grupoMuscularPrincipal": "ISQUIOS",
+    "gruposSecundarios": "GLUTEO,LUMBAR",
+    "patron": "BISAGRA_CADERA",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Barra permite progresar 30→50→70kg. Empezar 30kg. Tempo 3-1-1. Prioridad de la sesión B."
+  },
+  {
+    "seedId": "seed-ej-zancadas-con-mancuernas",
+    "nombre": "Zancadas con mancuernas",
+    "grupoMuscularPrincipal": "CUADRICEPS",
+    "gruposSecundarios": "GLUTEO,ISQUIOS",
+    "patron": "UNILATERAL",
+    "equipamientoCasa": true,
+    "equipamientoGym": true,
+    "notasTecnica": "Mismo movimiento que zancadas, más carga. 10kg c/mano referencia."
+  },
+  {
+    "seedId": "seed-ej-face-pulls",
+    "nombre": "Face pulls",
+    "grupoMuscularPrincipal": "HOMBRO_POSTERIOR",
+    "gruposSecundarios": "TRAPECIO",
+    "patron": "TIRON_HORIZONTAL",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Deltoides posterior + rotadores. Beneficio directo para el hombro. Polea baja. Carga a mapear."
+  },
+  {
+    "seedId": "seed-ej-abdominal-en-maquina",
+    "nombre": "Abdominal en máquina",
+    "grupoMuscularPrincipal": "CORE",
+    "gruposSecundarios": "",
+    "patron": "FLEXION_CORE",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Sustituye crunch en circuito Fase 2. Carga a mapear."
+  },
+  {
+    "seedId": "seed-ej-lenador-cable-woodchopper",
+    "nombre": "Leñador (cable woodchopper)",
+    "grupoMuscularPrincipal": "CORE",
+    "gruposSecundarios": "",
+    "patron": "ROTACION_CORE",
+    "equipamientoCasa": false,
+    "equipamientoGym": true,
+    "notasTecnica": "Alternativa a Russian twist. Rotación con polea. Carga a mapear."
+  }
+]

@@ -1,0 +1,2847 @@
+{
+  "_comentario": "Seed de sesiones. Fase 1 (12 ejecutadas, estado COMPLETADA) + Fase 2 (3 preparadas, estado PREPARADA sin fecha). RPE convertido a RIR (RIR=10-RPE). Ejercicios referenciados POR NOMBRE; el import debe resolver el id contra el catálogo Ejercicio. Series con reps menos del objetivo o sin dato se marcan según corresponda. Omisiones con motivo: TIEMPO o MOLESTIA.",
+  "_conversion_rpe_rir": "RPE6->RIR4, RPE7->RIR3, RPE8->RIR2, RPE9->RIR1, RPE10->RIR0. Rangos se mantienen como rango equivalente.",
+  "sesiones": [
+    {
+      "seedId": "seed-ses-A-2026-05-04",
+      "tipo": "A",
+      "estado": "COMPLETADA",
+      "fechaEjecutada": "2026-05-04",
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión A1. Primeras cargas de partida.",
+      "ejercicios": [
+        {
+          "ejercicio": "Press banca con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            }
+          ]
+        },
+        {
+          "ejercicio": "Press inclinado con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 2
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 2
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 2
+            }
+          ]
+        },
+        {
+          "ejercicio": "Remo con mancuerna",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            }
+          ]
+        },
+        {
+          "ejercicio": "Press militar con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 3
+            }
+          ]
+        },
+        {
+          "ejercicio": "Elevaciones laterales",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 3
+            }
+          ]
+        },
+        {
+          "ejercicio": "Pullover con mancuerna",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 3
+            }
+          ]
+        },
+        {
+          "ejercicio": "Curl bíceps con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 0
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 0
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 0
+            }
+          ],
+          "notas": "RPE 10, carga 8kg demasiado. Bajar a 5kg en siguiente sesión."
+        },
+        {
+          "ejercicio": "Tríceps overhead a dos manos",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 2
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 2
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 2
+            }
+          ],
+          "notas": "Molestia: codo."
+        },
+        {
+          "ejercicio": "Plancha frontal",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 30,
+          "repsObjetivoMax": 30,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 30,
+              "carga": 0,
+              "rir": 4
+            },
+            {
+              "reps": 30,
+              "carga": 0,
+              "rir": 4
+            },
+            {
+              "reps": 30,
+              "carga": 0,
+              "rir": 4
+            }
+          ],
+          "notas": "Segundos, no reps."
+        },
+        {
+          "ejercicio": "Crunch",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-A-2026-05-11",
+      "tipo": "A",
+      "estado": "COMPLETADA",
+      "fechaEjecutada": "2026-05-11",
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión A2. Aparece dolor de hombro/clavícula con la flexión. Origen del protocolo de hombro.",
+      "ejercicios": [
+        {
+          "ejercicio": "Flexión con rodilla apoyada",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 0,
+          "repsObjetivoMax": 0,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 13,
+              "carga": 0,
+              "rir": 2
+            },
+            {
+              "reps": 10,
+              "carga": 0,
+              "rir": 1
+            }
+          ],
+          "notas": "MOLESTIA hombro/clavícula. Este ejercicio deja dolor. AMRAP. A partir de aquí flexiones EXCLUIDAS."
+        },
+        {
+          "ejercicio": "Press inclinado con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 3
+            }
+          ]
+        },
+        {
+          "ejercicio": "Remo con mancuerna",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            }
+          ],
+          "notas": "Cambio a KB 16kg."
+        },
+        {
+          "ejercicio": "Press militar con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 4
+            }
+          ]
+        },
+        {
+          "ejercicio": "Elevaciones laterales",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 2
+            },
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 2
+            }
+          ]
+        },
+        {
+          "ejercicio": "Pullover con mancuerna",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 3
+            }
+          ]
+        },
+        {
+          "ejercicio": "Curl bíceps con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 3
+            }
+          ]
+        },
+        {
+          "ejercicio": "Tríceps overhead a dos manos",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 4
+            }
+          ],
+          "notas": "Vigilar codo."
+        },
+        {
+          "ejercicio": "Plancha frontal",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 45,
+          "repsObjetivoMax": 45,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 45,
+              "carga": 0,
+              "rir": 5
+            },
+            {
+              "reps": 45,
+              "carga": 0,
+              "rir": 5
+            },
+            {
+              "reps": 45,
+              "carga": 0,
+              "rir": 5
+            }
+          ],
+          "notas": "Segundos. Sobrado, subir tiempo."
+        },
+        {
+          "ejercicio": "Crunch",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "TIEMPO"
+            },
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "TIEMPO"
+            },
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "TIEMPO"
+            }
+          ],
+          "notas": "No la hice por falta de tiempo."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-A-2026-05-18",
+      "tipo": "A",
+      "estado": "COMPLETADA",
+      "fechaEjecutada": "2026-05-18",
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión A3. Press banca sustituye a flexión temporalmente por el hombro.",
+      "ejercicios": [
+        {
+          "ejercicio": "Press banca con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 4
+            }
+          ],
+          "notas": "Sustituye flexión por hombro."
+        },
+        {
+          "ejercicio": "Press inclinado con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 3
+            }
+          ]
+        },
+        {
+          "ejercicio": "Remo con mancuerna",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            }
+          ],
+          "notas": "Pausa 1s arriba."
+        },
+        {
+          "ejercicio": "Press militar con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 5
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 4
+            }
+          ],
+          "notas": "Sin molestias. Mantener 5kg hasta hombro limpio."
+        },
+        {
+          "ejercicio": "Pullover con mancuerna",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 4
+            }
+          ]
+        },
+        {
+          "ejercicio": "Curl bíceps con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 3
+            }
+          ],
+          "notas": "Tempo 3-1-1."
+        },
+        {
+          "ejercicio": "Tríceps overhead a dos manos",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 5
+            },
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 5
+            },
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 5
+            }
+          ],
+          "notas": "Dos manos. Codo OK."
+        },
+        {
+          "ejercicio": "Plancha frontal",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 60,
+          "repsObjetivoMax": 60,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 60,
+              "carga": 0,
+              "rir": 1
+            },
+            {
+              "reps": 60,
+              "carga": 0,
+              "rir": 1
+            },
+            {
+              "reps": 60,
+              "carga": 0,
+              "rir": 1
+            }
+          ],
+          "notas": "Segundos."
+        },
+        {
+          "ejercicio": "Crunch",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 3
+            }
+          ],
+          "notas": "Priorizar, no saltar."
+        },
+        {
+          "ejercicio": "Elevaciones laterales",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 4
+            }
+          ],
+          "notas": "Cayeron a 12 reps. Sacrificable si falta tiempo."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-A-2026-05-25",
+      "tipo": "A",
+      "estado": "COMPLETADA",
+      "fechaEjecutada": "2026-05-25",
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión A4. Ya registrada en RIR.",
+      "ejercicios": [
+        {
+          "ejercicio": "Press banca con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 5
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 5
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 5
+            }
+          ],
+          "notas": "Sin molestias. Necesita una sesión más con RIR>=3 para progresar."
+        },
+        {
+          "ejercicio": "Press inclinado con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 3
+            }
+          ],
+          "notas": "Subió reps 10->12."
+        },
+        {
+          "ejercicio": "Remo con mancuerna",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            }
+          ],
+          "notas": "Asentar KB16. Pausa 1s arriba."
+        },
+        {
+          "ejercicio": "Press militar con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 5
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 5
+            },
+            {
+              "reps": 10,
+              "carga": 5,
+              "rir": 5
+            }
+          ],
+          "notas": "Sin molestias. Congelado hasta hombro limpio 2 sem seguidas."
+        },
+        {
+          "ejercicio": "Pullover con mancuerna",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 8,
+              "rir": 6
+            },
+            {
+              "reps": 15,
+              "carga": 8,
+              "rir": 6
+            },
+            {
+              "reps": 15,
+              "carga": 8,
+              "rir": 6
+            }
+          ],
+          "notas": "Subió reps 12->15."
+        },
+        {
+          "ejercicio": "Curl bíceps con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 4
+            }
+          ],
+          "notas": "Subió reps 10->12. Tempo 3-1-1."
+        },
+        {
+          "ejercicio": "Tríceps overhead a dos manos",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 4
+            },
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 3
+            }
+          ],
+          "notas": "Subió reps 12->15. Dos manos."
+        },
+        {
+          "ejercicio": "Elevaciones laterales",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 4
+            },
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 3
+            }
+          ],
+          "notas": "Recuperó 15 reps."
+        },
+        {
+          "ejercicio": "Plancha frontal",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 60,
+          "repsObjetivoMax": 60,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "TIEMPO"
+            },
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "TIEMPO"
+            },
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "TIEMPO"
+            }
+          ],
+          "notas": "Saltada por tiempo."
+        },
+        {
+          "ejercicio": "Crunch",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 4
+            },
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 5
+            },
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 4
+            }
+          ],
+          "notas": "Priorizar."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-B-2026-05-06",
+      "tipo": "B",
+      "estado": "COMPLETADA",
+      "fechaEjecutada": "2026-05-06",
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión B1.",
+      "ejercicios": [
+        {
+          "ejercicio": "Goblet squat",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            }
+          ],
+          "notas": "Sin pausa."
+        },
+        {
+          "ejercicio": "Peso muerto rumano con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 4
+            }
+          ],
+          "notas": "Tempo 3-1-1, sentir isquios."
+        },
+        {
+          "ejercicio": "Zancadas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 3
+            }
+          ],
+          "notas": "Por pierna. Control equilibrio."
+        },
+        {
+          "ejercicio": "Hip thrust",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 3
+            }
+          ],
+          "notas": "Contraer arriba 1s."
+        },
+        {
+          "ejercicio": "Swing KB",
+          "seriesObjetivo": 4,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 2
+            }
+          ],
+          "notas": "Cadera explosiva."
+        },
+        {
+          "ejercicio": "Gemelos un pie a la vez",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 4
+            }
+          ],
+          "notas": "Pausa arriba 1s."
+        },
+        {
+          "ejercicio": "Crunch",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 4
+            },
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 4
+            },
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 4
+            }
+          ],
+          "notas": "Lento y controlado."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-B-2026-05-13",
+      "tipo": "B",
+      "estado": "COMPLETADA",
+      "fechaEjecutada": "2026-05-13",
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión B2. Tempo en varios ejercicios.",
+      "ejercicios": [
+        {
+          "ejercicio": "Goblet squat",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 3
+            }
+          ],
+          "notas": "Pausa 2s abajo."
+        },
+        {
+          "ejercicio": "Peso muerto rumano con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 5
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 5
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 5
+            }
+          ],
+          "notas": "Tempo 3-1-1, KB 2 manos."
+        },
+        {
+          "ejercicio": "Zancadas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 3
+            }
+          ],
+          "notas": "Por pierna. RPE 7 ya en zona."
+        },
+        {
+          "ejercicio": "Hip thrust",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 5
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 5
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 5
+            }
+          ],
+          "notas": "Tempo 3s bajada + 2s arriba. Cuando sea RIR4 dos sesiones, saltar a KB16 sin tempo."
+        },
+        {
+          "ejercicio": "Swing KB",
+          "seriesObjetivo": 4,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 2
+            }
+          ],
+          "notas": "RPE8, tope de zona."
+        },
+        {
+          "ejercicio": "Gemelos un pie a la vez",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "TIEMPO"
+            },
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "TIEMPO"
+            },
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "TIEMPO"
+            }
+          ],
+          "notas": "Sin tiempo."
+        },
+        {
+          "ejercicio": "Crunch",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 0
+            },
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 0
+            },
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 0
+            }
+          ],
+          "notas": "Tempo 3s subida + 2s pausa + 3s bajada. RPE10."
+        },
+        {
+          "ejercicio": "Plancha frontal",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 30,
+          "repsObjetivoMax": 30,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 30,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 30,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 30,
+              "carga": 0,
+              "rir": 3
+            }
+          ],
+          "notas": "Segundos. Core estabilizador, faltaba en día B."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-B-2026-05-20",
+      "tipo": "B",
+      "estado": "COMPLETADA",
+      "fechaEjecutada": "2026-05-20",
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión B3. Viene del fisio, salta ejercicios de hombro.",
+      "ejercicios": [
+        {
+          "ejercicio": "Goblet squat",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 3
+            }
+          ],
+          "notas": "Pausa 2s abajo."
+        },
+        {
+          "ejercicio": "Peso muerto rumano con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 6
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 6
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 6
+            }
+          ],
+          "notas": "Más reps, tempo 3-1-1."
+        },
+        {
+          "ejercicio": "Zancadas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            }
+          ],
+          "notas": "Por pierna."
+        },
+        {
+          "ejercicio": "Hip thrust",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            }
+          ],
+          "notas": "Volver a sin tempo, probar KB16."
+        },
+        {
+          "ejercicio": "Swing KB",
+          "seriesObjetivo": 4,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "MOLESTIA"
+            },
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "MOLESTIA"
+            },
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "MOLESTIA"
+            },
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "MOLESTIA"
+            }
+          ],
+          "notas": "Vengo del fisio, salto para no forzar hombro."
+        },
+        {
+          "ejercicio": "Gemelos un pie a la vez",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 5
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 5
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 5
+            }
+          ],
+          "notas": "Pausa 1s arriba."
+        },
+        {
+          "ejercicio": "Crunch",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 0,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 0,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 0,
+              "rir": 4
+            }
+          ],
+          "notas": "Tempo 3-2-3, bajar reps."
+        },
+        {
+          "ejercicio": "Plancha frontal",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 30,
+          "repsObjetivoMax": 30,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "MOLESTIA"
+            },
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "MOLESTIA"
+            },
+            {
+              "estado": "OMITIDA",
+              "motivoOmision": "MOLESTIA"
+            }
+          ],
+          "notas": "Vengo del fisio, salto para no forzar hombro."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-B-2026-05-27",
+      "tipo": "B",
+      "estado": "COMPLETADA",
+      "fechaEjecutada": "2026-05-27",
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión B4. Ya registrada en RIR.",
+      "ejercicios": [
+        {
+          "ejercicio": "Goblet squat",
+          "seriesObjetivo": 4,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            }
+          ],
+          "notas": "1 serie más. Pausa 2s abajo."
+        },
+        {
+          "ejercicio": "Peso muerto rumano con mancuernas",
+          "seriesObjetivo": 4,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 6
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 6
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 6
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 6
+            }
+          ],
+          "notas": "Con 3-1-1."
+        },
+        {
+          "ejercicio": "Zancadas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 4
+            }
+          ],
+          "notas": "Por pierna. 8kg en cada mano (16 total). Pasar de una mancuerna a dos."
+        },
+        {
+          "ejercicio": "Hip thrust",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 16,
+              "rir": 4
+            }
+          ],
+          "notas": "Tempo 3s bajada + 2s arriba."
+        },
+        {
+          "ejercicio": "Swing KB",
+          "seriesObjetivo": 4,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 15,
+              "carga": 16,
+              "rir": 3
+            }
+          ],
+          "notas": "Hombro OK."
+        },
+        {
+          "ejercicio": "Gemelos un pie a la vez",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 20,
+          "repsObjetivoMax": 20,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 20,
+              "carga": 16,
+              "rir": 5
+            },
+            {
+              "reps": 20,
+              "carga": 16,
+              "rir": 5
+            },
+            {
+              "reps": 20,
+              "carga": 16,
+              "rir": 5
+            }
+          ],
+          "notas": "1s arriba."
+        },
+        {
+          "ejercicio": "Russian twist",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 15,
+              "carga": 5,
+              "rir": 3
+            }
+          ],
+          "notas": "No domina la técnica de este ejercicio."
+        },
+        {
+          "ejercicio": "Plancha frontal",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 30,
+          "repsObjetivoMax": 30,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 30,
+              "carga": 0,
+              "rir": 4
+            },
+            {
+              "reps": 30,
+              "carga": 0,
+              "rir": 4
+            },
+            {
+              "reps": 30,
+              "carga": 0,
+              "rir": 4
+            }
+          ],
+          "notas": "Segundos. Hombro OK."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-C-2026-05-08",
+      "tipo": "C",
+      "estado": "COMPLETADA",
+      "fechaEjecutada": "2026-05-08",
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión C1.",
+      "ejercicios": [
+        {
+          "ejercicio": "Clean and press KB",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 8,
+          "repsObjetivoMax": 8,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 8,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 8,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 8,
+              "carga": 8,
+              "rir": 4
+            }
+          ],
+          "notas": "Full body explosivo."
+        },
+        {
+          "ejercicio": "Remo KB",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 4
+            }
+          ],
+          "notas": "Tirón horizontal."
+        },
+        {
+          "ejercicio": "Pullover KB suelo",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 8,
+              "rir": 4
+            }
+          ],
+          "notas": "Sustituye jalón banda, dorsal."
+        },
+        {
+          "ejercicio": "Goblet squat con tempo lento",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 1
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 1
+            }
+          ],
+          "notas": "Tempo 4s bajada + 2s pausa + 1s subida."
+        },
+        {
+          "ejercicio": "Curl martillo",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 1
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 1
+            }
+          ],
+          "notas": "Superserie con fondos."
+        },
+        {
+          "ejercicio": "Skull crusher",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 0,
+              "rir": null
+            }
+          ],
+          "notas": "Anotado como fondos en banco PC. Mala técnica, mucha carga. Una serie con técnica deficiente."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-C-2026-05-15",
+      "tipo": "C",
+      "estado": "COMPLETADA",
+      "fechaEjecutada": "2026-05-15",
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión C2. Confundió curl y skull (los hizo seguidos las 4 series).",
+      "ejercicios": [
+        {
+          "ejercicio": "Clean and press KB",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 8,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 8,
+              "rir": 4
+            }
+          ],
+          "notas": "16kg demasiado peso. Subir carga, técnica validada en 8kg."
+        },
+        {
+          "ejercicio": "Remo KB",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 2
+            }
+          ],
+          "notas": "Mejor técnica, de ahí el aumento de RPE. Pausa 1s arriba."
+        },
+        {
+          "ejercicio": "Pullover KB suelo",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 8,
+          "repsObjetivoMax": 8,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 8,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 8,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 8,
+              "carga": 16,
+              "rir": 2
+            }
+          ]
+        },
+        {
+          "ejercicio": "Goblet squat con tempo lento",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            }
+          ],
+          "notas": "Tempo 3-2-1."
+        },
+        {
+          "ejercicio": "Curl martillo",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 2
+            },
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 2
+            }
+          ],
+          "notas": "Equivocó ejercicio: hizo curl y skull seguidos las 4 series."
+        },
+        {
+          "ejercicio": "Skull crusher",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 1
+            },
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 1
+            }
+          ],
+          "notas": "Equivocó ejercicio: hizo curl y skull seguidos."
+        },
+        {
+          "ejercicio": "Plancha lateral",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 20,
+          "repsObjetivoMax": 20,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 20,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 20,
+              "carga": 0,
+              "rir": 2
+            },
+            {
+              "reps": 20,
+              "carga": 0,
+              "rir": 3
+            }
+          ],
+          "notas": "Segundos por lado. Mejor técnica."
+        },
+        {
+          "ejercicio": "Dead bug",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 0,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 0,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 0,
+              "rir": 4
+            }
+          ],
+          "notas": "Por lado."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-C-2026-05-22",
+      "tipo": "C",
+      "estado": "COMPLETADA",
+      "fechaEjecutada": "2026-05-22",
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión C3. Superserie corregida.",
+      "ejercicios": [
+        {
+          "ejercicio": "Clean and press KB",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 6,
+          "repsObjetivoMax": 6,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 6,
+              "carga": 16,
+              "rir": 1
+            },
+            {
+              "reps": 6,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 6,
+              "carga": 16,
+              "rir": 1
+            }
+          ],
+          "notas": "Probar 16kg menos reps, técnica limpia."
+        },
+        {
+          "ejercicio": "Remo KB",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 2
+            }
+          ],
+          "notas": "Pausa 1s arriba."
+        },
+        {
+          "ejercicio": "Pullover KB suelo",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 8,
+          "repsObjetivoMax": 8,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 8,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 8,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 8,
+              "carga": 16,
+              "rir": 2
+            }
+          ],
+          "notas": "Sentir dorsal 3 series."
+        },
+        {
+          "ejercicio": "Goblet squat con tempo lento",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            }
+          ],
+          "notas": "Tempo 3-2-1."
+        },
+        {
+          "ejercicio": "Curl martillo",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 4
+            }
+          ],
+          "notas": "Superserie correcta, 2 series. Sin pausa."
+        },
+        {
+          "ejercicio": "Skull crusher",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 3
+            }
+          ],
+          "notas": "Superserie correcta, 2 series."
+        },
+        {
+          "ejercicio": "Plancha lateral",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 25,
+          "repsObjetivoMax": 25,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 25,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 25,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 25,
+              "carga": 0,
+              "rir": 3
+            }
+          ],
+          "notas": "Segundos por lado. Mantener tiempo para mejorar técnica."
+        },
+        {
+          "ejercicio": "Dead bug",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 0,
+              "rir": 3
+            }
+          ],
+          "notas": "Por lado. Más reps."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-C-2026-05-29",
+      "tipo": "C",
+      "estado": "COMPLETADA",
+      "fechaEjecutada": "2026-05-29",
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión C4. Ya registrada en RIR.",
+      "ejercicios": [
+        {
+          "ejercicio": "Clean and press KB",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 6,
+          "repsObjetivoMax": 6,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 6,
+              "carga": 16,
+              "rir": 2
+            },
+            {
+              "reps": 6,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 6,
+              "carga": 16,
+              "rir": 2
+            }
+          ],
+          "notas": "Técnica limpia obligatoria."
+        },
+        {
+          "ejercicio": "Remo KB",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            }
+          ],
+          "notas": "Buscar RPE 6-7."
+        },
+        {
+          "ejercicio": "Pullover KB suelo",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 8,
+          "repsObjetivoMax": 8,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 8,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 8,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 8,
+              "carga": 16,
+              "rir": 3
+            }
+          ],
+          "notas": "Buscar RPE 6-7."
+        },
+        {
+          "ejercicio": "Goblet squat con tempo lento",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 16,
+          "series": [
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 4
+            },
+            {
+              "reps": 10,
+              "carga": 16,
+              "rir": 3
+            }
+          ],
+          "notas": "Tempo 3-2-1."
+        },
+        {
+          "ejercicio": "Curl martillo",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 4
+            },
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 4
+            }
+          ],
+          "notas": "Superserie con skull."
+        },
+        {
+          "ejercicio": "Skull crusher",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 5,
+          "series": [
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 3
+            },
+            {
+              "reps": 12,
+              "carga": 5,
+              "rir": 3
+            }
+          ],
+          "notas": "Mismo peso."
+        },
+        {
+          "ejercicio": "Plancha lateral",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 30,
+          "repsObjetivoMax": 30,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 30,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 30,
+              "carga": 0,
+              "rir": 3
+            },
+            {
+              "reps": 30,
+              "carga": 0,
+              "rir": 3
+            }
+          ],
+          "notas": "Segundos por lado."
+        },
+        {
+          "ejercicio": "Dead bug",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": null,
+          "series": [
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 2
+            },
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 2
+            },
+            {
+              "reps": 15,
+              "carga": 0,
+              "rir": 2
+            }
+          ],
+          "notas": "Por lado."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-A5-fase2",
+      "tipo": "A",
+      "estado": "PREPARADA",
+      "fechaEjecutada": null,
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión A5 — primera de Fase 2 (gym). Cargas a mapear el día del inventario. Empezar conservador.",
+      "ejercicios": [
+        {
+          "ejercicio": "Press banca con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 10,
+          "series": [],
+          "notas": "Mancuerna 10-12kg c/u (mapear). Cambio 8kg -> mancuernas pesadas. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Press inclinado con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 8,
+          "series": [],
+          "notas": "Mancuerna 8-10kg c/u (mapear). Progresar por peso real. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Remo en máquina o barra T",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 30,
+          "series": [],
+          "notas": "Mapear ~30kg. KB16 -> máquina. Único tirón horizontal de la semana. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Press militar en máquina",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "Mapear bajo 10-15kg. Máquina más amable para clavícula. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Curl bíceps con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 6,
+          "series": [],
+          "notas": "Superserie con tríceps polea. Mancuerna 6-8kg. Tempo 3-1-1. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Tríceps en polea con cuerda",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "Superserie con curl. Mapear polea. Tríceps overhead -> polea. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Elevaciones laterales",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 5,
+          "series": [],
+          "notas": "Mancuerna 5-7kg. Incrementos finos disponibles. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Plancha frontal",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 60,
+          "repsObjetivoMax": 60,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "Circuito con abdominal máquina, 2 vueltas. Segundos."
+        },
+        {
+          "ejercicio": "Abdominal en máquina",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "Circuito con plancha. Sustituye crunch. Mapear carga."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-B5-fase2",
+      "tipo": "B",
+      "estado": "PREPARADA",
+      "fechaEjecutada": null,
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión B5 — Fase 2 (gym). Cargas a mapear.",
+      "ejercicios": [
+        {
+          "ejercicio": "Sentadilla en hack o multipower",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "Mapear 30-50kg hack / 30-40kg multipower. KB16 -> máquina. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Peso muerto rumano con barra",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 30,
+          "series": [],
+          "notas": "Empezar 30kg, subir a 40-50 si técnica aguanta. Prioridad de la sesión. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Zancadas con mancuernas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 10,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": 20,
+          "series": [],
+          "notas": "10kg c/mano (20 total). RIR 4 en B4 lo justifica. Por pierna. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Hip thrust con barra",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "Barra 20kg + 10-20kg/lado (mapear). KB16 -> barra. Sin tempo, primera vez con barra. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Swing KB",
+          "seriesObjetivo": 4,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": 16,
+          "series": [],
+          "notas": "Mantener. SALTAR si hombro sensible. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Gemelos en máquina",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 15,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "Mapear. KB16 -> máquina. Pausa 1s arriba. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Dead bug",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 15,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "Sustituye Russian twist (preferencia). O leñador. Por lado. RIR objetivo 2-3."
+        }
+      ]
+    },
+    {
+      "seedId": "seed-ses-C5-fase2",
+      "tipo": "C",
+      "estado": "PREPARADA",
+      "fechaEjecutada": null,
+      "generadaPor": "MANUAL",
+      "rirGlobal": null,
+      "notasGlobales": "Sesión C5 — Fase 2 (gym). Introduce tirón vertical y curl femoral. Cargas a mapear.",
+      "ejercicios": [
+        {
+          "ejercicio": "Clean and press KB",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 6,
+          "repsObjetivoMax": 8,
+          "cargaObjetivoKg": 16,
+          "series": [],
+          "notas": "Mantener. Técnica limpia obligatoria. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Jalón al pecho / dominadas asistidas",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 8,
+          "repsObjetivoMax": 10,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "NUEVO Fase 2. Asistencia regresiva (mapear). Único tirón vertical de la semana. Solo si hombro limpio. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Pullover en máquina o polea",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "NUEVO. Mapear. Sube cobertura dorsal vertical. KB suelo -> máquina/polea. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Curl femoral en máquina",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "NUEVO Fase 2. Mapear, empezar bajo. Isquio aislado. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Curl martillo",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 8,
+          "series": [],
+          "notas": "Superserie con skull. 8-10kg. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Skull crusher",
+          "seriesObjetivo": 2,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": 5,
+          "series": [],
+          "notas": "Superserie con curl martillo. 5-8kg. Vigilar codo. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Face pulls",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 12,
+          "repsObjetivoMax": 12,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "NUEVO. Polea baja (mapear). Deltoides posterior + rotadores. Beneficio directo para hombro. RIR objetivo 2-3."
+        },
+        {
+          "ejercicio": "Plancha lateral",
+          "seriesObjetivo": 3,
+          "repsObjetivoMin": 30,
+          "repsObjetivoMax": 30,
+          "cargaObjetivoKg": null,
+          "series": [],
+          "notas": "Mantener. Segundos por lado. RIR objetivo 2-3."
+        }
+      ]
+    }
+  ],
+  "_seedId": "Cada sesión lleva un seedId estable. COMPLETADAS: seed-ses-{tipo}-{fecha}. PREPARADAS (sin fecha): seed-ses-{tipo}5-fase2. La carga de seed es idempotente por este campo: si ya existe una sesión con ese seedId, no se duplica."
+}

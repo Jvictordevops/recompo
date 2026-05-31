@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.vic.recompo.data.db.dao.ActividadDao
 import com.vic.recompo.data.db.dao.ComidaBaseDao
 import com.vic.recompo.data.db.dao.ConversacionDao
@@ -42,7 +44,7 @@ import com.vic.recompo.data.db.entity.TipoSesion
         Conversacion::class,
         MensajeIA::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -68,8 +70,17 @@ abstract class RecompoDatabase : RoomDatabase() {
                 INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
             }
 
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE Sesion ADD COLUMN seedId TEXT")
+                db.execSQL("ALTER TABLE Sesion ADD COLUMN activo INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE Ejercicio ADD COLUMN seedId TEXT")
+            }
+        }
+
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(context, RecompoDatabase::class.java, "recompo.db")
+                .addMigrations(MIGRATION_3_4)
                 .fallbackToDestructiveMigration(true)
                 .build()
     }

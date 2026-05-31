@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.json.JSONArray
 import java.time.Instant
 
 enum class EntrenoFase { LISTA, PRE_SESION, EN_CURSO, POST_SESION }
@@ -97,7 +96,10 @@ data class EntrenoUiState(
     val dialogCrearTipo: Boolean = false,
     val nombreNuevoTipo: String = "",
     val dialogRenombrarTipo: TipoSesion? = null,
-    val nombreRenombrar: String = ""
+    val nombreRenombrar: String = "",
+    val dialogCancelarSesion: Boolean = false,
+    val dialogSesionVacia: Boolean = false,
+    val dialogEnCursoConflicto: SesionConTipo? = null
 )
 
 class EntrenoViewModel(
@@ -159,11 +161,32 @@ class EntrenoViewModel(
                     rirGlobal = null
                 )
             )
+            copiarEjerciciosDeUltimaSesion(tipoId, id)
             val sesion = sesionDao.getById(id) ?: return@launch
             val tipo = tipoSesionDao.getById(tipoId)
-            if (tipo?.esSeed == true) poblarDesdeTemplate(sesion, tipo.nombre)
-            val sesionConTipo = SesionConTipo(sesion, tipo?.nombre ?: "?")
-            navegarAPreSesion(sesionConTipo)
+            navegarAPreSesion(SesionConTipo(sesion, tipo?.nombre ?: "?"))
+        }
+    }
+
+    fun duplicarSesion(sesionConTipo: SesionConTipo) {
+        viewModelScope.launch {
+            val id = sesionDao.insert(
+                sesionConTipo.sesion.copy(
+                    id = 0,
+                    estado = EstadoSesion.PREPARADA,
+                    fechaEjecutada = null,
+                    notasGlobales = null,
+                    rirGlobal = null,
+                    seedId = null
+                )
+            )
+            val ejercicios = ejercicioEnSesionDao.getBySesion(sesionConTipo.sesion.id).first()
+            ejercicios.forEachIndexed { idx, ees ->
+                ejercicioEnSesionDao.insert(ees.copy(id = 0, sesionId = id, orden = idx + 1, rir = null))
+            }
+            val sesion = sesionDao.getById(id) ?: return@launch
+            val tipo = tipoSesionDao.getById(sesion.tipoSesionId)
+            navegarAPreSesion(SesionConTipo(sesion, tipo?.nombre ?: "?"))
         }
     }
 
@@ -191,10 +214,7 @@ class EntrenoViewModel(
         viewModelScope.launch {
             val preparada = sesionDao.getPreparadaByTipo(tipoId)
             if (preparada != null) {
-                val ejerciciosIds = ejercicioEnSesionDao.getIdsBySesion(preparada.id)
-                ejerciciosIds.forEach { serieDao.deleteByEjercicioEnSesion(it) }
-                ejercicioEnSesionDao.deleteBySesion(preparada.id)
-                sesionDao.delete(preparada)
+                sesionDao.update(preparada.copy(activo = false))
             }
             val historial = cargarHistorial(tipoId)
             if (historial.isEmpty()) {
@@ -336,10 +356,7 @@ class EntrenoViewModel(
     fun confirmarEliminarSesion() {
         val sesionConTipo = _state.value.dialogConfirmarBorrado ?: return
         viewModelScope.launch {
-            val ejerciciosIds = ejercicioEnSesionDao.getIdsBySesion(sesionConTipo.sesion.id)
-            ejerciciosIds.forEach { serieDao.deleteByEjercicioEnSesion(it) }
-            ejercicioEnSesionDao.deleteBySesion(sesionConTipo.sesion.id)
-            sesionDao.delete(sesionConTipo.sesion)
+            sesionDao.update(sesionConTipo.sesion.copy(activo = false))
             _state.update { it.copy(dialogConfirmarBorrado = null) }
         }
     }
@@ -398,6 +415,37 @@ class EntrenoViewModel(
     fun iniciarSesion() {
         val sesionConTipo = _state.value.sesionActual ?: return
         viewModelScope.launch {
+            val enCurso = _state.value.sesiones.firstOrNull { it.sesion.estado == EstadoSesion.EN_CURSO }
+            if (enCurso != null && enCurso.sesion.id != sesionConTipo.sesion.id) {
+                _state.update { it.copy(dialogEnCursoConflicto = enCurso) }
+                return@launch
+            }
+            val updated = sesionConTipo.sesion.copy(
+                estado = EstadoSesion.EN_CURSO,
+                fechaEjecutada = Instant.now()
+            )
+            sesionDao.update(updated)
+            _state.update {
+                it.copy(
+                    fase = EntrenoFase.EN_CURSO,
+                    sesionActual = sesionConTipo.copy(sesion = updated)
+                )
+            }
+        }
+    }
+
+    fun reanudarSesionEnCurso() {
+        val enCurso = _state.value.dialogEnCursoConflicto ?: return
+        _state.update { it.copy(dialogEnCursoConflicto = null) }
+        viewModelScope.launch { navegarAEnCurso(enCurso) }
+    }
+
+    fun cancelarEnCursoYIniciar() {
+        val enCurso = _state.value.dialogEnCursoConflicto ?: return
+        val sesionConTipo = _state.value.sesionActual ?: return
+        _state.update { it.copy(dialogEnCursoConflicto = null) }
+        viewModelScope.launch {
+            sesionDao.update(enCurso.sesion.copy(estado = EstadoSesion.OMITIDA))
             val updated = sesionConTipo.sesion.copy(
                 estado = EstadoSesion.EN_CURSO,
                 fechaEjecutada = Instant.now()
@@ -437,7 +485,7 @@ class EntrenoViewModel(
     fun guardarSerie() {
         val form = _state.value.dialogSerie ?: return
         val reps = form.reps.toIntOrNull() ?: return
-        val carga = form.cargaKg.toDoubleOrNull() ?: return
+        val carga = form.cargaKg.toDoubleOrNull()
         viewModelScope.launch {
             serieDao.insert(
                 Serie(
@@ -495,11 +543,73 @@ class EntrenoViewModel(
         }
     }
 
-    fun irAPostSesion() = _state.update {
-        it.copy(fase = EntrenoFase.POST_SESION, notasGlobales = "", rirGlobal = "")
+    fun irAPostSesion() {
+        val totalSeries = _state.value.ejerciciosConSeries.sumOf { it.series.size }
+        if (totalSeries == 0) {
+            _state.update { it.copy(dialogSesionVacia = true) }
+            return
+        }
+        _state.update { it.copy(fase = EntrenoFase.POST_SESION, notasGlobales = "", rirGlobal = "") }
+    }
+
+    fun cerrarSesionVaciaySeguir() = _state.update {
+        it.copy(dialogSesionVacia = false, fase = EntrenoFase.POST_SESION, notasGlobales = "", rirGlobal = "")
+    }
+
+    fun descartarSesionVacia() {
+        val sesionConTipo = _state.value.sesionActual ?: return
+        viewModelScope.launch {
+            sesionDao.update(sesionConTipo.sesion.copy(activo = false))
+            _state.update {
+                it.copy(
+                    dialogSesionVacia = false,
+                    fase = EntrenoFase.LISTA,
+                    sesionActual = null,
+                    ejerciciosConSeries = emptyList()
+                )
+            }
+        }
+    }
+
+    fun pedirCancelarSesion() = _state.update { it.copy(dialogCancelarSesion = true) }
+    fun cerrarCancelarSesion() = _state.update { it.copy(dialogCancelarSesion = false) }
+
+    fun confirmarCancelarSesion() {
+        val sesionConTipo = _state.value.sesionActual ?: return
+        viewModelScope.launch {
+            // Discard series from this aborted attempt, keep the session plan
+            _state.value.ejerciciosConSeries.forEach { ec ->
+                serieDao.deleteByEjercicioEnSesion(ec.ejercicioEnSesion.id)
+                if (ec.ejercicioEnSesion.rir != null) {
+                    ejercicioEnSesionDao.update(ec.ejercicioEnSesion.copy(rir = null))
+                }
+            }
+            // Revert to PREPARADA — the session is not lost, just not started
+            sesionDao.update(sesionConTipo.sesion.copy(
+                estado = EstadoSesion.PREPARADA,
+                fechaEjecutada = null
+            ))
+            _state.update {
+                it.copy(
+                    dialogCancelarSesion = false,
+                    fase = EntrenoFase.LISTA,
+                    sesionActual = null,
+                    ejerciciosConSeries = emptyList()
+                )
+            }
+        }
     }
 
     fun volverAEnCurso() = _state.update { it.copy(fase = EntrenoFase.EN_CURSO) }
+
+    fun volverDesdePostSesion() {
+        val estado = _state.value.sesionActual?.sesion?.estado
+        if (estado == EstadoSesion.EN_CURSO) {
+            _state.update { it.copy(fase = EntrenoFase.EN_CURSO) }
+        } else {
+            _state.update { it.copy(fase = EntrenoFase.LISTA, sesionActual = null, ejerciciosConSeries = emptyList()) }
+        }
+    }
 
     // ── POST-SESIÓN ────────────────────────────────────────────────────────────
 
@@ -561,31 +671,11 @@ class EntrenoViewModel(
 
     // ── HELPERS ────────────────────────────────────────────────────────────────
 
-    private suspend fun poblarDesdeTemplate(sesion: Sesion, tipoNombre: String) {
-        val json = context.assets.open("seed/sesiones_template.json").bufferedReader().use { it.readText() }
-        val array = JSONArray(json)
-        for (i in 0 until array.length()) {
-            val obj = array.getJSONObject(i)
-            if (obj.getString("tipo") != tipoNombre) continue
-            val ejerciciosJson = obj.getJSONArray("ejercicios")
-            for (j in 0 until ejerciciosJson.length()) {
-                val ej = ejerciciosJson.getJSONObject(j)
-                val ejercicio = ejercicioDao.getByNombre(ej.getString("nombreEjercicio")) ?: continue
-                ejercicioEnSesionDao.insert(
-                    EjercicioEnSesion(
-                        sesionId = sesion.id,
-                        ejercicioId = ejercicio.id,
-                        orden = j + 1,
-                        seriesObjetivo = ej.getInt("seriesObjetivo"),
-                        repsObjetivoMin = ej.getInt("repsObjetivoMin"),
-                        repsObjetivoMax = ej.getInt("repsObjetivoMax"),
-                        cargaObjetivoKg = ej.getDouble("cargaObjetivoKg").takeIf { it > 0.0 },
-                        notas = ej.optString("notas").takeIf { it.isNotEmpty() },
-                        rir = null
-                    )
-                )
-            }
-            break
+    private suspend fun copiarEjerciciosDeUltimaSesion(tipoId: Long, nuevaSesionId: Long) {
+        val ultima = sesionDao.getCompletadasByTipo(tipoId, 1).firstOrNull() ?: return
+        val ejercicios = ejercicioEnSesionDao.getBySesion(ultima.id).first()
+        ejercicios.forEachIndexed { idx, ees ->
+            ejercicioEnSesionDao.insert(ees.copy(id = 0, sesionId = nuevaSesionId, orden = idx + 1, rir = null))
         }
     }
 

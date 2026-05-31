@@ -15,5 +15,7 @@ data class Sesion(
     val generadaPor: OrigenSesion,
     val notasIA: String?,
     val notasGlobales: String?,
-    val rirGlobal: Int?
+    val rirGlobal: Int?,
+    val seedId: String? = null,
+    val activo: Boolean = true
 )
