@@ -27,4 +27,7 @@ interface MedicionDao {
 
     @Query("SELECT * FROM Medicion WHERE fecha = :fecha LIMIT 1")
     suspend fun getByFecha(fecha: LocalDate): Medicion?
+
+    @Query("SELECT * FROM Medicion ORDER BY fecha DESC LIMIT :limit")
+    suspend fun getRecientes(limit: Int): List<Medicion>
 }

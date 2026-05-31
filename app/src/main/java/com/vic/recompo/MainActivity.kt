@@ -45,7 +45,11 @@ import com.vic.recompo.ui.mediciones.MedicionesScreen
 import com.vic.recompo.ui.mediciones.MedicionesViewModel
 import com.vic.recompo.ui.mediciones.MedicionesViewModelFactory
 import com.vic.recompo.data.ai.ParseComidaUseCase
+import com.vic.recompo.domain.usecase.ChatUseCase
 import com.vic.recompo.domain.usecase.GenerarSesionUseCase
+import com.vic.recompo.ui.chat.ChatScreen
+import com.vic.recompo.ui.chat.ChatViewModel
+import com.vic.recompo.ui.chat.ChatViewModelFactory
 import com.vic.recompo.ui.nutricion.NutricionScreen
 import com.vic.recompo.ui.nutricion.NutricionViewModel
 import com.vic.recompo.ui.nutricion.NutricionViewModelFactory
@@ -111,6 +115,21 @@ class MainActivity : ComponentActivity() {
         SettingsViewModelFactory(application, app.userSettingsStore, app.database)
     }
 
+    private val chatViewModel by viewModels<ChatViewModel> {
+        ChatViewModelFactory(
+            app.database.conversacionDao(),
+            app.database.mensajeIADao(),
+            app.userSettingsStore,
+            app.database.entradaComidaDao(),
+            app.database.sesionDao(),
+            app.database.actividadDao(),
+            app.database.medicionDao(),
+            app.database.tipoSesionDao(),
+            ChatUseCase(app.claudeApi),
+            applicationContext
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -127,7 +146,8 @@ class MainActivity : ComponentActivity() {
                     medicionesViewModel = medicionesViewModel,
                     actividadViewModel = actividadViewModel,
                     entrenoViewModel = entrenoViewModel,
-                    settingsViewModel = settingsViewModel
+                    settingsViewModel = settingsViewModel,
+                    chatViewModel = chatViewModel
                 )
                 }
             }
@@ -142,7 +162,8 @@ private fun MainAppContent(
     medicionesViewModel: MedicionesViewModel,
     actividadViewModel: ActividadViewModel,
     entrenoViewModel: EntrenoViewModel,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    chatViewModel: ChatViewModel
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -183,19 +204,30 @@ private fun MainAppContent(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) {
-                HomeScreen(homeViewModel, onNavigateToEntreno = {
-                    navController.navigate(Screen.Entreno.route) {
-                        popUpTo(Screen.Home.route) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
+                HomeScreen(
+                    viewModel = homeViewModel,
+                    onNavigateToEntreno = {
+                        navController.navigate(Screen.Entreno.route) {
+                            popUpTo(Screen.Home.route) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onNavigateToChat = {
+                        navController.navigate(Screen.Chat.route) {
+                            launchSingleTop = true
+                        }
                     }
-                })
+                )
             }
             composable(Screen.Nutricion.route) { NutricionScreen(nutricionViewModel) }
             composable(Screen.Entreno.route) { EntrenoScreen(entrenoViewModel) }
             composable(Screen.Actividad.route) { ActividadScreen(actividadViewModel) }
             composable(Screen.Mediciones.route) { MedicionesScreen(medicionesViewModel) }
             composable(Screen.Settings.route) { SettingsScreen(settingsViewModel) }
+            composable(Screen.Chat.route) {
+                ChatScreen(chatViewModel, onNavigateBack = { navController.navigateUp() })
+            }
         }
     }
 }

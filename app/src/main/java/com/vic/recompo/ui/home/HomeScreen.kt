@@ -38,7 +38,11 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel, onNavigateToEntreno: () -> Unit) {
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    onNavigateToEntreno: () -> Unit,
+    onNavigateToChat: () -> Unit
+) {
     val state by viewModel.uiState.collectAsState()
 
     LazyColumn(
@@ -80,6 +84,7 @@ fun HomeScreen(viewModel: HomeViewModel, onNavigateToEntreno: () -> Unit) {
         } else {
             item { TarjetaIA(onNavigateToEntreno = onNavigateToEntreno) }
         }
+        item { TarjetaChat(onNavigateToChat = onNavigateToChat) }
         item {
             BackupChip(
                 backupUri = state.backupUri,
@@ -258,6 +263,35 @@ private fun TarjetaSesion(sesion: Sesion, tipoNombre: String?) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+    }
+}
+
+@Composable
+private fun TarjetaChat(onNavigateToChat: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    "Asistente IA",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    "Consulta sobre tu dieta, progreso o entrenos.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            FilledTonalButton(onClick = onNavigateToChat) {
+                Text("Chat")
+            }
         }
     }
 }

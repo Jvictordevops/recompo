@@ -8,6 +8,19 @@ _(vacío)_
 
 ## DONE (reciente)
 
+### T-018 — Chat conversacional (2026-05-31)
+**Estado**: build verde, tests verdes, probado en móvil ✓ (2026-05-31).
+
+- `domain/usecase/ChatUseCase.kt` — wrapper Claude API para chat sin tool calling; `Resultado.Exito(texto, tokensIn, tokensOut)` / `Resultado.Fallo`.
+- `ui/chat/ChatViewModel.kt` — carga o crea `Conversacion` al init; construye system prompt dinámico desde `system_base.txt` con marcadores de perfil + contexto del día (macros, sesión activa, últimas 4 mediciones); truncado a MAX_MENSAJES_CHAT=20 y MAX_PROMPT_CHARS=8000 eliminando los más antiguos; persiste cada turno en `MensajeIA` con tokensIn/Out.
+- `ui/chat/ChatScreen.kt` — burbujas de chat (usuario derecha, asistente izquierda), spinner durante llamada, snackbar de error, scroll automático al último mensaje, TopAppBar con flecha volver, `imePadding()`.
+- `data/db/dao/MedicionDao.kt` — añadido `getRecientes(limit: Int): List<Medicion>`.
+- `ui/Screen.kt` — añadido `Screen.Chat`.
+- `ui/home/HomeScreen.kt` — `TarjetaChat` siempre visible; parámetro `onNavigateToChat`.
+- `MainActivity.kt` — `chatViewModel` cableado; composable `Screen.Chat`; callback `onNavigateToChat` en Home.
+
+---
+
 ### Entreno: seedId, histórico seed y 6 bugs (2026-05-30)
 **Commit**: `feat(entreno): seedId en entidades, seed histórico, recuperación y 6 bugs`
 
