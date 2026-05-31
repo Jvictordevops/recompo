@@ -29,7 +29,7 @@ _(vacío)_
 ---
 
 ### T-017 — Generador de próxima sesión con IA
-**Commit**: pendiente
+**Commit**: hecho
 
 **Estado**: build verde, 73 tests verdes, probado en móvil ✓ (2026-05-30).
 
@@ -223,24 +223,6 @@ que las sesiones ya completadas sigan siendo editables.
 ---
 
 ## TODO
-
----
-
-### T-017 — Generador de próxima sesión con IA
-**Estimación**: 3-4h
-**Fase**: 2
-
-**Descripción**
-Al cerrar una sesión de entreno (estado POST_SESION), botón "Generar próxima sesión" llama a Claude API con contexto de las últimas 3 sesiones del mismo tipo (A/B/C), RIR global, notas, y reglas de progresión del plan v2. La IA propone la siguiente sesión (ejercicios, series, reps, carga sugerida). El usuario puede aceptar, editar o regenerar.
-
-Contexto a inyectar: `ContextLimits.MAX_SESIONES_HISTORICO = 3`. System prompt desde `assets/prompts/system_sesion.txt` (ya existe con reglas de progresión + marcadores). Fallback si la IA falla: repetir sesión anterior con +1 rep en ejercicios donde RIR ≥ 3.
-
-**Hecho cuando**
-- Botón "Generar próxima sesión" activo en POST_SESION
-- IA propone sesión con cargas y reps concretos
-- Usuario puede editar la propuesta antes de aceptar
-- Sesión generada aparece en el listado con `generadaPor = IA`
-- Fallback funciona si la API falla
 
 ---
 
